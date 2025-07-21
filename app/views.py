@@ -16,10 +16,6 @@ def login_page(request):
 
     return render(request, 'Registration/login_page.html')  
 
-        
-    
-    
-    
 
 
 
@@ -62,6 +58,9 @@ def dashboard_page(request):
    
     response = requests.get("http://localhost:5678/webhook/get-data")
     data = response.json()
+    
+    if not data:
+        data = []
     context = {
         'data':data,
         
@@ -84,3 +83,87 @@ def base_html(request):
 
 def data_entry(request):
     return render(request, 'data_entry.html')
+
+def add_data(request):
+    if request.method == 'POST':
+        date =  request.POST.get('job_date')
+        bill_no = request.POST.get('bill_no')
+        company_name = request.POST.get('company_name')
+        job_name = request.POST.get('job_name')
+        job_type = request.POST.get('job_type')
+        noc = request.POST.get('noc')
+        prpc = request.POST.get('prpc')
+        cylinder_size = request.POST.get('cylinder_size')
+        cylinder_made_in = request.POST.get('cylinder_made_in')
+        pouch_size = request.POST.get('pouch_size')
+        pouch_open_size = request.POST.get('pouch_open_size')
+        pouch_combination = request.POST.get('pouch_combination')
+        correction = request.POST.get('correction')
+        
+        print(date)
+    
+    
+    
+    data  =  {
+        'date':date,
+        'bill_no':bill_no,
+        'company_name':company_name,
+        'job_type':job_type,
+        'job_name':job_name,
+        'noc':noc,
+        'prpc':prpc,
+        'cylinder_size':cylinder_size,
+        'cylinder_made_in':cylinder_made_in,
+        'pouch_size':pouch_size,
+        'pouch_open_size':pouch_open_size,
+        'pouch_combination':pouch_combination,
+        'correction':correction
+    }
+    
+    
+    response = requests.post('http://localhost:5678/webhook/create-data',data=data)
+    return redirect ('data_entry')
+        
+def  update_job(request,update_id):
+    if request.method == 'POST':
+        date =  request.POST.get('job_date')
+        bill_no = request.POST.get('bill_no')
+        company_name = request.POST.get('company_name')
+        job_name = request.POST.get('job_name')
+        job_type = request.POST.get('job_type')
+        noc = request.POST.get('noc')
+        prpc = request.POST.get('prpc')
+        cylinder_size = request.POST.get('cylinder_size')
+        cylinder_made_in = request.POST.get('cylinder_made_in')
+        pouch_size = request.POST.get('pouch_size')
+        pouch_open_size = request.POST.get('pouch_open_size')
+        pouch_combination = request.POST.get('pouch_combination')
+        correction = request.POST.get('correction')
+        
+        
+    data  =  {
+        'date':date,
+        'bill_no':bill_no,
+        'company_name':company_name,
+        'job_type':job_type,
+        'job_name':job_name,
+        'noc':noc,
+        'prpc':prpc,
+        'cylinder_size':cylinder_size,
+        'cylinder_made_in':cylinder_made_in,
+        'pouch_size':pouch_size,
+        'pouch_open_size':pouch_open_size,
+        'pouch_combination':pouch_combination,
+        'correction':correction
+    }
+    
+    response = requests.post(f'http://localhost:5678/webhook/7d8dd046-c41e-4f64-8607-caf5f43ddc84/update-data/{update_id}',
+            data=data,
+           
+    )
+    
+    return redirect('dashboard_page')
+
+
+def profile_page(request):
+    return render(request,'profile.html')

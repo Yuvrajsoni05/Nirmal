@@ -1,261 +1,18 @@
+{% extends "Base/base.html" %}
+{% block title %} Dashboard {% endblock %}
 {% load humanize %}
 {% load static %}
 
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Admin Dashboard</title>
-    <meta
-      content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
-      name="viewport"
-    />
-    <link
-      rel="icon"
-      href="assets/img/kaiadmin/favicon.ico"
-      type="image/x-icon"
-    />
-
-    <!-- Fonts and icons -->
-    <script src="{% static 'assets/js/plugin/webfont/webfont.min.js' %}"></script>
-    <script>
-      WebFont.load({
-        google: { families: ["Public Sans:300,400,500,600,700"] },
-        custom: {
-          families: [
-            "Font Awesome 5 Solid",
-            "Font Awesome 5 Regular",
-            "Font Awesome 5 Brands",
-            "simple-line-icons",
-          ],
-          urls: ["{% static ' assets/css/fonts.min.css' %}"],
-        },
-        active: function () {
-          sessionStorage.fonts = true;
-        },
-      });
-    </script>
-
-   <style>
-  /* Remove default margins and force box model */
-
-
-  html, body {
-    overflow-x: hidden !important;
-    width: 100% !important;
-  }
-
- 
-  body::-webkit-scrollbar {
-    display: none;
-  }
-
-  body {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-</style>
-
-
-    <!-- CSS Files -->
-    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}" />
-    <link rel="stylesheet" href="{% static 'assets/css/plugins.min.css' %}" />
-    <link rel="stylesheet" href="{% static 'assets/css/kaiadmin.min.css' %}" />
-
-
-
-    <!-- CSS Just for demo purpose, don't include it in your project -->
-    <link rel="stylesheet" href="{% static 'assets/css/demo.css' %}" />
-  </head>
-  <body>
-    
-    <div class="wrapper">
-      <!-- Sidebar -->
-      <div class="sidebar" data-background-color="dark">
-        <div class="sidebar-logo">
-          <!-- Logo Header -->
-          <div class="logo-header" data-background-color="dark">
-            <a href="index.html" class="logo">
-              <img
-                src="{% static 'assets/img/logoproduct.svg' %}"
-                alt="navbar brand"
-                class="navbar-brand"
-                height="20"
-              />
-            </a>
-            <div class="nav-toggle"  >
-              <button class="btn btn-toggle toggle-sidebar">
-                <i class="gg-menu-right"></i>
-              </button>
-              <button class="btn btn-toggle sidenav-toggler">
-                <i class="gg-menu-left"></i>
-              </button>
-            </div>
-            <button class="topbar-toggler more">
-              <i class="gg-more-vertical-alt"></i>
-            </button>
-          </div>
-          <!-- End Logo Header -->
-        </div>
-        <div class="sidebar-wrapper scrollbar scrollbar-inner">
-          <div class="sidebar-content">
-            <ul class="nav nav-secondary">
-              <li class="nav-item active">
-                <a
-                  data-bs-toggle="collapse"
-                  href="{% url "dashboard_page" %}"
-                  class="collapsed"
-                  aria-expanded="false"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="currentColor" class="bi bi-house-door" viewBox="0 0 16 16">
-                    <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4z"/>
-                    </svg>&nbsp;
-                  <p>Dashboard</p>
-                  
-                </a>
-                
-              </li>
-              <li class="nav-section">
-                
-                <h4 class="text-section"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-shop-window" viewBox="0 0 16 16">
-                <path d="M2.97 1.35A1 1 0 0 1 3.73 1h8.54a1 1 0 0 1 .76.35l2.609 3.044A1.5 1.5 0 0 1 16 5.37v.255a2.375 2.375 0 0 1-4.25 1.458A2.37 2.37 0 0 1 9.875 8 2.37 2.37 0 0 1 8 7.083 2.37 2.37 0 0 1 6.125 8a2.37 2.37 0 0 1-1.875-.917A2.375 2.375 0 0 1 0 5.625V5.37a1.5 1.5 0 0 1 .361-.976zm1.78 4.275a1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0 1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0 1.375 1.375 0 1 0 2.75 0V5.37a.5.5 0 0 0-.12-.325L12.27 2H3.73L1.12 5.045A.5.5 0 0 0 1 5.37v.255a1.375 1.375 0 0 0 2.75 0 .5.5 0 0 1 1 0M1.5 8.5A.5.5 0 0 1 2 9v6h12V9a.5.5 0 0 1 1 0v6h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1V9a.5.5 0 0 1 .5-.5m2 .5a.5.5 0 0 1 .5.5V13h8V9.5a.5.5 0 0 1 1 0V13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5a.5.5 0 0 1 .5-.5"/>
-                </svg>&nbsp; Components</h4>
-                            </li>
-              
-              <li class="nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarLayouts">
-                 
-                  <p> <i class="fas fa-th-list"></i> Sidebar Layouts</p>
-                  <span class="caret"></span>
-                </a>
-                <div class="collapse" id="sidebarLayouts">
-                  <ul class="nav nav-collapse">
-                    <li>
-                      <a href="sidebar-style-2.html">
-                        <span class="sub-item">Sidebar Style 2</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="icon-menu.html">
-                        <span class="sub-item">Icon Menu</span>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <!-- End Sidebar -->
-
-      <div class="main-panel">
-        <div class="main-header">
-          <div class="main-header-logo">
-            <!-- Logo Header -->
-            <div class="logo-header" data-background-color="dark">
-              <a href="index.html" class="logo">
-                <img
-                  src="assets/img/kaiadmin/logo_light.svg"
-                  alt="navbar brand"
-                  class="navbar-brand"
-                  height="20"
-                />
-              </a>
-              <div class="nav-toggle">
-                <button class="btn btn-toggle toggle-sidebar">
-                  <i class="gg-menu-right"></i>
-                </button>
-                <button class="btn btn-toggle sidenav-toggler">
-                  <i class="gg-menu-left"></i>
-                </button>
-              </div>
-              <button class="topbar-toggler more">
-                <i class="gg-more-vertical-alt"></i>
-              </button>
-            </div>
-            <!-- End Logo Header -->
-          </div>
-          <!-- Navbar Header -->
-          <nav
-            class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom"
-          >
-            <div class="container-fluid">
-             
-
-              <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">
-                
-                
-                
-                    
-
-                <li class="nav-item topbar-user dropdown">
-                  <a
-                    class="dropdown-toggle profile-pic"
-                    data-bs-toggle="dropdown"
-                    href="#"
-                    aria-expanded="false"
-                  >
-              
-                    <span class="profile-username">
-                   
-                      <span class="fw-bold">{{ user.username }}</span>&nbsp;&nbsp;
-                    </span>
-                  </a>
-
-                  <ul class="dropdown-menu dropdown-user animated fadeIn">
-                    <div class="dropdown-user-scroll scrollbar-outer">
-                      <li>
-                        <div class="user-box">
-                          <div class="avatar-lg">
-                            <img
-                              src="{% static 'assets/img/profile.jpg' %}"
-                              alt="image profile"
-                              class="avatar-img rounded"
-                            />
-                          </div>
-                          <div class="u-text">
-                            <h4>{{ user.first_name }}  {{ user.last_name }}</h4>
-                            <p class="text-muted">{{ user.email }}</p>
-                            <a
-                              href="profile.html"   
-                              class="btn btn-xs btn-secondary btn-sm"
-                              >View Profile</a
-                            >
-                          </div>
-                        </div>
-                      </li>
-                      <li>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">My Profile</a>
-                      
-                        <a class="dropdown-item" href="#">Inbox</a>
-                        <div class="dropdown-divider"></div>
-                     
-                        
-                        <a class="dropdown-item" href="#">Logout</a>
-                      </li>
-                    </div>
-                  </ul>
-                </li>
-              </ul>
-            </div>
-          </nav>
-          <!-- End Navbar -->
-        </div>
-
-        <div class="container">
-          <div class="page-inner">
-            <div
-              class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4"
-            >
+       {% block main_block %}
+       <div class="page-inner">
+            <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
               <div>
                 <h3 class="fw-bold mb-3">Dashboard</h3>
                 {% comment %} <h6 class="op-7 mb-2">Free Bootstrap 5 Admin Dashboard</h6> {% endcomment %}
               </div>
               <div class="ms-md-auto py-2 py-md-0">
                 {% comment %} <a href="#" class="btn btn-label-info btn-round me-2">Manage</a> {% endcomment %}
-                <a href="#" class="btn btn-primary btn-round">Add  New Data </a>
+                <a href="{% url "data_entry" %}" class="btn btn-primary btn-round">Add  New Data </a>
               </div>
             </div>
             <div class="row">
@@ -319,48 +76,24 @@
                   </div>
                 </div>
               </div>
-            </div>
-            
-           
+            </div>         
             <div class="row">
-             
               <div class="col-md-12">
                 <div class="card card-round">
                   <div class="card-header">
                     <div class="card-head-row card-tools-still-right">
                       <div class="card-title">Job Details</div>
                       <div class="card-tools">
-                        <div class="dropdown">
-                          <button
-                            class="btn btn-icon btn-clean me-0"
-                            type="button"
-                            id="dropdownMenuButton"
-                            data-bs-toggle="dropdown"
-                            aria-haspopup="true"
-                            aria-expanded="false"
-                          >
-                            <i class="fas fa-ellipsis-h"></i>
-                          </button>
-                          <div
-                            class="dropdown-menu"
-                            aria-labelledby="dropdownMenuButton"
-                          >
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <a class="dropdown-item" href="#"
-                              >Something else here</a
-                            >
-                          </div>
-                        </div>
+                       
                       </div>
                     </div>
                   </div>
                   <div class="card-body p-0">
-                    <div class="table-responsive" style="">
+                    <div class="table-responsive" >
                       <!-- Projects table -->
                       <table class="table align-items-center mb-0 ">
                         <thead class="thead-light">
-                          <tr class="text-nowrap">
+                          <tr class="text-nowrap text-center">
                             <th scope="col">#</th>
                                     <th scope="col" class="w-100">ID</th>
                                     <th scope="col">Date</th>
@@ -382,53 +115,171 @@
                         </thead>
                         <tbody>
                            
-                            {% for i in  data %}
-                             <tr class="">
-                                <td class="text-truncate">{{ forloop.counter }}</td>
-                                 <td class="text-truncate">{{ i.id }}</td>
-                                <td class="text-truncate"> {{ i.date}}</td>
-                                <td class="text-truncate">{{ i.bill_no }}</td>
-                                <td class="text-truncate">{{ i.company_name }}</td>
-                                <td >{{ i.job_type}}</td>
-                                <td class="text-truncate">{{ i.job_name }}</td>
-                                <td class="text-truncate">{{ i.noc }}</td>
-                                <td class="text-truncate">₹{{ i.prpc|intcomma }}</td>
-                                <td class="text-truncate">{{ i.cylinder_size }}</td>
-                                <td class="text-truncate">{{ i.cylinder_made_in }}</td>
-                                <td class="text-truncate">{{ i.pouch_size }}</td>
-                                <td class="text-truncate">{{ i.pouch_open_size }}</td>
-                                <td class="text-truncate">{{ i.pouch_combination }}</td>
-                                <td class="text-truncate">{{ i.correction|truncatechars:20 }}</td>
-                                <td class="text-truncate" > <a class="icon-link" href="https://drive.google.com/drive/u/0/folders/{{ i.folder_link }}">
-                                              <svg xmlns="http://www.w3.org/2000/svg" class="bi" viewBox="0 0 16 16" aria-hidden="true">
-                                                  <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5l2.404.961L10.404 2l-2.218-.887zm3.564 1.426L5.596 5 8 5.961 14.154 3.5l-2.404-.961zm3.25 1.7-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923l6.5 2.6zM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464L7.443.184z"/>
-                                              </svg>                              
-                                </a>
-                                <td class="text-truncate">
-                                    <form method="post" action="{% url "delete_data" delete_id=i.id %}" class="d-inline">
-                                    {% csrf_token %}
-                                    <button class="btn btn-sm btn-outline-danger ms-1" onclick="return confirm('Are you sure you want to delete this item?')">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
-  <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
+                                {% for i in  data %}
+                                  {% if i.id != none %}
+                                  <tr class="text-center">
+                                      <td class="text-truncate">{{ forloop.counter }}</td>
+                                      <td class="text-truncate">{{ i.id }}</td>
+                                      <td class="text-truncate"> {{ i.date}}</td>
+                                      <td class="text-truncate">{{ i.bill_no }}</td>
+                                      <td class="text-truncate">{{ i.company_name }}</td>
+                                      <td >{{ i.job_type}}</td>
+                                      <td class="text-truncate">{{ i.job_name }}</td>
+                                      <td class="text-truncate">{{ i.noc }}</td>
+                                      <td class="text-truncate">₹{{ i.prpc|intcomma }}</td>
+                                      <td class="text-truncate">{{ i.cylinder_size }}</td>
+                                      <td class="text-truncate">{{ i.cylinder_made_in }}</td>
+                                      <td class="text-truncate">{{ i.pouch_size }}</td>
+                                      <td class="text-truncate">{{ i.pouch_open_size }}</td>
+                                      <td class="text-truncate">{{ i.pouch_combination }}</td>
+                                      <td class="text-truncate">{{ i.correction|truncatechars:20 }}</td>
+                                      <td class="text-truncate" > <a class="icon-link" href="https://drive.google.com/drive/u/0/folders/{{ i.folder_link }}">
+                                                                          
+                                      </a>
+                                      <td class="text-truncate">
+                                          <form method="post" action="{% url "delete_data" delete_id=i.id %}" class="d-inline">
+                                          {% csrf_token %}
+                                          <button class="btn btn-sm btn-outline-danger ms-1" onclick="return confirm('Are you sure you want to delete this item?')">
+                                              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                                <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
+                                              </svg>
+                                          </button>
+                                          </form>
+                                    
+                                          <form method="post" action="" class="d-inline">
+                                          {% csrf_token %}
+                                          <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModal{{i.id}}">
+                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+  <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+  <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
 </svg>
-                                    </button>
-                                    </form>
-                               
-                                    <form method="post" action="" class="d-inline">
-                                    {% csrf_token %}
-                                    <button class="btn btn-sm btn-outline-primary ms-1" onclick="return confirm('Are you sure you want to delete this item?')">
-       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen" viewBox="0 0 16 16">
-  <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001m-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708z"/>
-</svg>  
-                                    </button>
-                                    </form>
-                                </td>
+                                                    </button>
+                                          </form>
+                                      </td>
+                                  </tr>
+
+                                  {% comment %} Model {% endcomment %}
+                                    <div class="modal fade"  id="exampleModal{{i.id}}" tabindex="-1" aria-hidden="true">
+                                                        <div class="modal-dialog modal-lg modal-dialog-centered">
+                                                          <div class="modal-content ">
+                                                            <div class="modal-header bg-light">
+                                                              <h5 class="modal-title">Edit Job</h5>
+                                                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body form-datas">
+                                                             
+                                                              <form method="post"  action="{% url "update_job" update_id=i.id %}" enctype="multipart/form-data">
+                                                                    {% csrf_token %}
+                                                                    <div class="row g-4">
+
+                                                                    <!-- Event Date -->
+                                                                    <div class="col-md-6">
+                                                                        <label for="date" class="form-label">Event Date</label><span style="color:red;"> *</span>
+                                                                        <input type="date" class="form-control" id="date" name="date" value="{{ i.date }}">
+                                                                        <div class="invalid-feedback" id="event_date_error">Please provide an event date.</div>
+                                                                    </div>
+
+                                                                    <!-- Bill No -->
+                                                                    <div class="col-md-6">
+                                                                        <label for="bill_no" class="form-label">Bill No</label><span style="color:red;"> *</span>
+                                                                        <input type="text" class="form-control" id="bill_no" name="bill_no" value="{{ i.bill_no }}">
+                                                                        <div class="invalid-feedback" id="event_name_error">Please provide an event Bill No.</div>
+                                                                    </div>
+
+                                                              
+
+                                                                    <!-- Company Name -->
+                                                                    <div class="col-md-6">
+                                                                        <label for="company_name" class="form-label">Company Name</label>
+                                                                        <input type="text" id="company_name" class="form-control" name="company_name" value="{{ i.company_name }}" readonly>
+                                                                    </div>
+
+                                                                    <!-- Job Type -->
+                                                                    <div class="col-md-6">
+                                                                        <label for="job_type" class="form-label">Job Type</label>
+                                                                        <input type="text" id="job_type" class="form-control" name="job_type" value="{{ i.job_type }}" readonly>
+                                                                    </div>
+
+                                                                    <!-- Job Name -->
+                                                                    <div class="col-md-6">
+                                                                        <label for="job_name" class="form-label">Job Name</label>
+                                                                        <input type="text" id="job_name" class="form-control" name="job_name" value="{{ i.job_name }}" readonly>
+                                                                    </div>
+
+                                                                    <!-- NOC -->
+                                                                    <div class="col-md-6">
+                                                                        <label for="noc" class="form-label">NOC</label>
+                                                                        <input type="text" id="noc" class="form-control" name="noc" value="{{ i.noc }}">
+                                                                    </div>
+
+                                                                    <!-- PRPC -->
+                                                                    <div class="col-md-6">
+                                                                        <label for="prpc" class="form-label">PRPC</label>
+                                                                        <input type="text" id="prpc" class="form-control" name="prpc" value="{{ i.prpc }}">
+                                                                    </div>
+
+                                                                    <!-- Cylinder Size -->
+                                                                    <div class="col-md-6">
+                                                                        <label for="cylinder_size" class="form-label">Cylinder Size</label>
+                                                                        <input type="text" id="cylinder_size" class="form-control" name="cylinder_size" value="{{ i.cylinder_size }}" readonly>
+                                                                    </div>
+
+                                                                    <!-- Cylinder Made In -->
+                                                                    <div class="col-md-6">
+                                                                        <label for="cylinder_made_in" class="form-label">Cylinder Made In</label>
+                                                                        <input type="text" id="cylinder_made_in" class="form-control" name="cylinder_made_in" value="{{ i.cylinder_made_in }}">
+                                                                    </div>
+
+                                                                    <!-- Pouch Size -->
+                                                                    <div class="col-md-6">
+                                                                        <label for="pouch_size" class="form-label">Pouch Size</label>
+                                                                        <input type="text" id="pouch_size" class="form-control" name="pouch_size" value="{{ i.pouch_size }}"readonly>
+                                                                    </div>
+
+                                                                    <!-- Pouch Open Size -->
+                                                                    <div class="col-md-6">
+                                                                        <label for="pouch_open_size" class="form-label">Pouch Open Size</label>
+                                                                        <input type="text" id="pouch_open_size" class="form-control" name="pouch_open_size" value="{{ i.pouch_open_size }}"readonly>
+                                                                    </div>
+
+                                                                    <!-- Pouch Combination -->
+                                                                    <div class="col-md-6">
+                                                                        <label for="pouch_combination" class="form-label">Pouch Combination</label>
+                                                                        <input type="text" id="pouch_combination" class="form-control" name="pouch_combination" value="{{ i.pouch_combination }}">
+                                                                    </div>
+
+                                                                    <!-- Image Upload (Multiple Files) -->
+                                                                    <div class="col-md-6">
+                                                                        <label for="image" class="form-label">Upload Images</label>
+                                                                        <input type="file" class="form-control" id="image" name="image" multiple>
+                                                                    </div>
 
 
+                                                                    <div class="col-md-6">
+                                                                        <label for="correction" class="form-label">Correction</label>
+                                                                        <input type="textarea" class="form-control" id="correction" name="correction"  value="{{ i.correction }}">
+                                                                    </div>
 
+                                                                    <!-- Form Actions -->
+                                                                    <div class="col-12">
+                                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                        <button type="submit" class="btn btn-primary">Save changes</button>
+                                                                    </div>
+
+                                                                    </div>
+                                                              </form>
+                                                            
+                                                          </div>
+                                                      </div>
+                                                  </div>
+
+                                  {% else %}
+                                  <tr>
+
+                              <td colspan="17" ><center><span> No Data </span></center></td>
                              </tr>
-                            {% endfor %}
-                            
+                           {% endif %}
+                            {% endfor %}            
                         </tbody>
                       </table>
                     </div>
@@ -437,77 +288,6 @@
               </div>
             </div>
           </div>
-        </div>
-
-        <footer class="footer">
-          <div class="container-fluid d-flex justify-content-between">
-            <nav class="pull-left">
-              <ul class="nav">
-                <li class="nav-item">
-                  <a class="nav-link" href="http://www.themekita.com">
-                    Yuvraj Soni
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#"> Help </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#"> Licenses </a>
-                </li>
-              </ul>
-            </nav>
-            <div class="copyright">
-              2025, made with <i class="fa fa-heart heart text-danger"></i> by
-              <a href="http://www.themekita.com">Mighty Tech</a>
-            </div>
-            <div>
-              Distributed by
-              <a target="_blank" href="https://themewagon.com/">Mighty Tech.</a>
-            </div>
-          </div>
-        </footer>
-      </div>
-     
-      <!-- Custom template | don't include it in your project! -->
-     
-      <!-- End Custom template -->
-    </div>
-    <!--   Core JS Files   -->
-    <script src="{% static 'assets/js/core/jquery-3.7.1.min.js' %}"></script>
-    <script src="{% static 'assets/js/core/popper.min.js' %}"></script>
-    <script src="{% static 'assets/js/core/bootstrap.min.js' %}"></script>
-
-    <!-- jQuery Scrollbar -->
-    <script src="{% static 'assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js' %}"></script>
-
-    <!-- Chart JS -->
-    {% comment %} <script src="assets/js/plugin/chart.js/chart.min.js"></script> {% endcomment %}
-
-    <!-- jQuery Sparkline -->
-    <script src="{% static 'assets/js/plugin/jquery.sparkline/jquery.sparkline.min.js' %}"></script>
-
-    <!-- Chart Circle -->
-    <script src="{% static 'assets/js/plugin/chart-circle/circles.min.js' %}"></script>
-
-    <!-- Datatables -->
-    <script src="{% static 'assets/js/plugin/datatables/datatables.min.js' %}"></script>
-
-    <!-- Bootstrap Notify -->
-    <script src="{% static 'assets/js/plugin/bootstrap-notify/bootstrap-notify.min.js' %}"></script>
-
-    <!-- jQuery Vector Maps -->
-    <script src="{% static 'assets/js/plugin/jsvectormap/jsvectormap.min.js' %}"></script>
-    <script src="{% static 'assets/js/plugin/jsvectormap/world.js' %}"></script>
-
-    <!-- Sweet Alert -->
-     <script src="{% static 'assets/js/plugin/sweetalert/sweetalert.min.js' %}"></script>
-
-    <!-- Kaiadmin JS -->
-    <script src="{% static 'assets/js/kaiadmin.min.js' %}"></script>
-
-    <!-- Kaiadmin DEMO methods, don't include it in your project! -->
-    {% comment %} <script src="assets/js/setting-demo.js"></script>
-    <script src="assets/js/demo.js"></script> {% endcomment %}
-   
-  </body>
-</html>
+       {% endblock main_block %} 
+          
+ 

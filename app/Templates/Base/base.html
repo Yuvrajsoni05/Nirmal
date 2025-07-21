@@ -10,11 +10,11 @@
       content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
       name="viewport"
     />
-    <link
+    {% comment %} <link
       rel="icon"
       href="assets/img/kaiadmin/favicon.ico"
       type="image/x-icon"
-    />
+    /> {% endcomment %}
 
     <!-- Fonts and icons -->
     <script src="{% static 'assets/js/plugin/webfont/webfont.min.js' %}"></script>
@@ -28,7 +28,7 @@
             "Font Awesome 5 Brands",
             "simple-line-icons",
           ],
-          urls: ["{% static ' assets/css/fonts.min.css' %}"],
+          urls: ["{% static 'assets/css/fonts.min.css' %}"],
         },
         active: function () {
           sessionStorage.fonts = true;
@@ -36,7 +36,7 @@
       });
     </script>
 
-   <style>
+    <style>
   /* Remove default margins and force box model */
 
 
@@ -54,7 +54,8 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-</style>
+  
+</style> 
 
 
     <!-- CSS Files -->
@@ -69,10 +70,11 @@
   </head>
   <body>
     <div class="wrapper">
+       {% include 'Base/slidebar.html'  %}
         <!-- ======= Header ======= -->
         {% include 'Base/navbar.html'  %}
         <!-- ======= Sidebar ======= -->
-        {% include 'Base/slidebar.html'  %}
+       
 
 
 
@@ -118,6 +120,11 @@
 
     <!-- Kaiadmin JS -->
     <script src="{% static 'assets/js/kaiadmin.min.js' %}"></script>
+    {% block script %}
 
+
+
+
+    {% endblock script %}
   </body>
 </html>

@@ -11,4 +11,9 @@ class Registration(AbstractUser):
     first_name = models.CharField(max_length=200, blank=True,null=True,)
     last_name = models.CharField(max_length=200,blank=True, null=True)
     email = models.EmailField(max_length=200, unique=True,)
+
+
+class CompanyName(models.Model):
+    company_name = models.CharField(max_length=300)
+    
     

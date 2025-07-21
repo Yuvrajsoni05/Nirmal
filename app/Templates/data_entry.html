@@ -1,2 +1,267 @@
+
 {% extends "Base/base.html" %}
-{% block title %} Data Entry {% endblock%}
+
+{% block title %} Add New Data {% endblock %}
+{% load humanize %}
+{% load static %}
+
+{% block main_block %}
+      <div class="page-inner">
+            <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
+              <div>
+                <h3 class="fw-bold mb-3">Add New Job</h3>
+                {% comment %} <h6 class="op-7 mb-2">Free Bootstrap 5 Admin Dashboard</h6> {% endcomment %}
+              </div>
+              
+            </div>
+ <div class="container-fluid py-2 px-1">
+        <div class="row justify-content-center">
+            <div class="col-12 col-xl-12 col-xxl-12">
+                <div class="card shadow-sm border-0 rounded-3">
+                    <div class="card-header bg-primary text-white py-3 rounded-top">
+                        <h4 class="mb-0 fw-semibold">
+                            <i class="bi bi-plus-circle me-2"></i>Add New Job
+                        </h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <form action="{% url 'add_data' %}" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+
+                            <!-- Basic Information Section -->
+                            <div class="mb-4">
+                                <h6 class="text-primary fw-semibold mb-3 border-bottom pb-2">Basic Information</h6>
+                                <div class="row g-3">
+                                    <div class="col-12 col-sm-6 col-lg-4">
+                                        <label for="job_date" class="form-label fw-semibold text-dark">
+                                            Date <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="date" class="form-control  border-1" id="job_date" name="job_date" required>
+                                    </div>
+                                    <div class="col-12 col-sm-6 col-lg-4">
+                                        <label for="bill_no" class="form-label fw-semibold text-dark">
+                                            Bill No. <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control border-1" id="bill_no" name="bill_no" placeholder="Enter Bill Number" required>
+                                    </div>
+                                    <div class="col-12 col-lg-4">
+                                        <label for="company_name" class="form-label fw-semibold text-dark">
+                                            Company Name <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control  border-2" id="company_name" name="company_name" placeholder="Enter Company Name" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Job Details Section -->
+                            <div class="mb-4">
+                                <h6 class="text-primary fw-semibold mb-3 border-bottom pb-2">Job Details</h6>
+                                <div class="row g-3">
+                                    <div class="col-12 col-sm-6 col-lg-4">
+                                        <label for="job_name" class="form-label fw-semibold text-dark">
+                                            Job Name <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control  border-1" id="job_name" name="job_name" placeholder="Enter Job Name" required>
+                                    </div>
+                                    <div class="col-12 col-sm-6 col-lg-4">
+                                        <label for="job_type" class="form-label fw-semibold text-dark">
+                                            Job Type <span class="text-danger">*</span>
+                                        </label>
+                                        <select id="job_type" name="job_type" class="form-control form-select border-1" required>
+                                            <option value="">Select Job Type</option>
+                                            <option value="New Job">New Job</option>
+                                            <option value="Old job">Old Job</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12 col-lg-4">
+                                        <label for="noc" class="form-label fw-semibold text-dark">
+                                            No. of Colors <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="number" class="form-control  border-1" id="noc" name="noc" placeholder="Enter Number of Colors" min="1" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Cylinder Information Section -->
+                            <div class="mb-4">
+                                <h6 class="text-primary fw-semibold mb-3 border-bottom pb-2">Cylinder Information</h6>
+                                <div class="row g-3">
+                                    <div class="col-12 col-sm-6 col-lg-4">
+                                        <label for="prpc" class="form-label fw-semibold text-dark">
+                                            Rate Per Cylinder <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group ">
+                                            <span class="input-group-text bg-light border-1">₹</span>
+                                            <input type="number" class="form-control border-1" id="prpc" name="prpc" placeholder="0.00" step="0.01" min="0" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-sm-6 col-lg-4">
+                                        <label class="form-label fw-semibold text-dark">
+                                            Cylinder Size <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group ">
+                                            <input type="number" class="form-control border-1" id="cylinder_diameter" placeholder="Diameter" step="0.01" min="0" required>
+                                            <span class="input-group-text bg-light border-1 fw-bold">×</span>
+                                            <input type="number" class="form-control border-1" id="cylinder_height" placeholder="Height" step="0.01" min="0" required>
+                                        </div>
+                                        <input type="hidden" id="cylinder_size" name="cylinder_size">
+                                    </div>
+                                    <div class="col-12 col-lg-4">
+                                        <label for="cylinder_made_in" class="form-label fw-semibold text-dark">
+                                            Cylinder Made In <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control  border-1" id="cylinder_made_in" name="cylinder_made_in" placeholder="Manufacturing Location" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pouch Information Section -->
+                            <div class="mb-4">
+                                <h6 class="text-primary fw-semibold mb-3 border-bottom pb-2">Pouch Information</h6>
+                                <div class="row g-3">
+                                    <div class="col-12 col-lg-3">
+                                        <label class="form-label fw-semibold text-dark">
+                                            Pouch Size <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group ">
+                                            <input type="number" class="form-control border-1" id="pouch_diameter" placeholder="Diameter" step="0.01" min="0" required>
+                                            <span class="input-group-text bg-light border-1 fw-bold">×</span>
+                                            <input type="number" class="form-control border-1" id="pouch_height" placeholder="Height" step="0.01" min="0" required>
+                                        </div>
+                                        <input type="hidden" id="pouch_size" name="pouch_size">
+                                    </div>
+                                    <div class="col-12 col-lg-3">
+                                        <label class="form-label fw-semibold text-dark">
+                                            Pouch Open Size <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group ">
+                                            <input type="number" class="form-control border-1" id="pouch_open_diameter" placeholder="Diameter" step="0.01" min="0" required>
+                                            <span class="input-group-text bg-light border-1 fw-bold">×</span>
+                                            <input type="number" class="form-control border-1" id="pouch_open_height" placeholder="Height" step="0.01" min="0" required>
+                                        </div>
+                                        <input type="hidden" id="pouch_open_size" name="pouch_open_size">
+                                    </div>
+                                    <div class="col-12 col-lg-6">
+                                        <label for="pouch_combination" class="form-label fw-semibold text-dark">
+                                            Pouch Combination <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control  border-1" id="pouch_combination" name="pouch_combination" placeholder="Enter Combination Details" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Additional Information Section -->
+                            <div class="mb-4">
+                                <h6 class="text-primary fw-semibold mb-3 border-bottom pb-2">Additional Information</h6>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label for="correction" class="form-label fw-semibold text-dark">
+                                            Correction <span class="text-danger">*</span>
+                                        </label>
+                                        <textarea class="form-control  border-1" id="correction" name="correction" rows="4" placeholder="Enter correction details or special instructions..." required></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- File Upload Section -->
+                            <div class="mb-4">
+                                <h6 class="text-primary fw-semibold mb-3 border-bottom pb-2">File Upload</h6>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label for="image" class="form-label fw-semibold text-dark">Upload Image</label>
+                                        <div class="border border-2 border-dashed rounded-3 p-4 text-center bg-light">
+                                            <input class="form-control  border-0 bg-transparent" type="file" id="image" name="image" accept="image/*">
+                                            {% comment %} <div class="mt-2 text-muted">
+                                                <small>Supported formats: JPG, PNG, GIF. Max size: 5MB</small>
+                                            </div> {% endcomment %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-flex flex-column flex-sm-row gap-3 justify-content-end pt-3 border-top">
+                                <button type="reset" class="btn btn-outline-secondary btn-lg px-4 order-2 order-sm-1">
+                                    <i class="bi bi-arrow-clockwise me-2"></i>Reset Form
+                                </button>
+                                <button type="submit" class="btn btn-primary btn-lg px-4 order-1 order-sm-2">
+                                    <i class="bi bi-check-circle me-2"></i>Submit Job
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+ {% block script %}
+
+
+ <script>
+        const diameterInput = document.getElementById('cylinder_diameter');
+        const heightInput = document.getElementById('cylinder_height');
+        const combinedInput = document.getElementById('cylinder_size');
+
+        function updateCylinderSize() {
+            const diameter = diameterInput.value.trim();
+            const height = heightInput.value.trim();
+            if (diameter && height) {
+                combinedInput.value = `${diameter} x ${height}`;
+            } else {
+                combinedInput.value = '';
+            }
+        }
+
+        diameterInput.addEventListener('input', updateCylinderSize);
+        heightInput.addEventListener('input', updateCylinderSize);
+
+
+    </script>  
+
+     <script>
+      const pouchOpenDiameterInput = document.getElementById('pouch_open_diameter');
+        const pouchOpenHeightInput = document.getElementById('pouch_open_height');
+        const pouchOpenSizeInput = document.getElementById('pouch_open_size');
+
+        function updatePouchOpenSize() {
+            const diameter = pouchOpenDiameterInput.value.trim();
+            const height = pouchOpenHeightInput.value.trim();
+            if (diameter && height) {
+                pouchOpenSizeInput.value = `${diameter} x ${height}`;
+            } else {
+                pouchOpenSizeInput.value = '';
+            }
+        }
+
+        pouchOpenDiameterInput.addEventListener('input', updatePouchOpenSize);
+        pouchOpenHeightInput.addEventListener('input', updatePouchOpenSize);
+
+
+    </script>
+
+     <script>
+     const pouchDiameterInput = document.getElementById('pouch_diameter');
+        const pouchHeightInput = document.getElementById('pouch_height');
+        const pouchSizeInput = document.getElementById('pouch_size');
+
+        function updatePouchSize() {
+            const diameter = pouchDiameterInput.value.trim();
+            const height = pouchHeightInput.value.trim();
+            if (diameter && height) {
+                pouchSizeInput.value = `${diameter} x ${height}`;
+            } else {
+                pouchSizeInput.value = '';
+            }
+        }
+
+        pouchDiameterInput.addEventListener('input', updatePouchSize);
+        pouchHeightInput.addEventListener('input', updatePouchSize);
+
+
+    </script>
+
+
+{% endblock script %}
+{% endblock main_block %}
+
+
