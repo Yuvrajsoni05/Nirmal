@@ -13,7 +13,23 @@ class Registration(AbstractUser):
     email = models.EmailField(max_length=200, unique=True,)
 
 
+class Job_detail(models.Model):
+        date = models.DateField()
+        bill_no = models.CharField(max_length=200)
+        company_name = models.CharField(max_length=300)
+        job_name = models.CharField(max_length=200)
+        job_type  = models.CharField(max_length=200)
+        noc =  models.IntegerField()
+        prpc = models.CharField(max_length=200)
+        cylinder_size = models.CharField(max_length=200)
+        cylinder_made_in = models.CharField(max_length=200)
+        pouch_size = models.CharField(max_length=200)
+        pouch_open_size = models.CharField(max_length=200)
+        pouch_combination = models.CharField(max_length=200)
+        correction = models.TextField()
+        image_url = models.URLField()
+        
+        
 class CompanyName(models.Model):
     company_name = models.CharField(max_length=300)
-    
     

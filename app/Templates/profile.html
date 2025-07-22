@@ -5,12 +5,119 @@
 {% load static %}
 
 {% block main_block %}
-   <div class="page-inner">
-            <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
-              <div>
-                <h3 class="fw-bold mb-3">Profile</h3>
-                
-              </div>
-              
+<div class="container-fluid py-4">
+    <!-- Page Title -->
+    <div class="d-flex align-items-center flex-column flex-md-row mb-4">
+        <h3 class="fw-bold mb-0">Profile</h3>
+    </div>
+
+    <!-- Profile Card -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            
+            <!-- Tab Navigation -->
+            <ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="edit-tab" data-bs-toggle="tab" data-bs-target="#profile-edit" type="button" role="tab">
+                        <i class="bi bi-pencil-square me-2"></i>Edit Profile
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="password-tab" data-bs-toggle="tab" data-bs-target="#profile-change-password" type="button" role="tab">
+                        <i class="bi bi-key me-2"></i>Change Password
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content row justify-content-center" id="profileTabsContent">
+                <!-- Edit Profile Tab -->
+                <div class="tab-pane fade show active " id="profile-edit" role="tabpanel">
+                    <form method="post" action="{% url "update_profile" users_id=user.id %}" id="profile_page" enctype="multipart/form-data">
+                      {% csrf_token %}
+                        <div class="row g-3">
+                            
+                            <div class="col-12 col-md-6">
+                                <label for="firstname" class="form-label fw-semibold text-dark">First Name</label>
+                                <input name="first_name"  type="text" class="form-control" id="first_name" value="{{ user.first_name }}">
+                                <div class="invalid-feedback" id="firstname_error">Please provide a First Name.</div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="lastname" class="form-label fw-semibold text-dark">Last Name</label>
+                                <input name="last_name" maxlength="15" type="text" class="form-control" id="last_name" value="{{user.last_name}}">
+                                <div class="invalid-feedback" id="lastname_error">Please provide a Last Name.</div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="username" class="form-label fw-semibold text-dark">Username</label>
+                                <input name="username" type="text" maxlength="20" class="form-control" id="username" value="{{user.username}}">
+                                <div class="invalid-feedback" id="username_error">Please provide a Username.</div>
+                            </div>
+
+
+                            <div class="col-12 col-md-6">
+                                <label for="email" class="form-label fw-semibold text-dark">Email</label>
+                                <input name="email" type="email" maxlength="40" class="form-control" id="email" value="{{user.email}}">
+                                <div class="invalid-feedback" id="email_error">Please provide a valid Email.</div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="d-flex flex-column flex-sm-row gap-2 ">
+                                    <button type="submit" class="btn btn-primary px-4">
+                                        <i class="bi bi-save me-2"></i>Save Changes
+                                    </button>
+                                    <button type="reset" class="btn btn-outline-secondary px-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+                                      <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2z"/>
+                                      <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466"/>
+                                    </svg>&nbsp;Reset
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Change Password Tab -->
+                <div class="tab-pane fade" id="profile-change-password" role="tabpanel">
+                    <form method="post" action="{% url "update_password" %}">
+                      {% csrf_token %}
+                        <div class="row g-3">
+                            
+                            <div class="col-12">
+                                <label for="old_password" class="form-label">Current Password</label>
+                                <input name="old_password" type="password" class="form-control" id="old_password" placeholder="Old Password">
+                            </div>
+
+                            <div class="col-12">
+                                <label for="new_password" class="form-label">New Password</label>
+                                <input name="new_password" type="password" minlength="8" maxlength="20" class="form-control" id="new_password" placeholder="New Password">
+                                <div class="form-text">At least 8 characters, one uppercase, and one special character.</div>
+                            </div>
+
+                            <div class="col-12">
+                                <label for="confirm_password" class="form-label">Re-enter New Password</label>
+                                <input name="confirm_password" type="password" minlength="8" maxlength="20" class="form-control" id="confirm_password" placeholder="Confirm Password">
+                            </div>
+
+                            <div class="col-12">
+                                <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
+                                    <button type="submit" class="btn btn-primary px-4">
+                                        <i class="bi bi-key me-2"></i>Change Password
+                                    </button>
+                                    <button type="reset" class="btn btn-outline-secondary px-4">
+                                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+                                          <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2z"/>
+                                          <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466"/>
+                                        </svg>&nbsp;</i>Reset
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
+        </div>
+    </div>
+</div>
 {% endblock main_block %}
