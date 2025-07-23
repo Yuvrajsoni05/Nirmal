@@ -1,12 +1,65 @@
 from django.shortcuts import get_object_or_404, render,redirect
+# from torch import t
 from .models import *
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate, logout 
 import requests 
 from django.contrib.auth import update_session_auth_hash
-# Create your views here.
+from googleapiclient.http import MediaFileUpload
 
+import tempfile
+#  google
+from django.core.mail import send_mail
+from django.http import JsonResponse
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseUpload
+import mimetypes
+import io
+
+
+
+#Password
+
+from django.urls import reverse_lazy
+from django.contrib.auth.views import PasswordResetDoneView
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib.auth.views import (
+    PasswordResetView,
+    PasswordResetDoneView,
+    PasswordResetConfirmView,
+)
+
+# Create your views here.
+import os
+from django.conf import settings
+
+
+class CustomPasswordResetView(PasswordResetView):
+    template_name = "Password/password_reset_form.html"
+    email_template_name = "Password/password_reset_email.html"
+    success_url = reverse_lazy("password_reset_done")
+
+
+class CustomPasswordResetDoneView(PasswordResetDoneView):
+    template_name = "Password/password_reset_confirm.html",
+    success_url = reverse_lazy("password_reset_complete")
+    
+
+class CustomPasswordResetConfirm(PasswordResetConfirmView):
+    template_name = "Password/password_reset_confirm.html"
+    success_url = reverse_lazy("password_reset_complete")
+
+
+def password_reset_done(request):
+    return render(request,'Password/password_reset_done.html')
+
+    
+    
+    
+SERVICE_ACCOUNT_FILE = os.path.join(settings.BASE_DIR, 'app', 'Google', 'credentials.json')
+SCOPES = ['https://www.googleapis.com/auth/drive']
 def login_page(request):    
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -36,10 +89,10 @@ def register_page(request):
         
         required_filed = {
            
-            'first_name':first_name,
-            'last_name':last_name, 
-            'username':username,
-            'password':password,
+            'First Name':first_name,
+            'Last Name':last_name, 
+            'Username':username,
+            'Password':password,
         }
         
         
@@ -77,7 +130,7 @@ def register_page(request):
             email= email,
         )
         create_user.save()
-        messages.success("New User Will Created")
+        messages.success(request,"New User Will Created")
         
         return redirect('register_page')
     return render(request,'Registration/register.html')
@@ -88,9 +141,11 @@ def dashboard_page(request):
     response = requests.get("http://localhost:5678/webhook/get-data")
     data = response.json()
     total_job = Job_detail.objects.all().count()
+    db_sqlite3  =  Job_detail.objects.all()
     if not data:
         data = []
     context = {
+        'database':db_sqlite3,
         'data':data,
         'total_job':total_job
     }
@@ -103,7 +158,8 @@ def delete_data(request,delete_id):
     print(id)
     response = requests.delete(f"http://localhost:5678/webhook/d51a7064-e3b9-41f5-a76f-264e19f60b70/artical/delete/{id}")
     data = response.json()
-    print(data)
+    # print(data)
+    messages.error(request,"Job Deleted Sussfully",extra_tags="custom-success-style")
     return redirect('dashboard_page')
 
 
@@ -121,10 +177,92 @@ def data_entry(request):
     }
     return render(request, 'data_entry.html',context)
 
+
+def get_drive_services():
+    creds = service_account.Credentials.from_service_account_file(
+        SERVICE_ACCOUNT_FILE, scopes=SCOPES
+    )
+    return build('drive', 'v3', credentials=creds)
+
+
+def get_job_name_folder(service,job_name,parent_job_id):
+    query = (
+    f"name='{job_name}' and mimeType='application/vnd.google-apps.folder'and trashed=false and '{parent_job_id}' in parents"
+)
+    
+    result = service.files().list(
+        q=query,
+        spaces = 'drive',
+        fields = 'files(id,name)'
+    ).execute()
+    
+    folders = result.get('files',[])
+    
+    
+    if folders:
+        job_id  = folders[0]['id']
+        job_url = f"https://drive.google.com/drive/folders/{job_id}"
+        return job_id , job_url
+    else:
+        folder_metadata = {
+            'name':job_name,
+            'parents': [parent_job_id],
+            'mimeType':'application/vnd.google-apps.folder'
+            
+        }
+        job_folder = service.files().create(
+            body = folder_metadata,
+            fields = 'id',
+            supportsAllDrives=True
+        ).execute()
+        
+        
+        job_id = job_folder.get('id')
+        job_url = f"https://drive.google.com/drive/folders/{job_id}"
+        return job_id,job_url
+        
+
+def get_create_folder(service, folder_name, parent_folder_id,):
+    query = (
+        f"name='{folder_name}' and mimeType='application/vnd.google-apps.folder' "
+        f"and trashed=false and '{parent_folder_id}' in parents"
+    )
+    result = service.files().list(
+        q=query,
+        spaces='drive',
+        fields='files(id, name)'
+    ).execute()
+
+    folders = result.get('files', [])
+    
+    if folders:
+        folder_id = folders[0]['id']
+        folder_url = f"https://drive.google.com/drive/folders/{folder_id}"
+        
+        return folder_id, folder_url
+
+    else:
+        # Create new folder
+        folder_metadata = {
+            'name': folder_name,
+            'parents': [parent_folder_id],
+            'mimeType': 'application/vnd.google-apps.folder'
+        }
+        
+        folder = service.files().create(
+            body=folder_metadata,
+            fields='id',
+            supportsAllDrives=True
+        ).execute()
+        
+        folder_id = folder.get('id')
+        folder_url = f"https://drive.google.com/drive/folders/{folder_id}"
+        return folder_id, folder_url
+
 @login_required(redirect_field_name=None)
 def add_data(request):
     if request.method == 'POST':
-        date =  request.POST.get('job_date')
+        date = request.POST.get('job_date')
         bill_no = request.POST.get('bill_no')
         company_name = request.POST.get('company_name')
         job_name = request.POST.get('job_name')
@@ -139,10 +277,49 @@ def add_data(request):
         correction = request.POST.get('correction')
         files = request.FILES.getlist('files')
         
-        print(date)
+        # service = get_drive_services()
+        # n8n_folder_id = '14AUzR7EWGbCGoQ-MnIoSabVALt_qUeRS' 
 
-        file_dic = {}
+        # folder_id, folder_url = get_create_folder(service, company_name, n8n_folder_id,)
         
+        # if folder_id:
+        #     print("Folder found/created:", folder_id)
+        #     print("Folder URL:", folder_url)
+        # else:
+        #     print("Error with folder operation")
+            
+        # job_id , job_url = get_job_name_folder(service,job_name,folder_id)
+        
+        # if job_id:
+        #     print("Job Folder found/created:", job_id)
+        #     print("Job Folder URL:", job_url)
+        # else:
+        #     print("Error with folder operation")
+        
+        # uploaded_file_ids = []
+        # for file in files:
+        #     temp_file = tempfile.NamedTemporaryFile(delete=False)  # Safe temp file creation
+        #     with open(temp_file.name, 'wb+') as destination:
+        #         for chunk in file.chunks():
+        #             destination.write(chunk)
+
+        #     file_metadata = {
+        #         'name': file.name,
+        #         'parents': [job_id]  # Correct key is 'parents' not 'parent'
+        #     }
+        #     media = MediaFileUpload(temp_file.name, mimetype=file.content_type)
+        #     uploaded_file = service.files().create(
+        #         body=file_metadata,
+        #         media_body=media,
+        #         fields='id',
+        #         supportsAllDrives=True
+        #     ).execute()
+
+        #     uploaded_file_ids.append(uploaded_file.get('id'))
+        #     os.remove(temp_file.name) 
+        
+        file_dic = {}
+
         for i ,file in enumerate(files):
             if file.name:
                 file_name_without  = file.name.rsplit('.',1)[0]
@@ -151,6 +328,22 @@ def add_data(request):
                 file_key = f"file_{i}"
                  
             file_dic[file_key] = (file.name, file, file.content_type)
+            
+    data  =  {
+            'date':date,
+            'bill_no':bill_no,
+            'company_name':company_name,
+            'job_type':job_type,
+            'job_name':job_name,
+            'noc':noc,
+            'prpc':prpc,
+            'cylinder_size':cylinder_size,
+            'cylinder_made_in':cylinder_made_in,
+            'pouch_size':pouch_size,
+            'pouch_open_size':pouch_open_size,
+            'pouch_combination':pouch_combination,
+            'correction':correction
+    }
         
     db_add = Job_detail.objects.create(
         date =  date,
@@ -171,27 +364,8 @@ def add_data(request):
     db_add.save()
     messages.success(request,"Data Will Sussfully Add on db.sqlite3",extra_tags="custom-success-style")
     
-    data  =  {
-        'date':date,
-        'bill_no':bill_no,
-        'company_name':company_name,
-        'job_type':job_type,
-        'job_name':job_name,
-        'noc':noc,
-        'prpc':prpc,
-        'cylinder_size':cylinder_size,
-        'cylinder_made_in':cylinder_made_in,
-        'pouch_size':pouch_size,
-        'pouch_open_size':pouch_open_size,
-        'pouch_combination':pouch_combination,
-        'correction':correction
-    }
-    
-    
-    
-    
-    
     response = requests.post('http://localhost:5678/webhook/create-data',data=data,files=file_dic)
+   
     
     return redirect ('data_entry')
 
@@ -238,7 +412,7 @@ def  update_job(request,update_id):
             file_key = f"file_{i}_{file_name_without}"
         else:
             file_key = f"file_{i}"
-                
+            
         file_dic[file_key] = (file.name, file, file.content_type)
             
             
@@ -312,3 +486,8 @@ def user_password(request):
         
         update_session_auth_hash(request,user_password)
         return redirect('profile_page')
+    
+
+
+
+

@@ -126,13 +126,13 @@
                                       <td >{{ i.job_type}}</td>
                                       <td class="text-truncate">{{ i.job_name }}</td>
                                       <td class="text-truncate">{{ i.noc }}</td>
-                                      <td class="text-truncate">₹{{ i.prpc|intcomma }}</td>
+                                      <td class="text-truncate">₹ {{ i.prpc|intcomma }}</td>
                                       <td class="text-truncate">{{ i.cylinder_size }}</td>
                                       <td class="text-truncate">{{ i.cylinder_made_in }}</td>
                                       <td class="text-truncate">{{ i.pouch_size }}</td>
                                       <td class="text-truncate">{{ i.pouch_open_size }}</td>
                                       <td class="text-truncate">{{ i.pouch_combination }}</td>
-                                      <td class="text-truncate">{{ i.correction|truncatechars:20 }}</td>
+                                      <td class="text-truncate" data-bs-toggle="modal" data-bs-target="#staticBackdrop{{i.id}}" title="{{i.correction}}">{{ i.correction|truncatechars:20 }}</td>
                                       <td class="text-truncate" > <a class="icon-link" href="https://drive.google.com/drive/u/0/folders/{{ i.folder_link }}">
                                                                           
                                       </a>
@@ -157,6 +157,26 @@
                                           </form>
                                       </td>
                                   </tr>
+                                  {% comment %} Model {% endcomment %}
+                                  <div class="modal fade" id="staticBackdrop{{i.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                      <div class="modal-content">
+                                        <div class="modal-header">
+                                          <h5 class="modal-title" id="exampleModalLongTitle">Event Discription</h5>
+                                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                          </button>
+                                        </div>
+                                        <div class="modal-body">
+                                          {{i.correction}}
+                                        </div>
+                                        {% comment %} <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                          <button type="button" class="btn btn-primary">Save changes</button>
+                                        </div> {% endcomment %}
+                                      </div>
+                                    </div>
+                                  </div>
 
                                   {% comment %} Model {% endcomment %}
                                     <div class="modal fade"  id="exampleModal{{i.id}}" tabindex="-1" aria-hidden="true">

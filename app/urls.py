@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path,include
 from .views import *
-
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('',login_page,name='login_page'),
@@ -16,4 +16,12 @@ urlpatterns = [
     path('profile_page',profile_page,name='profile_page'),
     path('update_profile/<uuid:users_id>/',update_profile,name='update_profile'),
     path('update_password',user_password,name='update_password'),
+    
+    #password
+    path('password_reset',CustomPasswordResetView.as_view(),name="password_reset"),
+    path('password_reset_done/', auth_views.PasswordResetDoneView.as_view(
+    template_name='registration/password_reset_done.html',
+), name='password_reset_done'),
+    path('reset/<uidb64>/<token>',CustomPasswordResetConfirm.as_view(),name="password_reset_confirm"),
+    path('reset_done',password_reset_done , name="password_reset_complete"),
 ]
