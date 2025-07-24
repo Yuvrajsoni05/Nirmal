@@ -19,6 +19,8 @@ import mimetypes
 import io
 
 
+from pydrive2.auth import GoogleAuth 
+from pydrive2.drive import GoogleDrive
 
 #Password
 
@@ -84,9 +86,7 @@ def register_page(request):
         email = request.POST.get('emailAddress')
         password = request.POST.get('password')
         confirma_password = request.POST.get('confirma_password')
-        
-        
-        
+
         required_filed = {
            
             'First Name':first_name,
@@ -101,8 +101,6 @@ def register_page(request):
                 messages.error(request,f"This  {i}  {required} field is Required",extra_tags="custom-success-style")
                 return redirect('register_page')
             
-            
-        
         if Registration.objects.filter(username=username).exists():
                 messages.error(request,'Username Alredy Exist',extra_tags="custom-success-style")
                 return redirect('register_page')
@@ -116,11 +114,8 @@ def register_page(request):
             messages.error(request,"Password  must be at least 8 character with one uppercase and one spical charchter",extra_tags="custom-success-style")
             return redirect('register_page')
         
-        
-        
         if password !=  confirma_password:
             messages.error(request,'Password Confirm Password must be same')
-        
 
         create_user = Registration.objects.create_user(
             first_name = first_name,
@@ -142,8 +137,8 @@ def dashboard_page(request):
     data = response.json()
     total_job = Job_detail.objects.all().count()
     db_sqlite3  =  Job_detail.objects.all()
-    if not data:
-        data = []
+    # if not data:
+    #     data = []
     context = {
         'database':db_sqlite3,
         'data':data,
@@ -152,7 +147,7 @@ def dashboard_page(request):
     
     return render(request,'dashboard.html',context)
 
-@login_required(redirect_field_name=None)
+@login_required(redirect_field_name=None)   
 def delete_data(request,delete_id):
     id = delete_id
     print(id)
@@ -276,25 +271,29 @@ def add_data(request):
         pouch_combination = request.POST.get('pouch_combination')
         correction = request.POST.get('correction')
         files = request.FILES.getlist('files')
+        # print(cylinder_size)
+        # print(pouch_open_size)
+        # print(pouch_size)
         
-        # service = get_drive_services()
-        # n8n_folder_id = '14AUzR7EWGbCGoQ-MnIoSabVALt_qUeRS' 
+        service = get_drive_services()
+        n8n_folder_id = '14AUzR7EWGbCGoQ-MnIoSabVALt_qUeRS' 
 
-        # folder_id, folder_url = get_create_folder(service, company_name, n8n_folder_id,)
+        folder_id, folder_url = get_create_folder(service, company_name, n8n_folder_id,)
         
-        # if folder_id:
-        #     print("Folder found/created:", folder_id)
-        #     print("Folder URL:", folder_url)
-        # else:
-        #     print("Error with folder operation")
+        if folder_id:
+            print("Folder found/created:", folder_id)
+            print("Folder URL:", folder_url)
+        else:
+            print("Error with folder operation")
             
-        # job_id , job_url = get_job_name_folder(service,job_name,folder_id)
+        job_id , job_url = get_job_name_folder(service,job_name,folder_id)
         
-        # if job_id:
-        #     print("Job Folder found/created:", job_id)
-        #     print("Job Folder URL:", job_url)
-        # else:
-        #     print("Error with folder operation")
+        if job_id:
+            print("Job Folder found/created:", job_id)
+            print("Job Folder URL:", job_url)
+        else:
+            print("Error with folder operation")
+        
         
         # uploaded_file_ids = []
         # for file in files:
@@ -317,9 +316,9 @@ def add_data(request):
 
         #     uploaded_file_ids.append(uploaded_file.get('id'))
         #     os.remove(temp_file.name) 
+        # Gauth=GoogleAuth()
         
         file_dic = {}
-
         for i ,file in enumerate(files):
             if file.name:
                 file_name_without  = file.name.rsplit('.',1)[0]
@@ -344,36 +343,36 @@ def add_data(request):
             'pouch_combination':pouch_combination,
             'correction':correction
     }
+    print(data['date'])
+    # db_add = Job_detail.objects.create(
+    #     date =  date,
+    #     bill_no = bill_no,
+    #     company_name = company_name,
+    #     job_name = job_name,
+    #     job_type = job_type,
+    #     noc = noc,
+    #     prpc = prpc,
+    #     cylinder_size = cylinder_size,
+    #     cylinder_made_in = cylinder_made_in,
+    #     pouch_size = pouch_size,
+    #     pouch_open_size = pouch_open_size,
+    #     pouch_combination = pouch_combination,
+    #     correction = correction,
         
-    db_add = Job_detail.objects.create(
-        date =  date,
-        bill_no = bill_no,
-        company_name = company_name,
-        job_name = job_name,
-        job_type = job_type,
-        noc = noc,
-        prpc = prpc,
-        cylinder_size = cylinder_size,
-        cylinder_made_in = cylinder_made_in,
-        pouch_size = pouch_size,
-        pouch_open_size = pouch_open_size,
-        pouch_combination = pouch_combination,
-        correction = correction,
-        
-        )
-    db_add.save()
+    #     )
+    # db_add.save()
     messages.success(request,"Data Will Sussfully Add on db.sqlite3",extra_tags="custom-success-style")
     
     response = requests.post('http://localhost:5678/webhook/create-data',data=data,files=file_dic)
    
-    
+   
     return redirect ('data_entry')
 
 
 @login_required(redirect_field_name=None)      
 def  update_job(request,update_id):
     if request.method == 'POST':
-        date =  request.POST.get('job_date')
+        date =  request.POST.get('date')
         bill_no = request.POST.get('bill_no')
         company_name = request.POST.get('company_name')
         job_name = request.POST.get('job_name')
@@ -388,7 +387,7 @@ def  update_job(request,update_id):
         correction = request.POST.get('correction')
         files = request.FILES.getlist('files')
         
-
+        
     data  =  {
         'date':date,
         'bill_no':bill_no,
@@ -417,7 +416,7 @@ def  update_job(request,update_id):
             
             
     
-    response = requests.post(f'http://localhost:5678/webhook/7d8dd046-c41e-4f64-8607-caf5f43ddc84/update-data/{update_id}',
+    response = requests.post(f'http://localhost:5678/webhook-test/7d8dd046-c41e-4f64-8607-caf5f43ddc84/update-data/{update_id}',
             data=data,files=file_dic
            
     )
@@ -435,6 +434,7 @@ def profile_page(request):
 
 
 def update_profile(request,users_id):
+    
     if request.method == 'POST':
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')

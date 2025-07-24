@@ -27,7 +27,9 @@ class Job_detail(models.Model):
         pouch_open_size = models.CharField(max_length=200)
         pouch_combination = models.CharField(max_length=200)
         correction = models.TextField()
-        image_url = models.URLField()
+        folder_url = models.URLField()
+        image_links = models.CharField(max_length=1000,blank=True, null=True)
+        
         
         
 class CompanyName(models.Model):
