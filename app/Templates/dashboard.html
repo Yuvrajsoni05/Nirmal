@@ -83,10 +83,10 @@
                   <div class="card-header">
                     <div class="card-head-row card-tools-still-right">
                       <div class="card-title">Job Details</div>
-                      
+{% comment %}                       
                       <div class="card-tools">
                        <div class="card-title">Search</div>
-                      </div>
+                      </div> {% endcomment %}
                     </div>
                   </div>
                   <div class="card-body p-0">
@@ -132,8 +132,18 @@
                                             <td class="text-truncate">{{ i.cylinder_made_in }}</td>
                                             <td class="text-truncate">{{ i.pouch_size }}</td>
                                             <td class="text-truncate">{{ i.pouch_open_size }}</td>
+
+                                            
                                             <td class="text-truncate">{{ i.pouch_combination }}</td>
+
+                                            {% if i.correction %}
                                             <td class="text-truncate" data-bs-toggle="modal" data-bs-target="#staticBackdrop{{i.id}}" title="{{i.correction}}">{{ i.correction|truncatechars:20 }}</td>
+
+                                            {% else %}
+                                                <td class="text-truncate"><span class="badge bg-light text-dark" >No Data<span></td>
+
+
+                                            {% endif %}
                                             {% comment %} <td class="text-truncate" > <a class="icon-link" href="https://drive.google.com/drive/u/0/folders/{{ i.folder_link }}">
                                                                                 
                                             </a></td> {% endcomment %}

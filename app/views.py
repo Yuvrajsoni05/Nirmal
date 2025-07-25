@@ -344,11 +344,7 @@ def add_data(request):
             correction = request.POST.get('correction')
             files = request.FILES.getlist('files')
             
-            
-            if len(files) >= 2 :
-                messages.error(request,"You can upload only 2 file")
-                return redirect('data_entry')
-                
+    
             
             # service = get_drive_services()
             # n8n_folder_id = '14AUzR7EWGbCGoQ-MnIoSabVALt_qUeRS' 
@@ -474,7 +470,10 @@ def  update_job(request,update_id):
             'pouch_combination':pouch_combination,
             'correction':correction
         }
-        
+        if len(files) >= 2 :
+            
+                messages.error(request,"You can upload only 2 file")
+                return redirect('data_entry')
         file_dic = {}
         for i ,file in enumerate(files):
             if file.name:
