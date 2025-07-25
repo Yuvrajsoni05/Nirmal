@@ -109,7 +109,7 @@
             {% include 'Base/footer.html' %}
       </div>
     </div>
-
+      
 
      {% if messages %}
     <div class="toast-container position-fixed toast-container-custom end-0 p-3">
@@ -141,6 +141,8 @@
     <script src="{% static 'assets/js/core/popper.min.js' %}"></script>
     <script src="{% static 'assets/js/core/bootstrap.min.js' %}"></script>
 
+
+   
     <!-- jQuery Scrollbar -->
     <script src="{% static 'assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js' %}"></script>
 
@@ -170,7 +172,22 @@
     <script src="{% static 'assets/js/kaiadmin.min.js' %}"></script>
 
 
+    <script>
+        // Check internet connectivity on page load
+        if (!navigator.onLine) {
+            window.location.href = "{% url 'offline-page' %}"; // Redirect to offline error page
+        }
 
+        // Listen for online/offline events
+        window.addEventListener('offline', function() {
+            window.location.href = "{% url 'offline-page' %}"; // Redirect on going offline
+        });
+
+        window.addEventListener('online', function() {
+           
+            window.location.href = "{% url "dashboard_page" %}"; 
+        });
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const toasts = document.querySelectorAll('.toast.show');

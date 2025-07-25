@@ -1,0 +1,162 @@
+{% extends "Base/base.html" %}
+
+{% block title %} Edit User {% endblock title %} Edit User 
+{% load static %}
+{% load humanize %}
+{% block main_block %}
+
+<div class="page-inner">
+            <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
+              <div>
+                <h3 class="fw-bold mb-3">Edit User</h3>
+              </div>
+            </div>
+                
+            <div class="row">
+              <div class="col-md-12">
+                <div class="card card-round">
+                  <div class="card-header">
+                    <div class="card-head-row card-tools-still-right">
+                      <div class="card-title">User Details</div>
+                      <div class="card-tools">
+                       
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-body p-0">
+                    <div class="table-responsive" >
+                      <!-- Projects table -->
+                      <table class="table align-items-center mb-0 ">
+                        <thead class="thead-light">
+                          <tr class="text-nowrap text-center">
+                                <th scope="col">#</th>
+                                <th scope="col">Username</th>
+                                <th scope="col">First Name</th>
+                                <th scope="col" >Last Name</th>
+                                <th scope="col">Email</th>
+                                <th scope="col"  colspan="2">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                           
+                            {% for i in  users %}
+                              {% if i.id != none %}
+                                        <tr class="text-center">
+                                            <td class="text-truncate">{{ forloop.counter }}</td>
+                                           
+                                            <td class="text-truncate"> {{ i.username }}</td>
+                                            <td class="text-truncate">{{ i.first_name }}</td>
+                                            <td class="text-truncate">{{ i.last_name }}</td> 
+                                            <td class="text-truncate">{{ i.email }}</td>
+                                                                           
+                                            </a></td> 
+                                           
+                                            <td class="text-truncate">
+                                                <form method="post" action="{% url "delete_user" user_id=i.id %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button class="btn btn-sm btn-outline-danger ms-1" onclick="return confirm('Are you sure you want to delete this item?')">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                                      <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
+                                                    </svg>
+                                                </button>
+                                                </form>
+                                                
+                                                <form method="post" action="" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#users_id{{i.id}}">
+                                                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                                      <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+                                                    </svg>
+                                                          </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        
+
+                                        {% comment %} Model {% endcomment %}
+                                          <div class="modal fade"  id="users_id{{i.id}}" tabindex="-1" aria-hidden="true">
+                                                              <div class="modal-dialog modal-lg modal-dialog-centered">
+                                                                <div class="modal-content ">
+                                                                  <div class="modal-header bg-light">
+                                                                    <h5 class="modal-title">Edit User  Id</h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                  </div>
+                                                                  <div class="modal-body form-datas">
+                                                                  
+                                                                    <form method="post"  action="{% url "update_user" user_id=i.id %}" enctype="multipart/form-data">
+                                                                          {% csrf_token %}
+                                                                          <div class="row g-4">
+
+                                                                          <!-- Event Date -->
+                                                                          <div class="col-md-6">
+                                                                              <label for="user_name" class="form-label">Username</label><span style="color:red;"> *</span>
+                                                                              <input type="text" class="form-control" id="username" name="username" value="{{ i.username }}">
+                                                                              <div class="invalid-feedback" id="user_name_error">Please provide Username.</div>
+                                                                          </div>
+
+                                                                          <!-- Bill No -->
+                                                                          <div class="col-md-6">
+                                                                              <label for="first_name" class="form-label">First Name</label><span style="color:red;"> *</span>
+                                                                              <input type="text" class="form-control" id="first_name" name="first_name" value="{{ i.first_name }}">
+                                                                              <div class="invalid-feedback" id="first_name_error">Please provide an First name.</div>
+                                                                          </div>
+
+                                                                    
+
+                                                                          <!-- Company Name -->
+                                                                          <div class="col-md-6">
+                                                                              <label for="last_name" class="form-label">Last Name</label><span style="color:red;"> *</span>
+                                                                              <input type="text" id="last_name" class="form-control" name="last_name" value="{{ i.last_name }}">
+                                                                              <div class="invalid-feedback" id="last_name_error">Please provide an Last name.</div>
+                                                                          </div>
+
+                                                                          <!-- Job Type -->
+                                                                          <div class="col-md-6">
+                                                                              <label for="job_type" class="form-label">Email</label><span style="color:red;"> *</span>
+                                                                              <input type="email" id="email" class="form-control" name="email" value="{{ i.email }}" >
+                                                                               <div class="invalid-feedback" id="email_error">Please provide an Email.</div>
+                                                                          </div>
+
+                                                                         
+                                                                          <!-- Form Actions -->
+                                                                          <div class="col-12">
+                                                                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                              <button type="submit" class="btn btn-primary">Save changes</button>
+                                                                          </div>
+
+                                                                          </div>
+                                                                    </form>
+                                                                  
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        {% else %}
+                                                        <tr>
+                                                        <td colspan="17" ><center><span> No Data </span></center></td>
+                                                      </tr>
+                           {% endif %}
+                            {% endfor %}            
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+{% endblock main_block %}
+
+{% block script %}
+
+<script>
+    
+</script>
+{% endblock script %}
+
+
+
+
+
+

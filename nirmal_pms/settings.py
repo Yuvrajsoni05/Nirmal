@@ -39,6 +39,7 @@ MESSAGE_TAGS = {
 } 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_SAVE_EVERY_REQUEST = False
+
 # Application definition
 
 CSRF_COOKIE_SECURE = False  # Set this to True if using HTTPS

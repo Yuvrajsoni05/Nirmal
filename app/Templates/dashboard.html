@@ -38,7 +38,7 @@
                       
                       <div class="col col-stats ms-3 ms-sm-0">
                         <div class="numbers">
-                          <p class="card-category">Subscribers</p>
+                          <p class="card-category">Total Rate</p>
                           <h4 class="card-title">1303</h4>
                         </div>
                       </div>
@@ -83,8 +83,9 @@
                   <div class="card-header">
                     <div class="card-head-row card-tools-still-right">
                       <div class="card-title">Job Details</div>
+                      
                       <div class="card-tools">
-                       
+                       <div class="card-title">Search</div>
                       </div>
                     </div>
                   </div>
@@ -95,7 +96,7 @@
                         <thead class="thead-light">
                           <tr class="text-nowrap text-center">
                             <th scope="col">#</th>
-                                    <th scope="col" class="w-100">ID</th>
+                                    {% comment %} <th scope="col" class="w-100">ID</th> {% endcomment %}
                                     <th scope="col">Date</th>
                                     <th scope="col">Bill No</th>
                                     <th scope="col" >Company Name</th>
@@ -119,7 +120,7 @@
                               {% if i.id != none %}
                                         <tr class="text-center">
                                             <td class="text-truncate">{{ forloop.counter }}</td>
-                                            <td class="text-truncate">{{ i.id }}</td>
+                                            {% comment %} <td class="text-truncate">{{ i.id }}</td> {% endcomment %}
                                             <td class="text-truncate"> {{ i.date }}</td>
                                             <td class="text-truncate">{{ i.bill_no }}</td>
                                             <td class="text-truncate">{{ i.company_name }}</td>
