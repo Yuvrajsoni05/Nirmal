@@ -9,6 +9,12 @@ from django.contrib.auth import update_session_auth_hash
 from googleapiclient.http import MediaFileUpload
 
 
+from django.core.paginator import Paginator
+
+
+
+
+from django.db.models import Q
 from django.db.models import Sum
 import tempfile
 #  google
@@ -199,21 +205,35 @@ def update_user(request,user_id):
 
 @login_required(redirect_field_name=None)
 def dashboard_page(request):
-   
-    response = requests.get("http://localhost:5678/webhook/get-data")
-    data = response.json()
-    total_job = Job_detail.objects.all().count()
-    # prpc_total = Job_detail.objects.values('date').annotate(date_impact=Sum('prpc')).distinct()
-    db_sqlite3  =  Job_detail.objects.all()
-    # print(prpc_total)
-    # if not data:
-    #     data = []
+    try:
+        # Get the search query
+        get_q = request.GET.get('q', '')
+        
+        db_sqlite3 = Job_detail.objects.all()
+        if get_q:
+            db_sqlite3 = Job_detail.objects.filter(Q(company_name__icontains=get_q)| Q(job_name__icontains=get_q) )
+        else:
+            db_sqlite3 = Job_detail.objects.all()
 
-    context = {
-        'database':db_sqlite3,
-        'data':data,
-        'total_job':total_job
-    }
+
+        p = Paginator(db_sqlite3, 10)
+        page = request.GET.get('page')
+        venues = p.get_page(page)
+        
+        total_job = db_sqlite3.count()
+        company_name = CompanyName.objects.all()
+        nums = "a" *venues.paginator.num_pages
+        print(nums)
+       
+        context = {
+            'nums':nums,
+            'database': db_sqlite3,
+            'venues': venues,
+            'total_job': total_job,
+            'company_name': company_name,
+        }
+    except Exception:
+        return redirect('dashboard_page')
     
     return render(request,'dashboard.html',context)
 
@@ -224,7 +244,7 @@ def delete_data(request,delete_id):
     response = requests.delete(f"http://localhost:5678/webhook/d51a7064-e3b9-41f5-a76f-264e19f60b70/artical/delete/{id}")
     data = response.json()
     # print(data)
-    messages.error(request,"Job Deleted Sussfully",extra_tags="custom-success-style")
+    messages.success(request,"Job Deleted Sussfully")
     return redirect('dashboard_page')
 
 
@@ -340,12 +360,30 @@ def add_data(request):
             cylinder_made_in = request.POST.get('cylinder_made_in')
             pouch_size = request.POST.get('pouch_size')
             pouch_open_size = request.POST.get('pouch_open_size')
-            pouch_combination = request.POST.get('pouch_combination')
+            pouch_combination_1 = request.POST.get('pouch_combination1')
+            pouch_combination_2 = request.POST.get('pouch_combination2')
+            pouch_combination_3 = request.POST.get('pouch_combination3')
+            pouch_combination_4 = request.POST.get('pouch_combination4')
+            
             correction = request.POST.get('correction')
             files = request.FILES.getlist('files')
             
-    
+            pouch_combination_total  = f"{pouch_combination_1} + {pouch_combination_2} + {pouch_combination_3} + {pouch_combination_4}"
             
+            
+            pouch_combination = pouch_combination_total
+            print(pouch_combination)
+            if len(files) >= 2 : 
+                messages.error(request,"You can upload only 2 file")
+                return redirect('data_entry')
+            
+            valid_extension = [".jpeg", ".jpg", ".png" ,".ai"]
+
+            for file in files:
+                ext = os.path.splitext(file.name)[1]
+                if ext.lower() not in valid_extension:
+                    messages.error(request,"Invalid file  Only .jpg, .jpeg, .png and .ai are allowed." ,extra_tags="custom-success-style")
+                    return redirect("dashboard_page")
             # service = get_drive_services()
             # n8n_folder_id = '14AUzR7EWGbCGoQ-MnIoSabVALt_qUeRS' 
 
@@ -424,8 +462,9 @@ def add_data(request):
         else:
             messages.error(request,"Data  Sussfully Add on dbsqlite 3")
             return redirect('data_entry')
-    except Exception:
-        messages.error(request,"Something went wrong")
+    except Exception as e:
+        messages.error(request,f"Something went wrong {e}")
+        return redirect('data_entry')
     
         
     # else:
@@ -470,6 +509,8 @@ def  update_job(request,update_id):
             'pouch_combination':pouch_combination,
             'correction':correction
         }
+        
+        
         if len(files) >= 2 :
             
                 messages.error(request,"You can upload only 2 file")
@@ -493,7 +534,7 @@ def  update_job(request,update_id):
         if response.status_code == 200:
             messages.success(request,'Data Updated Sussfully',)
         else:
-            messages.error(request,'Something went Wrong',extra_tags='custom-error-style')
+            messages.error(request,'Something went Wrong',)
         return redirect('dashboard_page')
     except Exception:
         messages.error(request,'Something went wrong try again')
@@ -527,7 +568,7 @@ def update_profile(request,users_id):
         }    
         for filed,required in required_filed.items():
             if not required:
-                messages.error(request,f"{filed} is Required" ,extra_tags='custom-success-style')
+                messages.error(request,f"{filed} is Required" ,)
                 return redirect('profile_page')
             
         update_profile = get_object_or_404(Registration,id=users_id)
@@ -538,7 +579,7 @@ def update_profile(request,users_id):
         
         
         update_profile.save()
-        messages.success(request,"Profile Will Updated",extra_tags='custom-success-style')
+        messages.success(request,"Profile Will Updated",)
         return redirect('profile_page')
     except Exception:
         messages.error(request,'Something went wrong try again')
@@ -551,7 +592,7 @@ def user_password(request):
         confirm_password = request.POST.get('confirm_password')
         user_password = request.user
         if not user_password.check_password(old_password):
-            messages.error(request,'Old Password is Incorrect',extra_tags='custom-success-style')
+            messages.error(request,'Old Password is Incorrect',)
             return redirect("profile_page")
         if len(new_password) < 8 or not any(i.isupper() for i in new_password) or not any (i in "!@#$%^&*()_+-={}[]\\:;\"'<>,.?/~`" for i in new_password):
             messages.error(request,"Password Must be 8 Char and One Upercase or one spicial Symboal ",extra_tags='custom-success-style')
