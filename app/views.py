@@ -206,24 +206,33 @@ def update_user(request,user_id):
 @login_required(redirect_field_name=None)
 def dashboard_page(request):
     try:
+
+        
         # Get the search query
         get_q = request.GET.get('q', '')
-        
-        db_sqlite3 = Job_detail.objects.all()
+
         if get_q:
-            db_sqlite3 = Job_detail.objects.filter(Q(company_name__icontains=get_q)| Q(job_name__icontains=get_q) )
+            db_sqlite3 = Job_detail.objects.filter(Q(company_name__icontains=get_q)| Q(job_name__icontains=get_q) ).order_by('id')
         else:
-            db_sqlite3 = Job_detail.objects.all()
+            db_sqlite3 = Job_detail.objects.all().order_by('id')
 
-
+        for i in db_sqlite3:
+            demo = i.pouch_combination
+        
+            # number_string = demo.split(' + ')
+            # for i in number_string:
+            #     print(i)
+            
         p = Paginator(db_sqlite3, 10)
         page = request.GET.get('page')
         venues = p.get_page(page)
         
         total_job = db_sqlite3.count()
-        company_name = CompanyName.objects.all()
-        nums = "a" *venues.paginator.num_pages
-        print(nums)
+        company_name = CompanyName.objects.all()    
+        cylinder_company_names = CylinderMadeIn.objects.all()
+        nums = "a" * venues.paginator.num_pages
+        
+        
        
         context = {
             'nums':nums,
@@ -231,6 +240,8 @@ def dashboard_page(request):
             'venues': venues,
             'total_job': total_job,
             'company_name': company_name,
+            'cylinder_company_names':cylinder_company_names,
+            'nums':nums
         }
     except Exception:
         return redirect('dashboard_page')
@@ -239,13 +250,18 @@ def dashboard_page(request):
 
 @login_required(redirect_field_name=None)   
 def delete_data(request,delete_id):
-    id = delete_id
-    print(id)
-    response = requests.delete(f"http://localhost:5678/webhook/d51a7064-e3b9-41f5-a76f-264e19f60b70/artical/delete/{id}")
-    data = response.json()
-    # print(data)
-    messages.success(request,"Job Deleted Sussfully")
-    return redirect('dashboard_page')
+    try:
+        
+        id = delete_id
+        print(id)
+        response = requests.delete(f"http://localhost:5678/webhook/d51a7064-e3b9-41f5-a76f-264e19f60b70/artical/delete/{id}")
+        data = response.json()
+        # print(data)
+        messages.success(request,"Job Deleted Sussfully")
+        return redirect('dashboard_page')
+    except Exception:
+        messages.warning(request,"Something went Wrong")
+        return redirect('dashboard_page')
 
 
 @login_required(redirect_field_name=None)  
@@ -256,9 +272,10 @@ def base_html(request):
 def data_entry(request):
     
     comapny_name = CompanyName.objects.all()
-    
+    cylinder_company_names = CylinderMadeIn.objects.all()
     context =  {
-        'comapany_name':comapny_name
+        'comapany_name':comapny_name,
+        'cylinder_company_names':cylinder_company_names
     }
     return render(request, 'data_entry.html',context)
 
@@ -357,22 +374,30 @@ def add_data(request):
             noc = request.POST.get('noc')
             prpc = request.POST.get('prpc')
             cylinder_size = request.POST.get('cylinder_size')
-            cylinder_made_in = request.POST.get('cylinder_made_in')
+            cylinder_made_in_s = request.POST.get('cylinder_select')
             pouch_size = request.POST.get('pouch_size')
             pouch_open_size = request.POST.get('pouch_open_size')
             pouch_combination_1 = request.POST.get('pouch_combination1')
             pouch_combination_2 = request.POST.get('pouch_combination2')
             pouch_combination_3 = request.POST.get('pouch_combination3')
             pouch_combination_4 = request.POST.get('pouch_combination4')
-            
+            new_company = request.POST.get('new_company')
+            new_cylinder_company_name = request.POST.get('cylinder_made_in_company_name')
             correction = request.POST.get('correction')
-            files = request.FILES.getlist('files')
-            
+            files = request.FILES.getlist('files') 
             pouch_combination_total  = f"{pouch_combination_1} + {pouch_combination_2} + {pouch_combination_3} + {pouch_combination_4}"
             
+            file_dic = {}
+            for i ,file in enumerate(files):
+                if file.name:
+                    file_name_without  = file.name.rsplit('.',1)[0]
+                    file_key = f"file_{i}_{file_name_without}"
+                else:
+                    file_key = f"file_{i}"
+                    
+                file_dic[file_key] = (file.name, file, file.content_type)
             
             pouch_combination = pouch_combination_total
-            print(pouch_combination)
             if len(files) >= 2 : 
                 messages.error(request,"You can upload only 2 file")
                 return redirect('data_entry')
@@ -383,7 +408,34 @@ def add_data(request):
                 ext = os.path.splitext(file.name)[1]
                 if ext.lower() not in valid_extension:
                     messages.error(request,"Invalid file  Only .jpg, .jpeg, .png and .ai are allowed." ,extra_tags="custom-success-style")
-                    return redirect("dashboard_page")
+                    return redirect("data_entry")
+            if new_company != '':
+                company_name = new_company
+                if CompanyName.objects.filter(company_name__icontains=company_name).exists():
+                    messages.error(request,"Company Name Alredy Exists",extra_tags='custom-success-style')
+                    return redirect('data_entry')
+                add_company = CompanyName.objects.create(
+                    company_name=company_name
+                )
+                add_company.save()
+
+            if  new_cylinder_company_name != '':
+                
+                cylinder_made_in_s = new_cylinder_company_name
+                if CylinderMadeIn.objects.filter(cylinder_made_in__icontains = cylinder_made_in_s).exists():
+                    messages.error(request,"Company Name Alredy Exists",extra_tags='custom-success-style')
+                    return redirect('data_entry')
+                add_new_cylinder_company = CylinderMadeIn.objects.create(
+                    cylinder_made_in = cylinder_made_in_s
+                )
+                add_new_cylinder_company.save()
+                
+           
+                 
+
+            # print(cylinder_made_in_s)
+           
+            
             # service = get_drive_services()
             # n8n_folder_id = '14AUzR7EWGbCGoQ-MnIoSabVALt_qUeRS' 
 
@@ -422,20 +474,41 @@ def add_data(request):
             #         fields='id',
             #         supportsAllDrives=True
             #     ).execute()
+            
+            
+            #             data_string = "1 + 1 + 1 + 1"
+
+            # # Split the string by " + " to get a list of number strings
+            # numbers_as_strings = data_string.split(" + ")
+
+            # # Convert each string to an integer and assign to separate variables
+            # # This assumes you know the exact number of elements beforehand
+            # if len(numbers_as_strings) >= 1:
+            #     var1 = int(numbers_as_strings[0])
+            # if len(numbers_as_strings) >= 2:
+            #     var2 = int(numbers_as_strings[1])
+            # if len(numbers_as_strings) >= 3:
+            #     var3 = int(numbers_as_strings[2])
+            # if len(numbers_as_strings) >= 4:
+            #     var4 = int(numbers_as_strings[3])
+
+            # # You can also store them in a list if the number of elements varies
+            # all_numbers = [int(num) for num in numbers_as_strings]
+
+            # # Print the results to verify
+            # print(f"var1: {var1}")
+            # print(f"var2: {var2}")
+            # print(f"var3: {var3}")
+            # print(f"var4: {var4}")
+            # print(f"All numbers in a list: {all_numbers}")
 
             #     uploaded_file_ids.append(uploaded_file.get('id'))
             #     os.remove(temp_file.name) 
             # Gauth=GoogleAuth()
             
-            file_dic = {}
-            for i ,file in enumerate(files):
-                if file.name:
-                    file_name_without  = file.name.rsplit('.',1)[0]
-                    file_key = f"file_{i}_{file_name_without}"
-                else:
-                    file_key = f"file_{i}"
-                    
-                file_dic[file_key] = (file.name, file, file.content_type)
+            
+                
+        
                 
         data  =  {
                 'date':date,
@@ -446,7 +519,7 @@ def add_data(request):
                 'noc':noc,
                 'prpc':prpc,
                 'cylinder_size':cylinder_size,
-                'cylinder_made_in':cylinder_made_in,
+                'cylinder_made_in':cylinder_made_in_s,
                 'pouch_size':pouch_size,
                 'pouch_open_size':pouch_open_size,
                 'pouch_combination':pouch_combination,
@@ -492,8 +565,22 @@ def  update_job(request,update_id):
             pouch_combination = request.POST.get('pouch_combination')
             correction = request.POST.get('correction')
             files = request.FILES.getlist('files')
+        
+        
+        print(update_id)
+        
+        get_data =  Job_detail.objects.all().get(id=update_id)
+        print(get_data)
+        
+        get_combinations = get_data.pouch_combination.replace(" ","").split("+")
+        print(get_combinations)
+        while len(get_combinations) < 4:
+            get_combinations.append('')
             
-            
+        print(get_combinations[0])
+        print(get_combinations[1])
+        print(get_combinations[2])
+
         data  =  {
             'date':date,
             'bill_no':bill_no,
@@ -535,10 +622,12 @@ def  update_job(request,update_id):
             messages.success(request,'Data Updated Sussfully',)
         else:
             messages.error(request,'Something went Wrong',)
+     
         return redirect('dashboard_page')
-    except Exception:
-        messages.error(request,'Something went wrong try again')
+    except Exception as e:
+        messages.error(request,f'Something went wrong try again {e}')
         return redirect('dashboard_page')
+    
 
 @login_required(redirect_field_name=None)
 def user_logout(request):

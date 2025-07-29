@@ -13,7 +13,10 @@
               <div class="ms-md-auto py-2 py-md-0">
                 {% comment %} <a href="#" class="btn btn-label-info btn-round me-2">Manage</a> {% endcomment %}
                 <a href="{% url "data_entry" %}" class="btn btn-primary btn-round">Add  New Job </a>
+                {% comment %} <a href="{% url "data_entry" %}" class="btn btn-primary btn-round">Add  New Job </a> {% endcomment %}
               </div>
+
+              
             </div>
             <div class="row">
               <div class="col-sm-6 col-md-3">
@@ -85,10 +88,10 @@
                       <div class="card-title">Job Details</div>
                      
                       <div class="card-tools">
-                        <form method="get" class="d-flex align-items-center" action="#">  
+                        <form method="get" class="d-flex align-items-center" action="{% url "dashboard_page" %}">  
                          
-                            <div class="form-outline me-2" data-mdb-input-init> 
-                                <input type="text" name="q" id="q" class="form-control"  placeholder="Search Filed"/>
+                            <div class="form-outline me-2" data-mdb-input-init>  
+                                <input type="text" name="q" id="q" class="form-control" value="{{request.GET.q}}" placeholder="Search Filed"/>
                                 {% comment %} <select id="job_type" name="q" class="form-control form-select border-2" required>
                                             <option value="">Select Company Name</option>
                                             {% for i in  company_name %}
@@ -298,7 +301,8 @@
                                                                           <!-- Pouch Combination -->
                                                                           <div class="col-md-6">
                                                                               <label for="pouch_combination" class="form-label">Pouch Combination</label>
-                                                                              <input type="text" id="pouch_combination" class="form-control" name="pouch_combination" value="{{ i.pouch_combination }}">
+                                                                              <input type="text" id="pouch_combination" class="form-control col-md-2" name="pouch_combination" value="{{ i.pouch_combination }}">
+                                                                              
                                                                           </div>
 
                                                                           <!-- Image Upload (Multiple Files) -->
@@ -312,6 +316,12 @@
                                                                               <label for="correction" class="form-label">Correction</label>
                                                                               <input type="textarea" class="form-control" id="correction" name="correction"  value="{{ i.correction }}">
                                                                           </div>
+                                                                          {% comment %} 
+                                                                            <div class="col-md-6">
+                                                                              <input type="hidden" class="form-control" id="demo1" name="demo1"  value="">
+                                                                              <input type="hidden" class="form-control" id="demo2" name="demo2"  value="">
+                                                                            </div> 
+                                                                          {% endcomment %}
 
                                                                           <!-- Form Actions -->
                                                                           <div class="col-12">
@@ -339,30 +349,52 @@
 
                 </div>
               </div>
-            <nav aria-label="Page navigation example">
-              <ul class="pagination">
-                {% if venues.has_previous %}
-                <li class="page-item"><a class="page-link" href="?page={{venues.previous_page_number}}">Previous</a></li>
-                 {% endif %}
-                {% comment %} {% for i  in  nums %}
+        {% if venues.paginator.count > 10 %}
+        <nav aria-label="Page navigation example">
+          <ul class="pagination justify-content-end">
+            {% if venues.has_previous %}
+              <li class="page-item"><a class="page-link" href="?page={{ venues.previous_page_number }}">Previous</a></li>
+            {% endif %}
+            
+            {% for i in nums %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ forloop.counter }}">{{ forloop.counter }}</a>
+              </li>
+            {% endfor %}
+            
+            {% if venues.has_next %}
+              <li class="page-item"><a class="page-link" href="?page={{ venues.next_page_number }}">Next</a></li>
+            {% endif %}
+          </ul>
+        </nav>
+        {% endif %}
 
-                <li class="page-item"><a class="page-link" href="?page = {{ forloop.counter }}">{{ forloop.counter }}</a></li>
-           {% endfor %} {% endcomment %}
-                 {% if venues.has_next %}
-                <li class="page-item"><a class="page-link" href="?page={{venues.next_page_number}}">Next</a></li>
-                {% endif %}
-              </ul>
-            </nav>
-              
+
+
+
+
               {% comment %} Current{{venues}}<br> 
               Previous:{{venues.has_previous}}<br> 
               Next {{venues.has_next}}<br>
               Current {{venues.number}}<br> 
               Number of Page: {{venues.paginator.num_pages}},br>
-              <hr><br><br> {% endcomment %}
+              <hr><br><br>  {% endcomment %}
+              
              
             </div>
           </div>
+          
        {% endblock main_block %} 
           
  
+{% block script %}
+{% comment %} 
+<script>
+
+const company_name = document.getElementById('company_name');
+const [a, b] = company_name.split(" ");
+console.log(a)
+
+</script> {% endcomment %}
+
+{% endblock script %}

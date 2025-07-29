@@ -48,17 +48,17 @@
                                             Company Name <span class="text-danger">*</span>
                                         </label>
                                            <select id="company_name" name="company_name" class="form-control form-select border-1" required>
-                                            <option value="" disabled>Select Company</option>
+                                            <option value="">Select Company</option>
                                             {% for company in comapany_name  %}
                                                     <option value="{{ company.company_name }}">{{ company.company_name }}</option>
                                             {% endfor %}
+                                             <option value="other">Other</option>
                                             
-                                            
+                                            <input type="text" name="new_company" class="form-control  border-1" id="new_company" style="display: none;" placeholder="Enter New Company Name">
                                         </select>
 
 
-                                        {% comment %} <input type="text" class="form-control  border-2" id="company_name" name="company_name" placeholder="Enter Company Name" required> {% endcomment %}
-                                    </div>
+                                    </div>  
                                 </div>
                             </div>
 
@@ -119,7 +119,15 @@
                                         <label for="cylinder_made_in" class="form-label fw-semibold text-dark">
                                             Cylinder Made In <span class="text-danger">*</span>
                                         </label>
-                                        <input type="text" class="form-control  border-1" id="cylinder_made_in" name="cylinder_made_in" placeholder="Cylinder Made In" required>
+                                        <select name="cylinder_select" id="cylinder_select" class="form-control form-select border-1" required> 
+                                            <option value="">Select Company </option>
+                                            {% for i in  cylinder_company_names %}
+                                                <option value="{{i.cylinder_made_in}}"> {{i.cylinder_made_in}} </option>
+                                            
+                                            {% endfor %}
+                                            <option value="others">Other</option>
+                                        </select>
+                                        <input type="text" class="form-control  border-1" style="display: none;" id="cylinder_made_in_company_name" name="cylinder_made_in_company_name" placeholder="Cylinder Made In" >
                                     </div>
                                 </div>
                             </div>
@@ -317,6 +325,39 @@ const combinedInput = document.getElementById("pouch_combination");
         input.value = formattedValue;
     }</script>
 
+
+    <script>
+
+        const mySelect = document.getElementById('company_name');
+        const new_company = document.getElementById('new_company');
+
+            mySelect.addEventListener('change', function() {
+            if (this.value === 'other') {
+                new_company.style.display = 'block'; 
+                new_company.focus(); 
+            } else {
+                new_company.style.display = 'none'; 
+                new_company.value = ''; 
+            }
+            });
+    </script>
+
+
+     <script>
+
+        const cylinder_select = document.getElementById('cylinder_select');
+        const new_company_cylinder = document.getElementById('cylinder_made_in_company_name');
+
+            cylinder_select.addEventListener('change', function() {
+            if (this.value === 'others') {
+               new_company_cylinder.style.display = 'block'; 
+                new_company_cylinder.focus(); 
+            } else {
+                new_company_cylinder.style.display = 'none'; 
+                new_company_cylinder.value = ''; 
+            }
+            });
+    </script>
 {% endblock script %}
 {% endblock main_block %}
 

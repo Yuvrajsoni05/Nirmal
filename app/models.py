@@ -33,5 +33,10 @@ class Job_detail(models.Model):
         
         
 class CompanyName(models.Model):
-    company_name = models.CharField(max_length=300)
+    company_name = models.CharField(max_length=300,unique=True,)
+    
+    
+class CylinderMadeIn(models.Model):
+    cylinder_made_in =  models.CharField(max_length=300,unique=True,blank=True, null=True)
+    
     
