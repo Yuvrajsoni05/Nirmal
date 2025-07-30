@@ -1,7 +1,13 @@
 {% extends "Base/base.html" %}
-{% block title %} Dashboard {% endblock %}
+{% load custom_tags %}
 {% load humanize %}
 {% load static %}
+
+
+{% block title %} Dashboard {% endblock %}
+
+
+
 
        {% block main_block %}
           <div class="page-inner">
@@ -10,6 +16,7 @@
                 <h3 class="fw-bold mb-3">Dashboard</h3>
                 {% comment %} <h6 class="op-7 mb-2">Free Bootstrap 5 Admin Dashboard</h6> {% endcomment %}
               </div>
+             
               <div class="ms-md-auto py-2 py-md-0">
                 {% comment %} <a href="#" class="btn btn-label-info btn-round me-2">Manage</a> {% endcomment %}
                 <a href="{% url "data_entry" %}" class="btn btn-primary btn-round">Add  New Job </a>
@@ -42,7 +49,7 @@
                       <div class="col col-stats ms-3 ms-sm-0">
                         <div class="numbers">
                           <p class="card-category">Total Rate</p>
-                          <h4 class="card-title">No Data</h4>
+                          <h4 class="card-title">22222222</h4>
                         </div>
                       </div>
                     </div>
@@ -90,16 +97,15 @@
                       <div class="card-tools">
                         <form method="get" class="d-flex align-items-center" action="{% url "dashboard_page" %}">  
                          
+
+                            <div class="form-outline me-2" data-mdb-input-init>  
+                              <input type="date" name="q" class="form-control" value="request.GET.date" >
+                              </div>
                             <div class="form-outline me-2" data-mdb-input-init>  
                                 <input type="text" name="q" id="q" class="form-control" value="{{request.GET.q}}" placeholder="Search Filed"/>
-                                {% comment %} <select id="job_type" name="q" class="form-control form-select border-2" required>
-                                            <option value="">Select Company Name</option>
-                                            {% for i in  company_name %}
-                                            <option value="{{i.company_name}}">{{ i.company_name }}</option>
-                                          
-                                            {% endfor %}
-                                        </select> {% endcomment %}
+                                
                             </div>
+                        
                             <button type="submit" name="search" class="btn btn-primary me-2" data-mdb-ripple-init> 
                                 <i class="fa fa-search"></i>
                             </button>
@@ -118,12 +124,13 @@
                       <table class="table align-items-center mb-0 ">
                         <thead class="thead-light">
                           <tr class="text-nowrap text-center">
-                            <th scope="col">Sr No.</th>
-                                    {% comment %} <th scope="col" class="w-100">ID</th> {% endcomment %}
-                                    <th scope="col">Date</th>
-                                    <th scope="col">Bill No</th>
-                                    <th scope="col" >Company Name</th>
-                                    <th scope="col">Job Type</th>
+                            <th  scope="col" >Sr No.</th>
+                            <th  scope="col" >Date</th>
+                            <th scope="col">Bill No</th>
+                            <th scope="col" >Company Name</th>
+                            <th scope="col" >Job Type</th>
+
+
                                     <th scope="col">Job Name</th>
                                     <th scope="col">Noc</th>
                                     <th scope="col">Rate/Cylinder</th>
@@ -150,7 +157,7 @@
                                             <td >{{ i.job_type}}</td>
                                             <td class="text-truncate">{{ i.job_name }}</td>
                                             <td class="text-truncate">{{ i.noc }}</td>
-                                            <td class="text-truncate">₹ {{ i.prpc|intcomma }}</td>
+                                            <td class="text-truncate">₹ {{ i.prpc|indian_currency_format }}</td>
                                             <td class="text-truncate">{{ i.cylinder_size }}</td>
                                             <td class="text-truncate">{{ i.cylinder_made_in }}</td>
                                             <td class="text-truncate">{{ i.pouch_size }}</td>
@@ -215,7 +222,7 @@
 
                                         {% comment %} Model {% endcomment %}
                                           <div class="modal fade"  id="exampleModal{{i.id}}" tabindex="-1" aria-hidden="true">
-                                                              <div class="modal-dialog modal-lg modal-dialog-centered">
+                                                              <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog modal-xl">
                                                                 <div class="modal-content ">
                                                                   <div class="modal-header bg-light">
                                                                     <h5 class="modal-title">Edit Job</h5>
@@ -300,12 +307,23 @@
 
                                                                           <!-- Pouch Combination -->
                                                                           <div class="col-md-6">
-                                                                              <label for="pouch_combination" class="form-label">Pouch Combination</label>
-                                                                              <input type="text" id="pouch_combination" class="form-control col-md-2" name="pouch_combination" value="{{ i.pouch_combination }}">
-                                                                              
-                                                                          </div>
+                                                                            <label for="pouch_combination" class="form-label">Pouch Combination</label>
+                                                                            <div class="col-md-12 d-flex justify-content-start">
+                                                                                {% with pc=i.pouch_combination|split_text %}
+                                                                                    <input type="text" id="pouch_combination" class="form-control" name="pouch_combination1" value="{{ pc.0 }}" required>
+                                                                                    <span class="input-group-text bg-light border-1 fw-bold">+</span>
+                                                                                    <input type="text" id="pouch_combination" class="form-control" name="pouch_combination2" value="{{ pc.1}}"required>
+                                                                                    <span class="input-group-text bg-light border-1 fw-bold">+</span>
+                                                                                    <input type="text" id="pouch_combination" class="form-control" name="pouch_combination3" value="{{ pc.2}}" required>
+                                                                                    <span class="input-group-text bg-light border-1 fw-bold">+</span>
+                                                                                    <input type="text" id="pouch_combination" class="form-control" name="pouch_combination4" value="{{ pc.3}}" >
+                                                                                {% endwith %}
+                                                                            </div>
+                                                                          
 
-                                                                          <!-- Image Upload (Multiple Files) -->
+                                          
+                                                                          </div>
+                                                                         
                                                                           <div class="col-md-6">
                                                                               <label for="image" class="form-label">Upload Images</label>
                                                                               <input type="file" class="form-control" id="files" name="files" multiple>
@@ -388,13 +406,13 @@
           
  
 {% block script %}
-{% comment %} 
+
 <script>
 
-const company_name = document.getElementById('company_name');
-const [a, b] = company_name.split(" ");
-console.log(a)
 
-</script> {% endcomment %}
+
+</script> 
+
+
 
 {% endblock script %}
