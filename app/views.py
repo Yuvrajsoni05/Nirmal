@@ -53,8 +53,7 @@ class CustomPasswordResetView(PasswordResetView):
 
 
 class CustomPasswordResetDoneView(PasswordResetDoneView):
-    template_name = "Password/password_reset_confirm.html",
-    success_url = reverse_lazy("password_reset_complete")
+    template_name = "Password/password_reset_done.html"
     
 
 class CustomPasswordResetConfirm(PasswordResetConfirmView):
@@ -63,7 +62,7 @@ class CustomPasswordResetConfirm(PasswordResetConfirmView):
 
 
 def password_reset_done(request):
-    return render(request,'Password/password_reset_done.html')
+    return render(request,'Password/password_update_done.html')
 
     
     
@@ -74,7 +73,8 @@ def login_page(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-
+        print(username)
+        print(password)
         user = authenticate(request, username=username, password=password)
         if user is not None:
             
@@ -83,7 +83,7 @@ def login_page(request):
             return redirect('dashboard_page') 
             
     return render(request, 'Registration/login_page.html')  
-
+import re
 @login_required(redirect_field_name=None)
 def register_page(request):
     if request.method == 'POST':
@@ -102,7 +102,12 @@ def register_page(request):
             'Username':username,
             'Password':password,
         }
+        pattern = r"^[a-zA-Z0-9_]+$"
         
+        
+        if re.match(pattern,first_name):
+            messages.error(request,"Only String Will allowed")
+            return redirect('register_page')
         
         for i , required in required_filed.items():
             if not required:
@@ -196,7 +201,7 @@ def update_user(request,user_id):
             #     return redirect('edit_user_page')
             
             update_user.save()
-            messages.success(request,"User Will Updated")
+            messages.success(request,"Job Updated successfully")
             return redirect('edit_user_page')
         
         
@@ -210,7 +215,7 @@ def dashboard_page(request):
         
         # Get the search query
         get_q = request.GET.get('q', '')
-
+        
         if get_q:
             db_sqlite3 = Job_detail.objects.filter(Q(company_name__icontains=get_q)| Q(job_name__icontains=get_q) ).order_by('id')
         else:
@@ -280,86 +285,86 @@ def data_entry(request):
     return render(request, 'data_entry.html',context)
 
 
-def get_drive_services():
-    creds = service_account.Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE, scopes=SCOPES
-    )
-    return build('drive', 'v3', credentials=creds)
+# def get_drive_services():
+#     creds = service_account.Credentials.from_service_account_file(
+#         SERVICE_ACCOUNT_FILE, scopes=SCOPES
+#     )
+#     return build('drive', 'v3', credentials=creds)
 
 
-def get_job_name_folder(service,job_name,parent_job_id):
-    query = (
-    f"name='{job_name}' and mimeType='application/vnd.google-apps.folder'and trashed=false and '{parent_job_id}' in parents"
-)
+# def get_job_name_folder(service,job_name,parent_job_id):
+#     query = (
+#     f"name='{job_name}' and mimeType='application/vnd.google-apps.folder'and trashed=false and '{parent_job_id}' in parents"
+# )
     
-    result = service.files().list(
-        q=query,
-        spaces = 'drive',
-        fields = 'files(id,name)'
-    ).execute()
+#     result = service.files().list(
+#         q=query,
+#         spaces = 'drive',
+#         fields = 'files(id,name)'
+#     ).execute()
     
-    folders = result.get('files',[])
+#     folders = result.get('files',[])
     
     
-    if folders:
-        job_id  = folders[0]['id']
-        job_url = f"https://drive.google.com/drive/folders/{job_id}"
-        return job_id , job_url
-    else:
-        folder_metadata = {
-            'name':job_name,
-            'parents': [parent_job_id],
-            'mimeType':'application/vnd.google-apps.folder'
+#     if folders:
+#         job_id  = folders[0]['id']
+#         job_url = f"https://drive.google.com/drive/folders/{job_id}"
+#         return job_id , job_url
+#     else:
+#         folder_metadata = {
+#             'name':job_name,
+#             'parents': [parent_job_id],
+#             'mimeType':'application/vnd.google-apps.folder'
             
-        }
-        job_folder = service.files().create(
-            body = folder_metadata,
-            fields = 'id',
-            supportsAllDrives=True
-        ).execute()
+#         }
+#         job_folder = service.files().create(
+#             body = folder_metadata,
+#             fields = 'id',
+#             supportsAllDrives=True
+#         ).execute()
         
         
-        job_id = job_folder.get('id')
-        job_url = f"https://drive.google.com/drive/folders/{job_id}"
-        return job_id,job_url
+#         job_id = job_folder.get('id')
+#         job_url = f"https://drive.google.com/drive/folders/{job_id}"
+#         return job_id,job_url
         
 
-def get_create_folder(service, folder_name, parent_folder_id,):
-    query = (
-        f"name='{folder_name}' and mimeType='application/vnd.google-apps.folder' "
-        f"and trashed=false and '{parent_folder_id}' in parents"
-    )
-    result = service.files().list(
-        q=query,
-        spaces='drive',
-        fields='files(id, name)'
-    ).execute()
+# def get_create_folder(service, folder_name, parent_folder_id,):
+#     query = (
+#         f"name='{folder_name}' and mimeType='application/vnd.google-apps.folder' "
+#         f"and trashed=false and '{parent_folder_id}' in parents"
+#     )
+#     result = service.files().list(
+#         q=query,
+#         spaces='drive',
+#         fields='files(id, name)'
+#     ).execute()
 
-    folders = result.get('files', [])
+#     folders = result.get('files', [])
     
-    if folders:
-        folder_id = folders[0]['id']
-        folder_url = f"https://drive.google.com/drive/folders/{folder_id}"
+#     if folders:
+#         folder_id = folders[0]['id']
+#         folder_url = f"https://drive.google.com/drive/folders/{folder_id}"
         
-        return folder_id, folder_url
+#         return folder_id, folder_url
 
-    else:
-        # Create new folder
-        folder_metadata = {
-            'name': folder_name,
-            'parents': [parent_folder_id],
-            'mimeType': 'application/vnd.google-apps.folder'
-        }
+#     else:
+#         # Create new folder
+#         folder_metadata = {
+#             'name': folder_name,
+#             'parents': [parent_folder_id],
+#             'mimeType': 'application/vnd.google-apps.folder'
+#         }
         
-        folder = service.files().create(
-            body=folder_metadata,
-            fields='id',
-            supportsAllDrives=True
-        ).execute()
+#         folder = service.files().create(
+#             body=folder_metadata,
+#             fields='id',
+#             supportsAllDrives=True
+#         ).execute()
         
-        folder_id = folder.get('id')
-        folder_url = f"https://drive.google.com/drive/folders/{folder_id}"
-        return folder_id, folder_url
+#         folder_id = folder.get('id')
+#         folder_url = f"https://drive.google.com/drive/folders/{folder_id}"
+#         return folder_id, folder_url
 
 @login_required(redirect_field_name=None)
 def add_data(request):
@@ -529,12 +534,35 @@ def add_data(request):
 
         
         response = requests.post('http://localhost:5678/webhook/create-data',data=data,files=file_dic)
-        if response.status_code == 200:
-            messages.success(request,"Data Sussfully Add")
-            return redirect('data_entry')
-        else:
-            messages.error(request,"Data  Sussfully Add on dbsqlite 3")
-            return redirect('data_entry')
+        print(response.status_code)
+        try:
+            
+            if response.status_code == 200:
+                messages.success(request,"New Job Create Successfully ")
+                return redirect('data_entry')
+            else:
+                db_sql_3 = Job_detail.objects.create(
+                    date = data,
+                    bill_no = bill_no,
+                    company_name = company_name,
+                    job_name = job_name,
+                    job_type = job_type,
+                    noc = noc ,
+                    prpc = prpc ,
+                    cylinder_size = cylinder_size,
+                    cylinder_made_in = cylinder_made_in_s,
+                    pouch_size = pouch_size,
+                    pouch_open_size = pouch_open_size,
+                    pouch_combination = pouch_combination,
+                    correction = correction,
+                    
+                    
+                )
+                db_sql_3.save()
+                messages.error(request,"Data  Sussfully Add on dbsqlite 3")
+                return redirect('data_entry')
+        except Exception:
+            messages.error(request,"Some thing went worng")
     except Exception as e:
         messages.error(request,f"Something went wrong {e}")
         return redirect('data_entry')
@@ -562,10 +590,18 @@ def  update_job(request,update_id):
             cylinder_made_in = request.POST.get('cylinder_made_in')
             pouch_size = request.POST.get('pouch_size')
             pouch_open_size = request.POST.get('pouch_open_size')
-            pouch_combination = request.POST.get('pouch_combination')
+            # pouch_combination = request.POST.get('pouch_combination')
+            pouch_combination1 = request.POST.get('pouch_combination1')
+            pouch_combination2 = request.POST.get('pouch_combination2')
+            pouch_combination3 = request.POST.get('pouch_combination3') 
+            pouch_combination4 = request.POST.get('pouch_combination4')
             correction = request.POST.get('correction')
             files = request.FILES.getlist('files')
         
+        
+            pouch_combination = f"{pouch_combination1} + {pouch_combination2} + {pouch_combination3} + {pouch_combination4}"
+            print(pouch_combination)
+            
         
         print(update_id)
         
@@ -598,9 +634,9 @@ def  update_job(request,update_id):
         }
         
         
-        if len(files) >= 2 :
+        if len(files) >= 1 :
             
-                messages.error(request,"You can upload only 2 file")
+                messages.error(request,"You can upload only 1 file")
                 return redirect('data_entry')
         file_dic = {}
         for i ,file in enumerate(files):

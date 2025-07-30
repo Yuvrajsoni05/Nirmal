@@ -1,4 +1,6 @@
+
 {% load humanize %}
+
 {% load static %}
 
 <!DOCTYPE html>
@@ -15,7 +17,8 @@
       href="assets/img/kaiadmin/favicon.ico"
       type="image/x-icon"
     /> {% endcomment %}
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" type="image/x-icon" href="{% static "assets/img/logo_icon.png" %}">
     <!-- Fonts and icons -->
     <script src="{% static 'assets/js/plugin/webfont/webfont.min.js' %}"></script>
     <script>
@@ -78,7 +81,17 @@
       position: relative;
       overflow: hidden;
   }
+
+  
 </style> 
+
+      {% block styles %}
+      
+      
+      {% endblock styles %}
+
+
+      
 
 
     <!-- CSS Files -->
