@@ -102,7 +102,7 @@
                                         </label>
                                         <div class="input-group">
                                         <span class="input-group-text bg-light border-1">₹</span>
-                                        <input type="text" class="form-control border-1" id="priceInput" name="prpc" placeholder="00" required>
+                                        <input type="text" class="form-control border-1" id="prpc" name="prpc"  onkeyup="formatNumberWithCommas(this)" placeholder="00" required>
                                     </div>
                                     </div>
                                     <div class="col-12 col-sm-6 col-lg-4">
@@ -360,42 +360,13 @@ const combinedInput = document.getElementById("pouch_combination");
             });
     </script>
 
-<script>
-    const priceInput = document.getElementById('priceInput');
-
-    // Function to format number into INR format
-    function formatToINR(num) {
-        return num.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+<script> 
+        function formatNumberWithCommas(input) {
+        let value = input.value;
+        value = value.replace(/,/g, '');
+        let formattedValue = Number(value).toLocaleString('EN-IN'); 
+        input.value = formattedValue;
     }
-
-    // Event listener to convert price to INR format while typing
-    priceInput.addEventListener('input', function () {
-        let inputValue = priceInput.value;
-
-        // Allow only numbers and one decimal point
-        inputValue = inputValue.replace(/[^0-9.]/g, ''); // Remove any non-numeric and non-decimal characters
-
-        // Allow only one decimal point
-        const decimalCount = (inputValue.match(/\./g) || []).length;
-        if (decimalCount > 1) {
-            inputValue = inputValue.slice(0, -1); // Remove extra decimal point
-        }
-
-        // Update the input field with the formatted number
-        priceInput.value = inputValue ? formatToINR(parseFloat(inputValue)) : '';
-    });
-
-    // Prevent typing anything that's not a number or decimal point
-    priceInput.addEventListener('keypress', function (event) {
-        const char = event.key;
-
-        // Allow numbers (0-9) and one decimal point (.)
-        const hasDecimal = priceInput.value.includes('.');
-
-        if (!/[0-9]/.test(char) && (char !== '.' || hasDecimal)) {
-            event.preventDefault();  // Prevent default if it's not a number or another decimal point
-        }
-    });
 </script>
 
 {% endblock script %}

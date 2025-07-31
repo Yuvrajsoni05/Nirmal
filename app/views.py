@@ -263,19 +263,19 @@ def dashboard_page(request):
         date_s = request.GET.get('date')
 
         # Start with all Job_detail objects
-        db_sqlite3 = Job_detail.objects.all()
+        db_sqlite3 = Job_detail.objects.all().order_by('id')
         
          
         
         if get_q and date_s:
             db_sqlite3 = db_sqlite3.filter(
-                Q(date__icontains=date_s) & (Q(job_name__icontains=get_q) | Q(company_name__icontains=get_q))
+                Q(date__icontains=date_s) & (Q(job_name__icontains=get_q) | Q(company_name__icontains=get_q)).order_by('id')
             )
         elif date_s:
-            db_sqlite3 = Job_detail.objects.filter(Q(date__icontains=date_s))
+            db_sqlite3 = Job_detail.objects.filter(Q(date__icontains=date_s)).order_by('id')
             
         elif  get_q:
-            db_sqlite3 = Job_detail.objects.filter(Q(job_name__icontains=get_q) | Q(company_name__icontains=get_q))
+            db_sqlite3 = Job_detail.objects.filter(Q(job_name__icontains=get_q) | Q(company_name__icontains=get_q)).order_by('id')
             
         p = Paginator(db_sqlite3, 10)
         page = request.GET.get('page')
