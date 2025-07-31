@@ -57,31 +57,79 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  .toast-timeout-bar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 3px;
-    background: rgba(255, 255, 255, 0.7);
-    animation: timeout-progress 5s linear forwards;
-    border-radius: 0 0 0.375rem 0.375rem;
-  }
-  
-  @keyframes timeout-progress {
-      from { width: 100%; }
-      to { width: 0%; }
-  }
-  
-  .toast-container-custom {
-      top: 70px !important;
-      z-index: 1050;
-  }
-  
-  .toast {
-      position: relative;
-      overflow: hidden;
-  }
-
+     .toast-container {
+            z-index: 1050;
+            max-width: 400px;
+        }
+        
+        .toast {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            animation: slideInDown 0.3s ease-out;
+        }
+        
+        .toast.hide {
+            animation: slideOutUp 0.3s ease-in forwards;
+        }
+        
+        @keyframes slideInDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOutUp {
+            from {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+        }
+        
+        .toast-body {
+            padding: 12px 16px;
+            font-weight: 500;
+        }
+        
+        .toast-progress {
+            height: 3px;
+            background: rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .toast-progress-bar {
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            width: 100%;
+            animation: progressBar 5s linear forwards;
+        }
+        
+        @keyframes progressBar {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+        
+        .btn-close-white {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+        
+        .toast-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
   
 
   
@@ -161,31 +209,33 @@ nav[aria-label="Page navigation example"] {
     </div>
       
 
-     {% if messages %}
-    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3">
-        {% for message in messages %}
-        <div class="toast align-items-center text-bg-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} border-0 mb-2 show" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body d-flex align-items-center">
-                    {% if message.tags == 'error' %}
-                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16">
-                    <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6"/>
-                  </svg>
-                    {% elif message.tags == 'success' %}
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill me-2" viewBox="0 0 16 16">
-                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.061L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-                    </svg>
-                    
-                    {% endif %}
-                    <span class="flex-grow-1">{{ message }}</span>
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" id="toastContainer">
+        {% if messages %}
+            {% for message in messages %}
+            <div class="toast align-items-center text-bg-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} border-0 show" role="alert" data-toast-id="{{ forloop.counter }}">
+                <div class="d-flex">
+                    <div class="toast-body d-flex align-items-center">
+                        {% if message.tags == 'error' %}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="toast-icon" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                            <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+                        </svg>
+                        {% elif message.tags == 'success' %}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="toast-icon" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.061L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                        </svg>
+                        {% endif %}
+                        <span class="flex-grow-1">{{ message }}</span>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" onclick="closeToast({{ forloop.counter }})"></button>
                 </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                <div class="toast-progress">
+                    <div class="toast-progress-bar"></div>
+                </div>
             </div>
-            <div class="toast-timeout-bar"></div>
-        </div>
-        {% endfor %}
+            {% endfor %}
+        {% endif %}
     </div>
-    {% endif %}
     <!--   Core JS Files   -->
     <script src="{% static 'assets/js/core/jquery-3.7.1.min.js' %}"></script>
     <script src="{% static 'assets/js/core/popper.min.js' %}"></script>
@@ -239,20 +289,25 @@ nav[aria-label="Page navigation example"] {
         });
     </script>
     <script>
+        function closeToast(id) {
+            const toast = document.querySelector(`[data-toast-id="${id}"]`);
+            if (toast) {
+                toast.classList.add('hide');
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);s
+                    }
+                }, 300);
+            }
+        }
+
+        // Auto-close toasts after 5 seconds
         document.addEventListener('DOMContentLoaded', function() {
-            const toasts = document.querySelectorAll('.toast.show');
-            toasts.forEach(function(toastElement) {
-                const bsToast = new bootstrap.Toast(toastElement, {
-                    autohide: false
-                });
-                
-                setTimeout(function() {
-                    bsToast.hide();
-                    setTimeout(function() {
-                        if (toastElement && toastElement.parentNode) {
-                            toastElement.parentNode.removeChild(toastElement);
-                        }
-                    }, 300);
+            const toasts = document.querySelectorAll('.toast[data-toast-id]');
+            toasts.forEach((toast, index) => {
+                const id = toast.getAttribute('data-toast-id');
+                setTimeout(() => {
+                    closeToast(id);
                 }, 5000);
             });
         });
