@@ -93,20 +93,15 @@
                   <div class="card-header">
                     <div class="card-head-row card-tools-still-right">
                       <div class="card-title">Job Details</div>
-                     
                       <div class="card-tools">
                         <form method="get" class="d-flex align-items-center" action="{% url "dashboard_page" %}">  
-                         
-
                             <div class="form-outline me-2" data-mdb-input-init>  
-                              <input type="date" name="q" class="form-control" value="request.GET.date" >
+                              <input type="date" name="date" id="date" class="form-control" value="{{ request.GET.date }}" >
                               </div>
                             <div class="form-outline me-2" data-mdb-input-init>  
                                 <input type="text" name="q" id="q" class="form-control" value="{{request.GET.q}}" placeholder="Search Filed"/>
-                                
                             </div>
-                        
-                            <button type="submit" name="search" class="btn btn-primary me-2" data-mdb-ripple-init> 
+                            <button type="submit"  class="btn btn-primary me-2" data-mdb-ripple-init> 
                                 <i class="fa fa-search"></i>
                             </button>
                             <a href="{% url "dashboard_page" %}"><button type="button"  name="reset" class="btn btn-secondary" data-mdb-ripple-init>
@@ -129,19 +124,17 @@
                             <th scope="col">Bill No</th>
                             <th scope="col" >Company Name</th>
                             <th scope="col" >Job Type</th>
-
-
-                                    <th scope="col">Job Name</th>
-                                    <th scope="col">Noc</th>
-                                    <th scope="col">Rate/Cylinder</th>
-                                    <th scope="col">Cylinder Size</th>
-                                    <th scope="col">Made In</th>
-                                    <th scope="col">Pouch Size</th>
-                                    <th scope="col">Open Size</th>
-                                    <th scope="col">Combination</th>
-                                    <th scope="col">Correction</th>
-                                    <th scope="col">Folder id</th>
-                                    <th scope="col"  colspan="2">Actions</th>
+                            <th scope="col">Job Name</th>
+                            <th scope="col">Noc</th>
+                            <th scope="col">Rate/Cylinder</th>
+                            <th scope="col">Cylinder Size</th>
+                            <th scope="col">Made In</th>
+                            <th scope="col">Pouch Size</th>
+                            <th scope="col">Open Size</th>
+                            <th scope="col">Combination</th>
+                            <th scope="col">Correction</th>
+                            <th scope="col">Folder id</th>
+                            <th scope="col"  colspan="2">Actions</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -163,14 +156,13 @@
                                             <td class="text-truncate">{{ i.pouch_size }}</td>
                                             <td class="text-truncate">{{ i.pouch_open_size }}</td>
 
-                                            
                                             <td class="text-truncate">{{ i.pouch_combination }}</td>
 
                                             {% if i.correction %}
                                             <td class="text-truncate" data-bs-toggle="modal" data-bs-target="#staticBackdrop{{i.id}}" title="{{i.correction}}">{{ i.correction|truncatechars:20 }}</td>
 
                                             {% else %}
-                                                <td class="text-truncate"><span class="badge bg-light text-dark" >No Data<span></td>
+                                                <td class="text-truncate"><span class="badge bg-light fw-bold" >No Data<span></td>
 
 
                                             {% endif %}
@@ -188,15 +180,14 @@
                                                 </button>
                                                 </form>
                                           
-                                                <form method="post" action="" class="d-inline">
-                                                {% csrf_token %}
+                                               
                                                 <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModal{{i.id}}">
                                                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                                                       <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
                                                       <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
                                                     </svg>
                                                           </button>
-                                                </form>
+                                               
                                             </td>
                                         </tr>
                                         {% comment %} Model {% endcomment %}
@@ -236,15 +227,15 @@
 
                                                                           <!-- Event Date -->
                                                                           <div class="col-md-6">
-                                                                              <label for="date" class="form-label">Event Date</label><span style="color:red;"> *</span>
-                                                                              <input type="date" class="form-control" id="date" name="date" value="{{ i.date|date:'Y-m-d' }}">
+                                                                              <label for="date" class="form-label fw-bold">Event Date</label><span style="color:red;"> *</span>
+                                                                              <input type="date" class="form-control" id="date" name="date" value="{{ i.date|date:'Y-m-d' }}" required>
                                                                               <div class="invalid-feedback" id="event_date_error">Please provide an event date.</div>
                                                                           </div>
 
                                                                           <!-- Bill No -->
                                                                           <div class="col-md-6">
-                                                                              <label for="bill_no" class="form-label">Bill No</label><span style="color:red;"> *</span>
-                                                                              <input type="text" class="form-control" id="bill_no" name="bill_no" value="{{ i.bill_no }}">
+                                                                              <label for="bill_no" class="form-label fw-bold">Bill No</label><span style="color:red;"> *</span>
+                                                                              <input type="text" class="form-control" id="bill_no" name="bill_no" value="{{ i.bill_no }}" required>
                                                                               <div class="invalid-feedback" id="event_name_error">Please provide an event Bill No.</div>
                                                                           </div>
 
@@ -253,85 +244,108 @@
                                                                           <!-- Company Name -->
                                                                           <div class="col-md-6">
                                                                       
-                                                                              <label for="company_name" class="form-label">Company Name</label>
+                                                                              <label for="company_name" class="form-label fw-bold">Company Name</label>
                                                                               <input type="text" id="company_name" class="form-control" name="company_name" value="{{ i.company_name }}" readonly>
                                                                           </div>
 
                                                                           <!-- Job Type -->
                                                                           <div class="col-md-6">
-                                                                              <label for="job_type" class="form-label">Job Type</label>
-                                                                              <input type="text" id="job_type" class="form-control" name="job_type" value="{{ i.job_type }}" readonly>
+                                                                              <label for="job_type" class="form-label fw-bold">Job Type</label>
+
+                                                                               <select id="job_type" name="job_type" class="form-control form-select border-1" required>
+                                                                                  <option value="{{ i.job_type }}">{{ i.job_type }}</option>
+                                                                                  <option value="New Job" {% if i.job_type == "New Job" %}disabled {% endif %}>New Job</option>
+                                                                                  <option value="Old Job"{% if i.job_type == "Old Job" %}disabled {% endif %}>Old Job</option>
+                                                                                  <option value="Job Work"{% if i.job_type == "Job Work" %}disabled {% endif %}>Job Work</option>
+                                                                              </select>
+                                                                              
                                                                           </div>
 
                                                                           <!-- Job Name -->
                                                                           <div class="col-md-6">
-                                                                              <label for="job_name" class="form-label">Job Name</label>
+                                                                              <label for="job_name" class="form-label fw-bold">Job Name</label>
                                                                               <input type="text" id="job_name" class="form-control" name="job_name" value="{{ i.job_name }}" readonly>
                                                                           </div>
 
                                                                           <!-- NOC -->
                                                                           <div class="col-md-6">
-                                                                              <label for="noc" class="form-label">NOC</label>
-                                                                              <input type="text" id="noc" class="form-control" name="noc" value="{{ i.noc }}">
+                                                                              <label for="noc" class="form-label fw-bold">NOC (No. of Colors)</label>
+                                                                              <input type="text" id="noc" class="form-control" name="noc" value="{{ i.noc }}"required>
                                                                           </div>
 
                                                                           <!-- PRPC -->
                                                                           <div class="col-md-6">
-                                                                              <label for="prpc" class="form-label">PRPC</label>
-                                                                              <input type="text" id="prpc" class="form-control" name="prpc" value="{{ i.prpc }}">
+                                                                              <label for="prpc" class="form-label fw-bold">PRPC (Per Rate Per Cylinder )</label>
+                                                                              <input type="text" id="prpc" class="form-control" name="prpc" onkeyup="formatNumberWithCommas(this)" value="{{ i.prpc }}"required>
                                                                           </div>
 
                                                                           <!-- Cylinder Size -->
                                                                           <div class="col-md-6">
-                                                                              <label for="cylinder_size" class="form-label">Cylinder Size</label>
-                                                                              <input type="text" id="cylinder_size" class="form-control" name="cylinder_size" value="{{ i.cylinder_size }}" readonly>
+                                                                              <label for="cylinder_size" class="form-label fw-bold">Cylinder Size</label>
+                                                                              <input type="text" id="cylinder_size" class="form-control" name="cylinder_size" value="{{ i.cylinder_size }}" readonly >
                                                                           </div>
 
                                                                           <!-- Cylinder Made In -->
                                                                           <div class="col-md-6">
-                                                                              <label for="cylinder_made_in" class="form-label">Cylinder Made In</label>
-                                                                              <input type="text" id="cylinder_made_in" class="form-control" name="cylinder_made_in" value="{{ i.cylinder_made_in }}">
+                                                                              <label for="cylinder_made_in" class="form-label fw-bold">Cylinder Made In</label>
+
+                                                                              <select id="cylinder_made_in" name="cylinder_made_in" class="form-control form-select border-1" required>
+                                                                                <option value="{{i.cylinder_made_in}}" default select> {{i.cylinder_made_in}}   </option>
+                                                                                {% for r in cylinder_company_names %}
+                                                                                
+                                                                                  <option value="{{ r.cylinder_made_in }}" {% if r.cylinder_made_in == i.cylinder_made_in %}disabled{% endif %}>
+                                                                                          {{r.cylinder_made_in }}
+                                                                                      </option>
+                                                                                {% endfor %}
+                                                                                
+
+
+                                                                              </select>
+                                                                              {% comment %} <input type="text" id="cylinder_made_in" class="form-control" name="cylinder_made_in" value="{{ i.cylinder_made_in }}" required> {% endcomment %}
                                                                           </div>
 
                                                                           <!-- Pouch Size -->
                                                                           <div class="col-md-6">
-                                                                              <label for="pouch_size" class="form-label">Pouch Size</label>
+                                                                              <label for="pouch_size" class="form-label fw-bold">Pouch Size</label>
                                                                               <input type="text" id="pouch_size" class="form-control" name="pouch_size" value="{{ i.pouch_size }}"readonly>
                                                                           </div>
 
                                                                           <!-- Pouch Open Size -->
                                                                           <div class="col-md-6">
-                                                                              <label for="pouch_open_size" class="form-label">Pouch Open Size</label>
+                                                                              <label for="pouch_open_size" class="form-label fw-bold">Pouch Open Size</label>
                                                                               <input type="text" id="pouch_open_size" class="form-control" name="pouch_open_size" value="{{ i.pouch_open_size }}"readonly>
                                                                           </div>
 
                                                                           <!-- Pouch Combination -->
                                                                           <div class="col-md-6">
-                                                                            <label for="pouch_combination" class="form-label">Pouch Combination</label>
+                                                                            <label for="pouch_combination" class="form-label fw-bold">Pouch Combination (thickness)</label>
                                                                             <div class="col-md-12 d-flex justify-content-start">
-                                                                                {% with pc=i.pouch_combination|split_text %}
-                                                                                    <input type="text" id="pouch_combination" class="form-control" name="pouch_combination1" value="{{ pc.0 }}" required>
-                                                                                    <span class="input-group-text bg-light border-1 fw-bold">+</span>
-                                                                                    <input type="text" id="pouch_combination" class="form-control" name="pouch_combination2" value="{{ pc.1}}"required>
-                                                                                    <span class="input-group-text bg-light border-1 fw-bold">+</span>
-                                                                                    <input type="text" id="pouch_combination" class="form-control" name="pouch_combination3" value="{{ pc.2}}" required>
-                                                                                    <span class="input-group-text bg-light border-1 fw-bold">+</span>
-                                                                                    <input type="text" id="pouch_combination" class="form-control" name="pouch_combination4" value="{{ pc.3}}" >
-                                                                                {% endwith %}
-                                                                            </div>
+                                                                                  {% with pc=i.pouch_combination|split_text %}
+                                                                                      <div class="d-flex align-items-center">
+                                                                                          <input type="text" id="pouch_combination" class="form-control" name="pouch_combination1" value="{{pc.0}}" required>
+                                                                                          <span class="input-group-text bg-light border-1 fw-bold">+</span>
+                                                                                          <input type="text" id="pouch_combination" class="form-control" name="pouch_combination2" value="{{pc.1}}" required>
+                                                                                          <span class="input-group-text bg-light border-1 fw-bold">+</span>
+                                                                                          <input type="text" id="pouch_combination" class="form-control" name="pouch_combination3" value="{{pc.2}}">
+                                                                                          <span class="input-group-text bg-light border-1 fw-bold">+</span>
+                                                                                          <input type="text" id="pouch_combination" class="form-control" name="pouch_combination4" value="{{pc.3}}">
+                                                                                      </div>
+                                                                                  {% endwith %}
+                                                                              </div>
+
                                                                           
 
                                           
                                                                           </div>
                                                                          
                                                                           <div class="col-md-6">
-                                                                              <label for="image" class="form-label">Upload Images</label>
+                                                                              <label for="image" class="form-label fw-bold">Upload Images</label>
                                                                               <input type="file" class="form-control" id="files" name="files" multiple>
                                                                           </div>
 
 
                                                                           <div class="col-md-6">
-                                                                              <label for="correction" class="form-label">Correction</label>
+                                                                              <label for="correction" class="form-label fw-bold">Correction</label>
                                                                               <input type="textarea" class="form-control" id="correction" name="correction"  value="{{ i.correction }}">
                                                                           </div>
                                                                           {% comment %} 
@@ -357,7 +371,7 @@
                                                         <tr>
                                                         <td colspan="17" ><center><span> No Data </span></center></td>
                                                       </tr>
-                           {% endif %}
+                                                {% endif %}
                             {% endfor %}            
                         </tbody>
                       </table>
@@ -367,36 +381,39 @@
 
                 </div>
               </div>
-        {% if venues.paginator.count > 10 %}
-        <nav aria-label="Page navigation example">
-          <ul class="pagination justify-content-end">
-            {% if venues.has_previous %}
-              <li class="page-item"><a class="page-link" href="?page={{ venues.previous_page_number }}">Previous</a></li>
-            {% endif %}
-            
-            {% for i in nums %}
-              <li class="page-item">
-                <a class="page-link" href="?page={{ forloop.counter }}">{{ forloop.counter }}</a>
-              </li>
-            {% endfor %}
-            
-            {% if venues.has_next %}
-              <li class="page-item"><a class="page-link" href="?page={{ venues.next_page_number }}">Next</a></li>
-            {% endif %}
-          </ul>
-        </nav>
+    {% if venues.paginator.count > 10 %}
+<nav aria-label="Page navigation example">
+    <div class="pagination-info">
+        Page {{ venues.number }} of {{ venues.paginator.num_pages }}
+    </div>
+
+    <ul class="pagination justify-content-end">
+        {% if venues.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ venues.previous_page_number }}&q={{ request.GET.q }}&date={{ request.GET.date }}">Previous</a></li>
         {% endif %}
 
+        {% for i in venues.paginator.page_range %}
+        <li class="page-item {% if venues.number == i %}active{% endif %}">
+            <a class="page-link" href="?page={{ i }}&q={{ request.GET.q }}&date={{ request.GET.date }}">{{ i }}</a>
+        </li>
+        {% endfor %}
+
+        {% if venues.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ venues.next_page_number }}&q={{ request.GET.q }}&date={{ request.GET.date }}">Next</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
 
 
 
 
-              {% comment %} Current{{venues}}<br> 
+
+              {% comment %} Current Page {{venues}}<br>
               Previous:{{venues.has_previous}}<br> 
               Next {{venues.has_next}}<br>
               Current {{venues.number}}<br> 
-              Number of Page: {{venues.paginator.num_pages}},br>
-              <hr><br><br>  {% endcomment %}
+              Number of Page: {{venues.paginator.num_pages}} {% endcomment %}
               
              
             </div>
@@ -407,11 +424,16 @@
  
 {% block script %}
 
-<script>
+<script> 
+        function formatNumberWithCommas(input) {
+        let value = input.value;
+        value = value.replace(/,/g, '');
+        let formattedValue = Number(value).toLocaleString('EN-IN'); 
+        input.value = formattedValue;
+    }
+</script>
 
 
-
-</script> 
 
 
 

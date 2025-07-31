@@ -83,6 +83,43 @@
   }
 
   
+
+  
+    /* Styling for the entire pagination container */
+nav[aria-label="Page navigation example"] {
+    display: flex; /* Makes the pagination info and page links align horizontally */
+    align-items: center; /* Vertically aligns items in the container */
+    justify-content: space-between; /* Pushes the page info to the left and page links to the right */
+}
+
+/* Custom CSS for Active Pagination Link (from previous response) */
+.pagination .page-item.active .page-link {
+    background-color: #007bff; /* Example: Blue background for active page */
+    color: white; /* Example: White text for active page */
+    border-color: #007bff; /* Example: Matching border color */
+}
+
+/* Optional: Styling for hover effect on inactive pages (from previous response) */
+.pagination .page-item:not(.active) .page-link:hover {
+    background-color: #e9ecef; /* Example: Light gray background on hover */
+}
+
+/* Styling for when a link is actively clicked (pressed down) (from previous response) */
+.pagination .page-link:active {
+    background-color: #6c757d; /* Example: Darker gray background while clicking */
+    border-color: #6c757d;
+}
+
+/* Styling for the pagination-info */
+.pagination-info {
+    font-weight: bold;
+    color: #555;
+    margin-right: 15px; /* Adds some spacing between the info and the pagination links */
+}
+
+
+
+  
 </style> 
 
       {% block styles %}

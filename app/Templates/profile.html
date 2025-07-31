@@ -32,7 +32,7 @@
             <div class="tab-content row justify-content-center" id="profileTabsContent">
                 <!-- Edit Profile Tab -->
                 <div class="tab-pane fade show active " id="profile-edit" role="tabpanel">
-                    <form method="post" action="{% url "update_profile" users_id=user.id %}" id="profile_page" enctype="multipart/form-data">
+                    <form method="post" action="{% url "update_profile" users_id=user.id %}" autocomplete="off" id="profile_page" enctype="multipart/form-data">
                       {% csrf_token %}
                         <div class="row g-3">
                             
@@ -80,7 +80,7 @@
 
                 <!-- Change Password Tab -->
                 <div class="tab-pane fade" id="profile-change-password" role="tabpanel">
-                    <form method="post" action="{% url "update_password" %}">
+                    <form method="post" autocomplete="off" action="{% url "update_password" %}">
                       {% csrf_token %}
                         <div class="row g-3">
                             

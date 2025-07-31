@@ -1,4 +1,8 @@
 from django.shortcuts import get_object_or_404, render,redirect
+from django.core.validators import EmailValidator
+from django.core.exceptions import ValidationError
+
+
 # from torch import t
 from .models import *
 from django.contrib import messages
@@ -84,6 +88,35 @@ def login_page(request):
             
     return render(request, 'Registration/login_page.html')  
 import re
+
+def usernmae_validator(username):
+    if len(username) < 3 or len(username) > 12:
+        return "Username must be between 3 and 12 character"
+
+def email_validator(email):
+    try:
+        EmailValidator()(email)
+        return None
+    except ValidationError:
+        return "Invalid email format"
+
+def validator_password(password):
+    if len(password) < 8:
+        return "Password Must be at least 8 characters long"
+    
+    if not any(char.isupper() for char in password):
+        return "Password must contain at least one uppercase "
+    if not any(char.islower() for char in password):
+         return "Password must contain at least one lowercase"
+     
+    if not any(char.isdigit() for char in password):
+        return "Password must contain at least one number"
+    
+    if not any(char in "!@#$%^&*()_+-={}[]\\:;\"'<>,.?/~`" for char in password):
+        return "Password must contain at least one special character."
+    
+    
+    
 @login_required(redirect_field_name=None)
 def register_page(request):
     if request.method == 'POST':
@@ -102,17 +135,17 @@ def register_page(request):
             'Username':username,
             'Password':password,
         }
-        pattern = r"^[a-zA-Z0-9_]+$"
-        
-        
-        if re.match(pattern,first_name):
-            messages.error(request,"Only String Will allowed")
-            return redirect('register_page')
-        
+    
         for i , required in required_filed.items():
             if not required:
-                messages.error(request,f"This  {i}  {required} field is Required",extra_tags="custom-success-style")
+                messages.error(request,f" {i} field is Required",extra_tags="custom-success-style")
                 return redirect('register_page')
+        
+        
+        email_error = email_validator(email)
+        if email_error:
+            messages.error(request, email_error, extra_tags="custom-success-style")
+            return redirect('register_page')
             
         if Registration.objects.filter(username=username).exists():
                 messages.error(request,'Username Alredy Exist',extra_tags="custom-success-style")
@@ -123,9 +156,9 @@ def register_page(request):
             return redirect('register_page')
         
         
-        if len(password) < 8 or not any(i.isupper() for i in password) or not any (i in "!@#$%^&*()_+-={}[]\\:;\"'<>,.?/~`" for i in password):
-            messages.error(request,"Password  must be at least 8 character with one uppercase and one spical charchter",extra_tags="custom-success-style")
-            
+        password_error = validator_password(password)
+        if password_error:
+            messages.error(request,password_error,extra_tags="custom-success-style")
             if password != confirma_password:
                 messages.error(request,'Password Confirm Password must be same',extra_tags="custom-success-style")
                 return redirect('register_page')
@@ -138,23 +171,18 @@ def register_page(request):
             email= email,
         )
         create_user.save()
-        messages.success(request,"New User Will Created",extra_tags="custom-success-style")
+        messages.success(request,"New User Will Created",)
         
-        return redirect('register_page')
+        return redirect('edit_user_page')
     return render(request,'Registration/register.html')
 
 
 def edit_user_page(request):
-    
-    
     user_info = Registration.objects.exclude(is_superuser=True).exclude(id=request.user.id)
-
     context = {
         'users':user_info
     }
-    
     return render(request,'Registration/edit_user.html',context)
-
 
 
 def delete_user(request,user_id):
@@ -166,92 +194,112 @@ def delete_user(request,user_id):
         messages.success(request,"User Deleted")
         return redirect('edit_user_page')
     
-def update_user(request,user_id):
-    if request.method == 'POST':
-        update_user = get_object_or_404(Registration,id=user_id)
+def update_user(request, user_id):
+    
+    try:
+        
         if request.method == 'POST':
-            update_user.username = request.POST.get('username')
-            update_user.first_name = request.POST.get('first_name')
-            update_user.last_name = request.POST.get('last_name')
-            update_user.email = request.POST.get('email')
             
-            
-            required = {
-                'username':update_user.username,
-                'Firstname':update_user.first_name,
-                'Lastname':update_user.last_name,
-                'Email':update_user.email
-                
-                
+            update_user = get_object_or_404(Registration, id=user_id)
+
+        
+            username = request.POST.get('username')
+            email = request.POST.get('email')
+            first_name = request.POST.get('first_name')
+            last_name = request.POST.get('last_name')
+
+            if username != update_user.username and Registration.objects.filter(username=username).exists():
+                messages.error(request, "Username already exists.", extra_tags="custom-success-style")
+                return redirect('edit_user_page')
+
+
+            if email != update_user.email and Registration.objects.filter(email=email).exists():
+                messages.error(request, "Email already exists.", extra_tags="custom-success-style")
+                return redirect('edit_user_page')
+
+    
+            required_fields = {
+                'Username': username,
+                'Firstname': first_name,
+                'Lastname': last_name,
+                'Email': email,
             }
-            for i , field  in required.items():
-                if not field:
-                    messages.error(request,f"{i} is Required")
+
+            for field_name, value in required_fields.items():
+                if not value:
+                    messages.error(request, f"{field_name} is required.",extra_tags="custom-success-style")
                     return redirect('edit_user_page')
-                    
-                    
-                
-            
-            # if Registration.objects.filter(username = update_user.username).exists():
-            #     messages.error(request,"User Username Alredy exist")
-            #     return redirect('edit_user_page')
-            
-            # if Registration.objects.filter(email = update_user.email).exists():
-            #     messages.error(request,"User Email Alredy exist")
-            #     return redirect('edit_user_page')
-            
+
+            if username != update_user.username:
+                update_user.username = username
+            if email != update_user.email:
+                update_user.email = email
+        
+            update_user.first_name = first_name
+            update_user.last_name = last_name
             update_user.save()
-            messages.success(request,"Job Updated successfully")
+
+            # Success message and redirect
+            messages.success(request, "User updated successfully.")
             return redirect('edit_user_page')
+    except Exception:
+        messages.error(request,"Something went wrong",extra_tags="custom-success-style")
+        return redirect('edit_user_page')
         
         
         
 
 
 @login_required(redirect_field_name=None)
+
+
+# from django.core.paginator import Paginator
+# from django.db.models import Q
+
 def dashboard_page(request):
     try:
+      
+        get_q = request.GET.get('q')
+        date_s = request.GET.get('date')
 
+        # Start with all Job_detail objects
+        db_sqlite3 = Job_detail.objects.all()
         
-        # Get the search query
-        get_q = request.GET.get('q', '')
+         
         
-        if get_q:
-            db_sqlite3 = Job_detail.objects.filter(Q(company_name__icontains=get_q)| Q(job_name__icontains=get_q) ).order_by('id')
-        else:
-            db_sqlite3 = Job_detail.objects.all().order_by('id')
-
-        for i in db_sqlite3:
-            demo = i.pouch_combination
-        
-            # number_string = demo.split(' + ')
-            # for i in number_string:
-            #     print(i)
+        if get_q and date_s:
+            db_sqlite3 = db_sqlite3.filter(
+                Q(date__icontains=date_s) & (Q(job_name__icontains=get_q) | Q(company_name__icontains=get_q))
+            )
+        elif date_s:
+            db_sqlite3 = Job_detail.objects.filter(Q(date__icontains=date_s))
+            
+        elif  get_q:
+            db_sqlite3 = Job_detail.objects.filter(Q(job_name__icontains=get_q) | Q(company_name__icontains=get_q))
             
         p = Paginator(db_sqlite3, 10)
         page = request.GET.get('page')
-        venues = p.get_page(page)
-        
+        datas = p.get_page(page)
         total_job = db_sqlite3.count()
-        company_name = CompanyName.objects.all()    
+        company_name = CompanyName.objects.all()
         cylinder_company_names = CylinderMadeIn.objects.all()
-        nums = "a" * venues.paginator.num_pages
-        
-        
-       
+        nums = "a" * datas.paginator.num_pages  
+
         context = {
-            'nums':nums,
-            'database': db_sqlite3,
-            'venues': venues,
+            'nums': nums,
+            'venues': datas,
             'total_job': total_job,
             'company_name': company_name,
-            'cylinder_company_names':cylinder_company_names,
-            'nums':nums
+            'cylinder_company_names': cylinder_company_names,
         }
-    except Exception:
+
+    except Exception as e:
+        print(f"Error: {e}")
         return redirect('dashboard_page')
-    
-    return render(request,'dashboard.html',context)
+
+    return render(request, 'dashboard.html', context)
+
+
 
 @login_required(redirect_field_name=None)   
 def delete_data(request,delete_id):
@@ -392,6 +440,27 @@ def add_data(request):
             files = request.FILES.getlist('files') 
             pouch_combination_total  = f"{pouch_combination_1} + {pouch_combination_2} + {pouch_combination_3} + {pouch_combination_4}"
             
+            
+            required_filed = {
+                'Date' :date,
+                    'Bill no':bill_no,
+                    'Company_Name': company_name,
+                    'job name' : job_name,
+                    'job type':job_type,
+                    'Noc':noc,
+                    'Prpc':prpc,
+                    'Cylinder Size':cylinder_size,
+                    'Cylinder Made in':cylinder_made_in_s,
+                    'Pouch size':pouch_size,
+                    'Pouch Open Size':pouch_open_size,
+                    
+            }
+            for i ,r in required_filed.items():
+                if not  r:
+                    messages.error(request,f"This {r} Filed Was Required",extra_tags="custom-success-style")
+                    return redirect('data_entry')
+            
+            
             file_dic = {}
             for i ,file in enumerate(files):
                 if file.name:
@@ -403,7 +472,7 @@ def add_data(request):
                 file_dic[file_key] = (file.name, file, file.content_type)
             
             pouch_combination = pouch_combination_total
-            if len(files) >= 2 : 
+            if len(files) >= 3: 
                 messages.error(request,"You can upload only 2 file")
                 return redirect('data_entry')
             
@@ -597,7 +666,7 @@ def  update_job(request,update_id):
             pouch_combination4 = request.POST.get('pouch_combination4')
             correction = request.POST.get('correction')
             files = request.FILES.getlist('files')
-        
+            
         
             pouch_combination = f"{pouch_combination1} + {pouch_combination2} + {pouch_combination3} + {pouch_combination4}"
             print(pouch_combination)
@@ -634,10 +703,19 @@ def  update_job(request,update_id):
         }
         
         
-        if len(files) >= 1 :
-            
-                messages.error(request,"You can upload only 1 file")
-                return redirect('data_entry')
+        if len(files) >= 3 :
+            messages.error(request,"You can upload only 2 file")
+            return redirect('dashboard_page')
+        
+        
+        valid_extension = [".jpeg", ".jpg", ".png" ,".ai"]
+
+        for file in files:
+            ext = os.path.splitext(file.name)[1]
+            if ext.lower() not in valid_extension:
+                messages.error(request,"Invalid file  Only .jpg, .jpeg, .png and .ai are allowed." ,extra_tags="custom-success-style")
+                return redirect("data_entry")
+        
         file_dic = {}
         for i ,file in enumerate(files):
             if file.name:
@@ -677,7 +755,7 @@ def profile_page(request):
 
 def update_profile(request,users_id):
     try:
-        
+        update_profile = get_object_or_404(Registration,id=users_id)
         if request.method == 'POST':
             first_name = request.POST.get('first_name')
             last_name = request.POST.get('last_name')
@@ -690,20 +768,36 @@ def update_profile(request,users_id):
             'Last Name':last_name,
             'Email':email,
             'Username':username
-        }    
+        } 
+        
+        
         for filed,required in required_filed.items():
             if not required:
                 messages.error(request,f"{filed} is Required" ,)
                 return redirect('profile_page')
             
-        update_profile = get_object_or_404(Registration,id=users_id)
+            
+        if email !=  update_profile.email and Registration.objects.filter(email=email).exists():
+            messages.error(request,"Email alredy exists" ,extra_tags="custom-success-style")
+            return redirect('profile_page')
+        
+        if username !=  update_profile.username and Registration.objects.filter(username=username).exists():
+            messages.error(request,"Username alredy exists",extra_tags="custom-success-style")
+            return redirect('profile_page')
+            
+        
+        
+        
+        
+        
+        
         update_profile.username = username
         update_profile.last_name = last_name
         update_profile.first_name = first_name
         update_profile.email = email
-        
-        
         update_profile.save()
+        
+        
         messages.success(request,"Profile Will Updated",)
         return redirect('profile_page')
     except Exception:
@@ -719,6 +813,10 @@ def user_password(request):
         if not user_password.check_password(old_password):
             messages.error(request,'Old Password is Incorrect',)
             return redirect("profile_page")
+        
+        
+        
+        
         if len(new_password) < 8 or not any(i.isupper() for i in new_password) or not any (i in "!@#$%^&*()_+-={}[]\\:;\"'<>,.?/~`" for i in new_password):
             messages.error(request,"Password Must be 8 Char and One Upercase or one spicial Symboal ",extra_tags='custom-success-style')
 
