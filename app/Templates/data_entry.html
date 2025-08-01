@@ -1,4 +1,3 @@
-
 {% extends "Base/base.html" %}
 
 {% block title %} Add New Data {% endblock %}
@@ -35,7 +34,7 @@
                                         <label for="job_date" class="form-label fw-semibold text-dark">
                                             Date <span class="text-danger">*</span>
                                         </label>
-                                        <input type="date" class="form-control  border-1" id="job_date" name="job_date" required>
+                                        <input type="date" class="form-control  border-1" id="job_date" name="job_date" pattern="\d{2}-\d{2}-\d{4}" required>
                                     </div>
                                     <div class="col-12 col-sm-6 col-lg-4">
                                         <label for="bill_no" class="form-label fw-semibold text-dark">
@@ -102,10 +101,19 @@
                                         </label>
                                         <div class="input-group">
                                         <span class="input-group-text bg-light border-1">₹</span>
-                                        <input type="text" class="form-control border-1" id="prpc" name="prpc"  onkeyup="formatNumberWithCommas(this)" placeholder="00" required>
+                                        <input type="text" class="form-control border-1" id="prpc" name="prpc_purchase"  onkeyup="formatNumberWithCommas(this)" placeholder="00" required>
                                     </div>
                                     </div>
                                     <div class="col-12 col-sm-6 col-lg-4">
+                                        <label for="prpc_sell" class="form-label fw-semibold text-dark">
+                                           Per Rate Per Cylinder (Sell) <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                        <span class="input-group-text bg-light border-1">₹</span>
+                                        <input type="text" class="form-control border-1" id="prpc_sell" name="prpc_sell"  onkeyup="formatNumberWithCommas(this)" placeholder="00" required>
+                                    </div>
+                                    </div>
+                                    <div class="col-12 col-lg-4">
                                         <label class="form-label fw-semibold text-dark">
                                             Cylinder Size <span class="text-danger">*</span>
                                         </label>
@@ -116,7 +124,9 @@
                                         </div>
                                         <input type="hidden" id="cylinder_size" name="cylinder_size">
                                     </div>
-                                    <div class="col-12 col-lg-4">
+                                </div>
+                                <div class="row g-3 mt-2">
+                                    <div class="col-4">
                                         <label for="cylinder_made_in" class="form-label fw-semibold text-dark">
                                             Cylinder Made In <span class="text-danger">*</span>
                                         </label>
@@ -171,9 +181,7 @@
                                         <input type="number" class="form-control border-1" id="pouch_combination3" name = "pouch_combination3" placeholder="Combination 3" step="0.01" min="0" >
                                         <span class="input-group-text bg-light border-1 fw-bold">+</span>
                                         <input type="number" class="form-control border-1" id="pouch_combination4" name = "pouch_combination4" placeholder="Combination 4" step="0.01" min="0" >
-                                    {% comment %} </div>
-                                       <input type="hidden" class="form-control  border-1" id="pouch_combination" name="pouch_combination" placeholder="Enter Combination Details" required>
-                                    </div> {% endcomment %}
+                                    </div>
                                 </div>
                             </div>
 
@@ -198,9 +206,6 @@
                                         <label for="image" class="form-label fw-semibold text-dark">Upload Image</label>
                                         <div class="border border-2 border-dashed rounded-3 p-4 text-center bg-light">
                                             <input class="form-control  border-0 bg-transparent" type="file" id="files" name="files" multiple>
-                                            {% comment %} <div class="mt-2 text-muted">
-                                                <small>Supported formats: JPG, PNG, GIF. Max size: 5MB</small>
-                                            </div> {% endcomment %}
                                         </div>
                                     </div>
                                 </div>
@@ -224,38 +229,6 @@
   </div>
  {% block script %}
 
-
-{% comment %} <script>
-
-const combination1 = document.getElementById("pouch_combination1");
-const combination2 = document.getElementById("pouch_combination2");
-const combination3 = document.getElementById("pouch_combination3");
-const combination4 = document.getElementById("pouch_combination4");
-const combinedInput = document.getElementById("pouch_combination");
-
-    function updatecombination(){
-        const combination_1 = combination1.value.trim();
-        const combination_2 = combination2.value.trim();
-        const combination_3 = combination3.value.trim();
-        const combination_4 = combination4.value.trim();
-
-
-        if (combination_1 &&  combination_2  &&  combination_3  &&  combination_4){
-            combinedInput_combination.value = `${combination_1} + ${combination_2} + ${combination_3} + ${combination_4}`;
-        }
-        else {
-            combinedInput_combination.value = '';
-        }
-        combination1.addEventListener('input', updatecombination);
-        combination2.addEventListener('input', updatecombination);
-        combination3.addEventListener('input', updatecombination);
-        combination4.addEventListener('input', updatecombination);
-    }
-
-
-</script> {% endcomment %}
-
-
  <script>
         const diameterInput = document.getElementById('cylinder_diameter');
         const heightInput = document.getElementById('cylinder_height');
@@ -273,8 +246,6 @@ const combinedInput = document.getElementById("pouch_combination");
 
         diameterInput.addEventListener('input', updateCylinderSize);
         heightInput.addEventListener('input', updateCylinderSize);
-
-
     </script>  
 
      <script>
@@ -294,8 +265,6 @@ const combinedInput = document.getElementById("pouch_combination");
 
         pouchOpenDiameterInput.addEventListener('input', updatePouchOpenSize);
         pouchOpenHeightInput.addEventListener('input', updatePouchOpenSize);
-
-
     </script>
 
      <script>
@@ -315,20 +284,9 @@ const combinedInput = document.getElementById("pouch_combination");
 
         pouchDiameterInput.addEventListener('input', updatePouchSize);
         pouchHeightInput.addEventListener('input', updatePouchSize);
-
-
     </script>
-    <script>    
-        function formatNumberWithCommas(input) {
-        let value = input.value;
-        value = value.replace(/,/g, '');
-        let formattedValue = Number(value).toLocaleString('en-IN'); 
-        input.value = formattedValue;
-    }</script>
-
 
     <script>
-
         const mySelect = document.getElementById('company_name');
         const new_company = document.getElementById('new_company');
 
@@ -343,9 +301,7 @@ const combinedInput = document.getElementById("pouch_combination");
             });
     </script>
 
-
      <script>
-
         const cylinder_select = document.getElementById('cylinder_select');
         const new_company_cylinder = document.getElementById('cylinder_made_in_company_name');
 
@@ -361,15 +317,104 @@ const combinedInput = document.getElementById("pouch_combination");
     </script>
 
 <script> 
-        function formatNumberWithCommas(input) {
-        let value = input.value;
-        value = value.replace(/,/g, '');
-        let formattedValue = Number(value).toLocaleString('EN-IN'); 
-        input.value = formattedValue;
+function formatNumberWithCommas(input) {
+    let value = input.value;
+    
+    // Remove all commas first
+    value = value.replace(/,/g, '');
+    
+    // Allow only numbers and decimal point
+    // Remove any character that is not a digit or decimal point
+    value = value.replace(/[^0-9.]/g, '');
+    
+    // Ensure only one decimal point
+    const parts = value.split('.');
+    if (parts.length > 2) {
+        value = parts[0] + '.' + parts.slice(1).join('');
     }
+    
+    // If the value is empty, clear the input
+    if (value === '') {
+        input.value = '';
+        return;
+    }
+    
+    // If it's just a decimal point, allow it
+    if (value === '.') {
+        input.value = '.';
+        return;
+    }
+    
+    // Split into integer and decimal parts
+    const [integerPart, decimalPart] = value.split('.');
+    
+    // If there's no integer part, just show the decimal point
+    if (!integerPart) {
+        input.value = decimalPart !== undefined ? '.' + decimalPart : '';
+        return;
+    }
+    
+    // Format the integer part with commas (Indian numbering system)
+    const formattedInteger = parseInt(integerPart).toLocaleString('en-IN');
+    
+    // Combine integer and decimal parts
+    if (decimalPart !== undefined) {
+        input.value = formattedInteger + '.' + decimalPart;
+    } else {
+        input.value = formattedInteger;
+    }
+}
 </script>
+
+{% comment %} <script>
+
+ 
+// Simple number validation function
+function validateNumber(input) {
+    input.addEventListener('input', function() {
+        // Remove non-numeric characters except dots and minus
+        this.value = this.value.replace(/[^0-9.-]/g, '');
+    });
+}
+
+// Apply to all pouch inputs
+function initPouchValidation() {
+    const inputs = [
+        'cylinder_diameter',
+        'cylinder_height', 
+        'pouch_diameter',
+        'pouch_height',
+        'pouch_open_diameter',
+        'pouch_open_height'
+    ];
+    
+    inputs.forEach(name => {
+        const input = document.querySelector(`input[name="${name}"]`);
+        if (input) {
+            validateNumber(input);
+        }
+    });
+}
+
+// Get all values
+function getPouchValues() {
+    const values = {};
+    const inputs = ['cylinder_diameter', 'cylinder_height', 'pouch_diameter', 'pouch_height','pouch_open_diameter','pouch_open_height'];
+    
+    inputs.forEach(name => {
+        const input = document.querySelector(`input[name="${name}"]`);
+        if (input) {
+            values[name] = input.value ? parseFloat(input.value) : null;
+        }
+    });
+    
+    return values;
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', initPouchValidation);
+</script> {% endcomment %}
+
 
 {% endblock script %}
 {% endblock main_block %}
-
-

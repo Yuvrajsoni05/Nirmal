@@ -48,3 +48,9 @@ def indian_currency_format(value):
 def split_text(value):
     return value.split('+')
 
+@register.filter
+def remove_white(value):
+    return value.split(' ')
+
+
+

@@ -126,7 +126,8 @@
                             <th scope="col" >Job Type</th>
                             <th scope="col">Job Name</th>
                             <th scope="col">Noc</th>
-                            <th scope="col">Rate/Cylinder</th>
+                            <th scope="col">Rate/Cylinder Purchase</th>
+                            <th scope="col">Rate/Cylinder Sell</th>
                             <th scope="col">Cylinder Size</th>
                             <th scope="col">Made In</th>
                             <th scope="col">Pouch Size</th>
@@ -150,7 +151,8 @@
                                             <td >{{ i.job_type}}</td>
                                             <td class="text-truncate">{{ i.job_name }}</td>
                                             <td class="text-truncate">{{ i.noc }}</td>
-                                            <td class="text-truncate">₹ {{ i.prpc|indian_currency_format }}</td>
+                                            <td class="text-truncate">₹ {{ i.prpc_purchase|indian_currency_format }}</td>
+                                              <td class="text-truncate">₹ {{ i.prpc_sell|indian_currency_format }}</td>
                                             <td class="text-truncate">{{ i.cylinder_size }}</td>
                                             <td class="text-truncate">{{ i.cylinder_made_in }}</td>
                                             <td class="text-truncate">{{ i.pouch_size }}</td>
@@ -270,13 +272,18 @@
                                                                           <!-- NOC -->
                                                                           <div class="col-md-6">
                                                                               <label for="noc" class="form-label fw-bold">NOC (No. of Colors)</label>
-                                                                              <input type="text" id="noc" class="form-control" name="noc" value="{{ i.noc }}"required>
+                                                                              <input type="number" id="noc" class="form-control" name="noc" value="{{ i.noc }}"required>
                                                                           </div>
 
                                                                           <!-- PRPC -->
                                                                           <div class="col-md-6">
-                                                                              <label for="prpc" class="form-label fw-bold">PRPC (Per Rate Per Cylinder )</label>
-                                                                              <input type="text" id="prpc" class="form-control" name="prpc" onkeyup="formatNumberWithCommas(this)" value="{{ i.prpc }}"required>
+                                                                              <label for="prpc" class="form-label fw-bold">PRPC Purchase (Per Rate Per Cylinder )</label>
+                                                                              <input type="text" id="prpc" class="form-control" name="prpc_purchase" onkeyup="formatNumberWithCommas(this)" value="{{ i.prpc_purchase }}"required>
+                                                                          </div>
+
+                                                                          <div class="col-md-6">
+                                                                              <label for="prpc" class="form-label fw-bold">PRPC Sell (Per Rate Per Cylinder )</label>
+                                                                              <input type="text" id="prpc" class="form-control" name="prpc_sell" onkeyup="formatNumberWithCommas(this)" value="{{ i.prpc_sell }}"required>
                                                                           </div>
 
                                                                           <!-- Cylinder Size -->
@@ -320,15 +327,17 @@
                                                                           <div class="col-md-6">
                                                                             <label for="pouch_combination" class="form-label fw-bold">Pouch Combination (thickness)</label>
                                                                             <div class="col-md-12 d-flex justify-content-start">
+                                                                              
                                                                                   {% with pc=i.pouch_combination|split_text %}
+                                                                                  
                                                                                       <div class="d-flex align-items-center">
-                                                                                          <input type="text" id="pouch_combination" class="form-control" name="pouch_combination1" value="{{pc.0}}" required>
+                                                                                          <input type="text" id="pouch_combination" class="form-control " name="pouch_combination1" value="{{pc.0|cut:" " }}" required>
                                                                                           <span class="input-group-text bg-light border-1 fw-bold">+</span>
-                                                                                          <input type="text" id="pouch_combination" class="form-control" name="pouch_combination2" value="{{pc.1}}" required>
+                                                                                          <input type="text" id="pouch_combination" class="form-control " name="pouch_combination2" value="{{pc.1|cut:" " }}" required>
                                                                                           <span class="input-group-text bg-light border-1 fw-bold">+</span>
-                                                                                          <input type="text" id="pouch_combination" class="form-control" name="pouch_combination3" value="{{pc.2}}">
+                                                                                          <input type="text" id="pouch_combination" class="form-control " name="pouch_combination3" value="{{pc.2|cut:" " }}">
                                                                                           <span class="input-group-text bg-light border-1 fw-bold">+</span>
-                                                                                          <input type="text" id="pouch_combination" class="form-control" name="pouch_combination4" value="{{pc.3}}">
+                                                                                          <input type="text" id="pouch_combination" class="form-control " name="pouch_combination4" value="{{pc.3|cut:" " }}">
                                                                                       </div>
                                                                                   {% endwith %}
                                                                               </div>
@@ -433,8 +442,99 @@
     }
 </script>
 
+<script> 
+function formatNumberWithCommas(input) {
+    let value = input.value;
+    
+    // Remove all commas first
+    value = value.replace(/,/g, '');
+    
+    // Allow only numbers and decimal point
+    // Remove any character that is not a digit or decimal point
+    value = value.replace(/[^0-9.]/g, '');
+    
+    // Ensure only one decimal point
+    const parts = value.split('.');
+    if (parts.length > 2) {
+        value = parts[0] + '.' + parts.slice(1).join('');
+    }
+    
+    // If the value is empty, clear the input
+    if (value === '') {
+        input.value = '';
+        return;
+    }
+    
+    // If it's just a decimal point, allow it
+    if (value === '.') {
+        input.value = '.';
+        return;
+    }
+    
+    // Split into integer and decimal parts
+    const [integerPart, decimalPart] = value.split('.');
+    
+    // If there's no integer part, just show the decimal point
+    if (!integerPart) {
+        input.value = decimalPart !== undefined ? '.' + decimalPart : '';
+        return;
+    }
+    
+    // Format the integer part with commas (Indian numbering system)
+    const formattedInteger = parseInt(integerPart).toLocaleString('en-IN');
+    
+    // Combine integer and decimal parts
+    if (decimalPart !== undefined) {
+        input.value = formattedInteger + '.' + decimalPart;
+    } else {
+        input.value = formattedInteger;
+    }
+}
+</script>
 
+<script>
+// Simple number validation function
+function validateNumber(input) {
+    input.addEventListener('input', function() {
+        // Remove non-numeric characters except dots and minus
+        this.value = this.value.replace(/[^0-9.-]/g, '');
+    });
+}
 
+// Apply to all pouch inputs
+function initPouchValidation() {
+    const inputs = [
+        'pouch_combination1',
+        'pouch_combination2', 
+        'pouch_combination3',
+        'pouch_combination4'
+    ];
+    
+    inputs.forEach(name => {
+        const input = document.querySelector(`input[name="${name}"]`);
+        if (input) {
+            validateNumber(input);
+        }
+    });
+}
 
+// Get all values
+function getPouchValues() {
+    const values = {};
+    const inputs = ['pouch_combination1', 'pouch_combination2', 'pouch_combination3', 'pouch_combination4'];
+    
+    inputs.forEach(name => {
+        const input = document.querySelector(`input[name="${name}"]`);
+        if (input) {
+            values[name] = input.value ? parseFloat(input.value) : null;
+        }
+    });
+    
+    return values;
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', initPouchValidation);
+</script>
 
 {% endblock script %}

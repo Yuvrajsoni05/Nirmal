@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, render,redirect
 from django.core.validators import EmailValidator
 from django.core.exceptions import ValidationError
 
-
+from datetime import datetime
 # from torch import t
 from .models import *
 from django.contrib import messages
@@ -269,8 +269,7 @@ def dashboard_page(request):
         
         if get_q and date_s:
             db_sqlite3 = db_sqlite3.filter(
-                Q(date__icontains=date_s) & (Q(job_name__icontains=get_q) | Q(company_name__icontains=get_q)).order_by('id')
-            )
+            Q(date__icontains=date_s) &(Q(job_name__icontains=get_q) | Q(company_name__icontains=get_q))).order_by('id')
         elif date_s:
             db_sqlite3 = Job_detail.objects.filter(Q(date__icontains=date_s)).order_by('id')
             
@@ -414,6 +413,18 @@ def data_entry(request):
 #         folder_url = f"https://drive.google.com/drive/folders/{folder_id}"
 #         return folder_id, folder_url
 
+def normalize_job_name(job_name):
+    return re.sub(r'\s+', ' ', job_name.strip()).lower()
+
+
+def check_company_name(company_name):
+    return re.sub(r'\s+',' ',company_name.strip()).lower()
+            
+            
+def normalize_cylinder_company_name(cylinder_company_name):
+    return re.sub(r'\s+',' ',cylinder_company_name.strip()).lower()
+
+
 @login_required(redirect_field_name=None)
 def add_data(request):
     try:
@@ -425,7 +436,8 @@ def add_data(request):
             job_name = request.POST.get('job_name')
             job_type = request.POST.get('job_type')
             noc = request.POST.get('noc')
-            prpc = request.POST.get('prpc')
+            prpc_purchase = request.POST.get('prpc_purchase')
+            prpc_sell = request.POST.get('prpc_sell')
             cylinder_size = request.POST.get('cylinder_size')
             cylinder_made_in_s = request.POST.get('cylinder_select')
             pouch_size = request.POST.get('pouch_size')
@@ -439,16 +451,30 @@ def add_data(request):
             correction = request.POST.get('correction')
             files = request.FILES.getlist('files') 
             pouch_combination_total  = f"{pouch_combination_1} + {pouch_combination_2} + {pouch_combination_3} + {pouch_combination_4}"
+            print(prpc_purchase)
+            
+            
+            if Job_detail.objects.filter(job_name = job_name).exists():
+                messages.error(request,"Job are alredy Exsits kidnly apdate job")
+                return redirect('data_entry')
+            
+           
+            normalized_name = normalize_job_name(job_name)
+            exsting_job_name = Job_detail.objects.all()
+            for i in exsting_job_name:
+                if normalize_job_name(i.job_name) == normalized_name:
+                    messages.error(request,"Job Name Alredy Exsits",extra_tags="custom-success-style")
+                    return redirect('data_entry')             
             
             
             required_filed = {
-                'Date' :date,
+                    'Date' :date,
                     'Bill no':bill_no,
                     'Company_Name': company_name,
                     'job name' : job_name,
                     'job type':job_type,
                     'Noc':noc,
-                    'Prpc':prpc,
+                    'Prpc Purchase':prpc_purchase,
                     'Cylinder Size':cylinder_size,
                     'Cylinder Made in':cylinder_made_in_s,
                     'Pouch size':pouch_size,
@@ -485,6 +511,13 @@ def add_data(request):
                     return redirect("data_entry")
             if new_company != '':
                 company_name = new_company
+                company_name_normalize = check_company_name(company_name)
+                exsting_company_name  = CompanyName.objects.all()
+                for i in exsting_company_name:
+                    if check_company_name(i.company_name) == company_name_normalize:
+                        messages.error(request,'Company Name Alredy Exsits',extra_tags='custom-success-style')
+                        return redirect('data_entry')
+                        
                 if CompanyName.objects.filter(company_name__icontains=company_name).exists():
                     messages.error(request,"Company Name Alredy Exists",extra_tags='custom-success-style')
                     return redirect('data_entry')
@@ -494,8 +527,16 @@ def add_data(request):
                 add_company.save()
 
             if  new_cylinder_company_name != '':
-                
                 cylinder_made_in_s = new_cylinder_company_name
+                cylinder_company_name_normalize = normalize_cylinder_company_name(cylinder_made_in_s)
+                exsting_cylinder_company_name = CylinderMadeIn.objects.all()
+                for i in exsting_cylinder_company_name:
+                    if normalize_cylinder_company_name(i.cylinder_made_in) == cylinder_company_name_normalize:
+                        messages.error(request,"Cylinder Company Name Alrdy Exsits",extra_tags='custom-success-style')
+                        return redirect('data-entry')
+                                    
+                
+                
                 if CylinderMadeIn.objects.filter(cylinder_made_in__icontains = cylinder_made_in_s).exists():
                     messages.error(request,"Company Name Alredy Exists",extra_tags='custom-success-style')
                     return redirect('data_entry')
@@ -508,7 +549,34 @@ def add_data(request):
                  
 
             # print(cylinder_made_in_s)
-           
+        
+            # from django.shortcuts import render, redirect
+            # from .models import Company
+            # from django.core.exceptions import ValidationError
+            # import re
+
+            # def normalize_company_name(name):
+            #     return re.sub(r'\s+', ' ', name.strip()).lower()
+
+            # def add_company(request):
+            #     error = None
+            #     if request.method == 'POST':
+            #         name = request.POST.get('name', '')
+            #         normalized_name = normalize_company_name(name)
+
+            #         # Check for existing company with same normalized name
+            #         existing_companies = Company.objects.all()
+            #         for company in existing_companies:
+            #             if normalize_company_name(company.name) == normalized_name:
+            #                 error = "Company name already exists."
+            #                 break
+
+            #         if not error:
+            #             Company.objects.create(name=name)
+            #             return redirect('success_page')  # replace with your redirect
+
+            #     return render(request, 'add_company.html', {'error': error})
+
             
             # service = get_drive_services()
             # n8n_folder_id = '14AUzR7EWGbCGoQ-MnIoSabVALt_qUeRS' 
@@ -591,7 +659,8 @@ def add_data(request):
                 'job_type':job_type,
                 'job_name':job_name,
                 'noc':noc,
-                'prpc':prpc,
+                'prpc_sell':prpc_sell,
+                'prpc_purchase':prpc_purchase,
                 'cylinder_size':cylinder_size,
                 'cylinder_made_in':cylinder_made_in_s,
                 'pouch_size':pouch_size,
@@ -617,7 +686,8 @@ def add_data(request):
                     job_name = job_name,
                     job_type = job_type,
                     noc = noc ,
-                    prpc = prpc ,
+                    prpc_sell =prpc_sell,
+                    prpc_purchase = prpc_purchase ,
                     cylinder_size = cylinder_size,
                     cylinder_made_in = cylinder_made_in_s,
                     pouch_size = pouch_size,
@@ -632,6 +702,7 @@ def add_data(request):
                 return redirect('data_entry')
         except Exception:
             messages.error(request,"Some thing went worng")
+            return redirect('data_entry')
     except Exception as e:
         messages.error(request,f"Something went wrong {e}")
         return redirect('data_entry')
@@ -654,7 +725,8 @@ def  update_job(request,update_id):
             job_name = request.POST.get('job_name')
             job_type = request.POST.get('job_type')
             noc = request.POST.get('noc')
-            prpc = request.POST.get('prpc')
+            prpc_purchase = request.POST.get('prpc_purchase')
+            prpc_sell = request.POST.get('prpc_sell')
             cylinder_size = request.POST.get('cylinder_size')
             cylinder_made_in = request.POST.get('cylinder_made_in')
             pouch_size = request.POST.get('pouch_size')
@@ -669,13 +741,13 @@ def  update_job(request,update_id):
             
         
             pouch_combination = f"{pouch_combination1} + {pouch_combination2} + {pouch_combination3} + {pouch_combination4}"
-            print(pouch_combination)
-            
+            # print(pouch_combination)
+            print(prpc_purchase)
         
-        print(update_id)
+        # print(update_id)
         
         get_data =  Job_detail.objects.all().get(id=update_id)
-        print(get_data)
+        # print(get_data)
         
         get_combinations = get_data.pouch_combination.replace(" ","").split("+")
         print(get_combinations)
@@ -693,7 +765,8 @@ def  update_job(request,update_id):
             'job_type':job_type,
             'job_name':job_name,
             'noc':noc,
-            'prpc':prpc,
+            'prpc_purchase':prpc_purchase,
+             'prpc_sell':prpc_sell,
             'cylinder_size':cylinder_size,
             'cylinder_made_in':cylinder_made_in,
             'pouch_size':pouch_size,
@@ -714,7 +787,7 @@ def  update_job(request,update_id):
             ext = os.path.splitext(file.name)[1]
             if ext.lower() not in valid_extension:
                 messages.error(request,"Invalid file  Only .jpg, .jpeg, .png and .ai are allowed." ,extra_tags="custom-success-style")
-                return redirect("data_entry")
+                return redirect("dashboard_page")
         
         file_dic = {}
         for i ,file in enumerate(files):
@@ -741,8 +814,7 @@ def  update_job(request,update_id):
     except Exception as e:
         messages.error(request,f'Something went wrong try again {e}')
         return redirect('dashboard_page')
-    
-
+   
 @login_required(redirect_field_name=None)
 def user_logout(request):
     logout(request)
@@ -811,7 +883,7 @@ def user_password(request):
         confirm_password = request.POST.get('confirm_password')
         user_password = request.user
         if not user_password.check_password(old_password):
-            messages.error(request,'Old Password is Incorrect',)
+            messages.error(request,'Old Password is Incorrect',extra_tags='custom-success-style')
             return redirect("profile_page")
         
         
