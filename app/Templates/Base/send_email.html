@@ -1,0 +1,92 @@
+{% load static %}
+<!doctype html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>Job Order Completed</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: #f4f4f7;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 650px;
+            margin: 30px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #333333;
+            text-align: center;
+        }
+        p {
+            font-size: 16px;
+            color: #555555;
+            line-height: 1.5;
+        }
+        .info-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        .info-table td {
+            padding: 10px;
+            border-bottom: 1px solid #eeeeee;
+        }
+        .info-table td.label {
+            font-weight: bold;
+            color: #333333;
+            width: 40%;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 25px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .footer {
+            text-align: center;
+            font-size: 13px;
+            color: #888888;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <h2>Job Order Completed</h2>
+        <p>Hello,</p>
+        <p>This is to inform you that the following job order has been successfully completed. Please find the job details below:</p>
+
+        <table class="info-table">
+            <tr><td class="label">Date</td><td>{{ date }}</td></tr>
+            <tr><td class="label">Bill Number</td><td>{{ bill_no }}</td></tr>
+            <tr><td class="label">Company Name</td><td>{{ company_name }}</td></tr>
+            <tr><td class="label">Company Email</td><td>{{ company_email_address }}</td></tr>
+            <tr><td class="label">Job Name</td><td>{{ job_name }}</td></tr>
+            <tr><td class="label">Number of Colors (NOC)</td><td>{{ noc }}</td></tr>
+            <tr><td class="label">PRPC Sell</td><td>{{ prpc_sell }}</td></tr>
+            <tr><td class="label">Cylinder Size</td><td>{{ cylinder_size }}</td></tr>
+            <tr><td class="label">Pouch Size</td><td>{{ pouch_size }}</td></tr>
+            <tr><td class="label">Pouch Open Size</td><td>{{ pouch_open_size }}</td></tr>
+            <tr><td class="label">Correction</td><td>{{ correction }}</td></tr>
+        </table>
+
+        <a href="http://localhost:8000/" class="btn">Go to Nirmal Ventures</a>
+
+        <div class="footer">
+            &copy; {{ date|date:"Y" }} Nirmal Ventures | <a href="http://localhost:8000/">www.nirmal.com</a>
+        </div>
+    </div>
+</body>
+</html>

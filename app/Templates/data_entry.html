@@ -418,3 +418,35 @@ document.addEventListener('DOMContentLoaded', initPouchValidation);
 
 {% endblock script %}
 {% endblock main_block %}
+                      <label for="old_password" class="form-label fw-semibold text-dark">Current Password</label>
+                        <div class="input-group">
+                            <input name="old_password" type="password" class="form-control" id="old_password" placeholder="Old Password">
+                            <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('old_password', this)">
+                            <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback" id="password_error">Please provide Old Password.</div>
+                        </div>
+
+                        <!-- New Password -->
+                        <div class="col-12 position-relative">
+                        <label for="new_password" class="form-label fw-semibold text-dark">New Password</label>
+                        <div class="input-group">
+                            <input name="new_password" type="password" minlength="8" maxlength="20" class="form-control" id="new_password" placeholder="New Password">
+                            <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('new_password', this)">
+                            <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback" id="new_password_error">At least 8 characters, one uppercase, and one special character.</div>
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="col-12 position-relative">
+                        <label for="confirm_password" class="form-label fw-semibold text-dark">Re-enter New Password</label>
+                        <div class="input-group">
+                            <input name="confirm_password" type="password" minlength="8" maxlength="20" class="form-control" id="confirm_password" placeholder="Confirm Password">
+                            <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('confirm_password', this)">
+                            <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                        </div>

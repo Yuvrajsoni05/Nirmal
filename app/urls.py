@@ -21,11 +21,11 @@ urlpatterns = [
     path('delete_user/<uuid:user_id>/',delete_user,name='delete_user'),
     path('update_user/<uuid:user_id>/',update_user,name="update_user"),
     
-    #offline
+  
     path('offline_page',offline_page,name='offline-page'),
     
-
-    #password
+    path('send_mail',send_mail_data,name='send_mail'),
+    
     path('password_reset',CustomPasswordResetView.as_view(),name="password_reset"),
     path('password_reset_done/',CustomPasswordResetDoneView.as_view(), name='password_reset_done'),
     path('reset/<uidb64>/<token>',CustomPasswordResetConfirm.as_view(),name="password_reset_confirm"),

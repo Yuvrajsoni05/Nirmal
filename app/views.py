@@ -12,11 +12,12 @@ import requests
 from django.contrib.auth import update_session_auth_hash
 from googleapiclient.http import MediaFileUpload
 
-
+from decimal import Decimal
 from django.core.paginator import Paginator
 
 
-
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
 from django.db.models import Q
 from django.db.models import Sum
@@ -29,7 +30,7 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
 import mimetypes
 import io
-
+import re
 
 from pydrive2.auth import GoogleAuth 
 from pydrive2.drive import GoogleDrive
@@ -75,19 +76,29 @@ SERVICE_ACCOUNT_FILE = os.path.join(settings.BASE_DIR, 'app', 'Google', 'credent
 SCOPES = ['https://www.googleapis.com/auth/drive']
 def login_page(request):    
     if request.method == 'POST':
-        username = request.POST.get('username')
+        username_email = request.POST.get('username')
         password = request.POST.get('password')
-        print(username)
+        print(username_email)
         print(password)
-        user = authenticate(request, username=username, password=password)
+        
+        valid = re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',username_email)
+        
+        if valid:
+            user_login = Registration.objects.get(email = username_email.lower()).username
+            user = authenticate(request, username=user_login, password=password)
+            
+        else:
+            user = authenticate(request,username=username_email,password=password)
+            
         if user is not None:
-            
-            login(request, user)  
-
+            login(request, user)
+            messages.success(request,'You are Login')
             return redirect('dashboard_page') 
-            
+        else:
+            print('Invalid Login')
+            return redirect('login_page')
     return render(request, 'Registration/login_page.html')  
-import re
+
 
 def usernmae_validator(username):
     if len(username) < 3 or len(username) > 12:
@@ -251,14 +262,10 @@ def update_user(request, user_id):
 
 
 @login_required(redirect_field_name=None)
-
-
-# from django.core.paginator import Paginator
-# from django.db.models import Q
-
 def dashboard_page(request):
     try:
-      
+        
+        
         get_q = request.GET.get('q')
         date_s = request.GET.get('date')
 
@@ -284,6 +291,11 @@ def dashboard_page(request):
         cylinder_company_names = CylinderMadeIn.objects.all()
         nums = "a" * datas.paginator.num_pages  
 
+       
+
+        data = Job_detail.objects.values_list('prpc_sell')
+        print(data)
+ 
         context = {
             'nums': nums,
             'venues': datas,
@@ -677,7 +689,7 @@ def add_data(request):
             
             if response.status_code == 200:
                 messages.success(request,"New Job Create Successfully ")
-                return redirect('data_entry')
+                return redirect('dashboard_page')
             else:
                 db_sql_3 = Job_detail.objects.create(
                     date = data,
@@ -699,7 +711,7 @@ def add_data(request):
                 )
                 db_sql_3.save()
                 messages.error(request,"Data  Sussfully Add on dbsqlite 3")
-                return redirect('data_entry')
+                return redirect('dashboard_page')
         except Exception:
             messages.error(request,"Some thing went worng")
             return redirect('data_entry')
@@ -817,8 +829,14 @@ def  update_job(request,update_id):
    
 @login_required(redirect_field_name=None)
 def user_logout(request):
-    logout(request)
-    return redirect('login_page')
+    
+    try:
+        logout(request)
+        request.session.clear()
+        return redirect('login_page')
+    except Exception as e:
+        messages.error(request,f"Something went Wrong try again {e}")
+        return redirect('dashboard_page')
 
 @login_required(redirect_field_name=None)
 def profile_page(request):
@@ -845,7 +863,7 @@ def update_profile(request,users_id):
         
         for filed,required in required_filed.items():
             if not required:
-                messages.error(request,f"{filed} is Required" ,)
+                messages.error(request,f"{filed} is Required" ,extra_tags="custom-success-style")
                 return redirect('profile_page')
             
             
@@ -857,11 +875,6 @@ def update_profile(request,users_id):
             messages.error(request,"Username alredy exists",extra_tags="custom-success-style")
             return redirect('profile_page')
             
-        
-        
-        
-        
-        
         
         update_profile.username = username
         update_profile.last_name = last_name
@@ -878,26 +891,39 @@ def update_profile(request,users_id):
 def user_password(request):
     if request.method == 'POST':
         
-        old_password = request.POST.get('old_password')
+        old_password = request.POST.get('old_password').strip()
         new_password = request.POST.get('new_password')
         confirm_password = request.POST.get('confirm_password')
+        
+        
+        if old_password == ''  or old_password == None:
+            error = "Please provide Old Password."
+            return render (request,'profile.html',context={'error':error})
+            
         user_password = request.user
         if not user_password.check_password(old_password):
+            
             messages.error(request,'Old Password is Incorrect',extra_tags='custom-success-style')
-            return redirect("profile_page")
+            return redirect('profile_page')
         
         
+        
+        if new_password == ''  or new_password == None:
+            errors = "Please provide New Password."
+            return render (request,'profile.html',context={'errors':errors})
         
         
         if len(new_password) < 8 or not any(i.isupper() for i in new_password) or not any (i in "!@#$%^&*()_+-={}[]\\:;\"'<>,.?/~`" for i in new_password):
             messages.error(request,"Password Must be 8 Char and One Upercase or one spicial Symboal ",extra_tags='custom-success-style')
+            return redirect("profile_page")
 
         if new_password != confirm_password:
             messages.error(request,"new password or confirm Passworsd Must be same ",extra_tags='custom-success-style')
+            return redirect("profile_page")
         
         user_password.set_password(new_password)
         user_password.save()
-        messages.success(request,'Password Updated Successfully',extra_tags='custom-success-style')
+        messages.success(request,'Password Updated Successfully',)
         
         update_session_auth_hash(request,user_password)
         return redirect('profile_page')
@@ -908,3 +934,61 @@ def user_password(request):
 
 def offline_page(request):
     return render(request,'Base/offline_page.html')
+
+
+def send_mail_data(request):
+    if request.method == 'POST':
+        date = request.POST.get('date')
+        bill_no = request.POST.get('bill_no')
+        company_name = request.POST.get('company_name')
+        company_email_address = request.POST.get('company_address')
+        job_name = request.POST.get('job_name')
+        noc = request.POST.get('noc')
+        prpc_sell = request.POST.get('prpc_sell')
+        cylinder_size = request.POST.get('cylinder_size')
+        pouch_size = request.POST.get('pouch_size')
+        pouch_open_size = request.POST.get('pouch_open_size')
+        correction = request.POST.get('correction')
+    print(date,bill_no,company_name,company_email_address,job_name,noc,prpc_sell,cylinder_size,pouch_size,pouch_open_size,correction)
+    
+    
+    
+    job_info = {
+                "date": date,
+                "bill_no": bill_no,
+                "company_name": company_name,
+                "company_email_address": company_email_address,
+                "job_name":job_name,
+                "noc":noc,
+                "prpc_sell":prpc_sell,
+                "cylinder_size":cylinder_size,
+                "pouch_size":pouch_size,
+                "pouch_open_size":pouch_open_size,
+                "correction":correction,
+                
+                
+                
+        }
+    
+    receiver_email = company_email_address
+    template_name  = "Base/send_email.html"
+    convert_to_html_content =  render_to_string(
+    template_name=template_name,
+    context=job_info
+
+    )
+    plain_message  = strip_tags(convert_to_html_content)
+    send_mail(
+        subject= "Mail From Nirmal Ventuers",
+        message = plain_message,
+        from_email = request.user.email,
+        recipient_list=[receiver_email],
+        html_message=convert_to_html_content,
+        fail_silently=False
+        
+    )
+    messages.success(request,"Mail Send successfully")
+    return redirect('dashboard_page')
+    
+    
+   # LF will be replaced by CRLF the next time Git touches it

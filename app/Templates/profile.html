@@ -51,14 +51,14 @@
                             <div class="col-12 col-md-6">
                                 <label for="username" class="form-label fw-semibold text-dark">Username</label>
                                 <input name="username" type="text" maxlength="20" class="form-control" id="username" value="{{user.username}}">
-                                <div class="invalid-feedback" id="username_error">Please provide a Username.</div>
+                                <div   class="invalid-feedback"  id="username_error">Please provide a Username.</div>
                             </div>
 
 
                             <div class="col-12 col-md-6">
                                 <label for="email" class="form-label fw-semibold text-dark">Email</label>
                                 <input name="email" type="email" maxlength="40" class="form-control" id="email" value="{{user.email}}">
-                                <div class="invalid-feedback" id="email_error">Please provide a valid Email.</div>
+                                <span class="invalid-feedback" id="email_error">Please provide Valid Email.</span>
                             </div>
 
                             <div class="col-12">
@@ -84,21 +84,49 @@
                       {% csrf_token %}
                         <div class="row g-3">
                             
-                            <div class="col-12">
-                                <label for="old_password" class="form-label fw-semibold text-dark">Current Password</label>
-                                <input name="old_password" type="password" class="form-control" id="old_password" placeholder="Old Password">
-                            </div>
+                                  <div class="col-12 position-relative">
+                                    <label for="old_password" class="form-label fw-semibold text-dark">Current Password</label>
+                                    <div class="input-group">
+                                        <input name="old_password" type="password" class="form-control" id="old_password" placeholder="Old Password">
+                                        {% comment %} <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('old_password', this)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+  <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+  <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
+</svg>
+                                        </button>  {% endcomment %}
+                                  </div>
+                                    <div style="color:red" id="password_error">{{ error }}</div>
+                                    </div>
 
-                            <div class="col-12">
-                                <label for="new_password" class="form-label fw-semibold text-dark">New Password</label>
-                                <input name="new_password" type="password" minlength="8" maxlength="20" class="form-control" id="new_password" placeholder="New Password">
-                                <div class="form-text">At least 8 characters, one uppercase, and one special character.</div>
-                            </div>
+                                    <!-- New Password -->
+                                    <div class="col-12 position-relative">
+                                    <label for="new_password" class="form-label fw-semibold text-dark">New Password</label>
+                                    <div class="input-group">
+                                        <input name="new_password" type="password" minlength="8" maxlength="20" class="form-control" id="new_password" placeholder="New Password">
+                                        {% comment %} <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('new_password', this)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+  <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+  <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
+</svg>
+                                        </button>  {% endcomment %}
+                                    </div>
+                                    <div style="color:red">{{ errors }}</div>
+                                    {% comment %} <div class="invalid-feedback" id="new_password_error">At least 8 characters, one uppercase, and one special character.</div> {% endcomment %}
+                                    </div>
 
-                            <div class="col-12">
-                                <label for="confirm_password" class="form-label fw-semibold text-dark">Re-enter New Password</label>
-                                <input name="confirm_password" type="password" minlength="8" maxlength="20" class="form-control" id="confirm_password" placeholder="Confirm Password">
-                            </div>
+                                    <!-- Confirm Password -->
+                                    <div class="col-12 position-relative">
+                                    <label for="confirm_password" class="form-label fw-semibold text-dark">Re-enter New Password</label>
+                                    <div class="input-group">
+                                    <input name="confirm_password" type="password" minlength="8" maxlength="20" class="form-control" id="confirm_password" placeholder="Confirm Password">
+                                        {% comment %} <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('confirm_password', this)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+  <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+  <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
+</svg>
+                                        </button>  {% endcomment %}
+                                    </div>
+                          </div>
 
                             <div class="col-12">
                                 <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
@@ -121,3 +149,164 @@
     </div>
 </div>
 {% endblock main_block %}
+
+
+{% block script %}
+
+
+
+<script>
+  function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('i');
+
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.classList.remove('bi-eye');
+      icon.classList.add('fa fa-eye-slash');
+    } else {
+      input.type = 'password';
+      icon.classList.remove('fa fa-eye-slash');
+      icon.classList.add('bi-eye');
+    }
+  }
+</script>
+
+<script>
+
+// Get references to the input and feedback elements
+const emailInput = document.getElementById('email');
+const emailFeedback = document.getElementById('email_error');
+
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+function validateEmail() {
+  const emailValue = emailInput.value;
+
+  if (emailRegex.test(emailValue)) {
+  
+    emailFeedback.style.display = 'none';
+  } else {
+  
+    emailFeedback.style.display = 'block';
+  }
+}
+
+
+emailInput.addEventListener('input', validateEmail);
+</script>
+
+
+<script>
+
+const usernameInput = document.getElementById('username'); 
+const usernameError = document.getElementById('username_error');
+
+function validateUser() {
+  const usernameValue = usernameInput.value;
+  if (usernameValue === '') {
+    usernameError.style.display = 'block'; 
+  } else {
+    usernameError.style.display = 'none'; 
+  }
+}
+
+
+usernameInput.addEventListener('input', validateUser);
+usernameInput.addEventListener('blur', validateUser);
+
+
+</script>
+
+
+<script>
+
+const lastnameInput = document.getElementById('last_name'); 
+const lastnameError = document.getElementById('lastname_error');
+
+function validateLastName() {
+  const lastNameValue = lastnameInput.value;
+  if ( lastNameValue === '') {
+    lastnameError.style.display = 'block'; 
+  } else {
+    lastnameError.style.display = 'none'; 
+  }
+}
+
+
+lastnameInput.addEventListener('input', validateLastName);
+lastnameInput.addEventListener('blur', validateLastName);
+
+
+</script>
+
+
+<script>
+
+const lastnameInput = document.getElementById('last_name'); 
+const lastnameError = document.getElementById('lastname_error');
+
+function validateLastName() {
+  const lastNameValue = lastnameInput.value;
+  if ( lastNameValue === '') {
+    lastnameError.style.display = 'block'; 
+  } else {
+    lastnameError.style.display = 'none'; 
+  }
+}
+
+
+lastnameInput.addEventListener('input', validateLastName);
+lastnameInput.addEventListener('blur', validateLastName);
+
+
+</script>
+
+
+
+<script>
+
+const FirstInput = document.getElementById('first_name'); 
+const FirstError = document.getElementById('firstname_error');
+
+function validateFirstName() {
+  const FirstNameValue = FirstInput.value;
+  if ( FirstNameValue === '') {
+    FirstError.style.display = 'block'; 
+  } else {
+    FirstError.style.display = 'none'; 
+  }
+}
+
+
+FirstInput.addEventListener('input', validateFirstName);
+FirstInput.addEventListener('blur', validateFirstName);
+
+
+</script>
+
+<script>
+
+
+const new_password = document.getElementById('new_password'); 
+const new_password_error = document.getElementById('new_password_error');
+
+function NewPasswordValid() {
+  const newpasswordvalue = new_password.value;
+  if ( newpasswordvalue == '') {
+    new_password_error.style.display = 'block'; 
+  } else {
+    new_password_error.style.display = 'none'; 
+  }
+}
+
+
+new_password.addEventListener('blur', NewPasswordValid);
+</script>
+
+
+{% endblock script %}
+
+

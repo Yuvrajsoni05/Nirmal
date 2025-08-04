@@ -49,7 +49,7 @@
                       <div class="col col-stats ms-3 ms-sm-0">
                         <div class="numbers">
                           <p class="card-category">Total Rate</p>
-                          <h4 class="card-title">22222222</h4>
+                          <h4 class="card-title"></h4>
                         </div>
                       </div>
                     </div>
@@ -135,13 +135,14 @@
                             <th scope="col">Combination</th>
                             <th scope="col">Correction</th>
                             <th scope="col">Folder id</th>
-                            <th scope="col"  colspan="2">Actions</th>
+                            <th scope="col" colspan="3">Actions</th>
+                           
                           </tr>
                         </thead>
                         <tbody>
                            
                             {% for i in  venues %}
-                              {% if i.id != none %}
+                              {% if i.id !=  none %}
                                         <tr class="text-center">
                                             <td class="text-truncate">{{ forloop.counter }}</td>
                                             {% comment %} <td class="text-truncate">{{ i.id }}</td> {% endcomment %}
@@ -156,7 +157,10 @@
                                             <td class="text-truncate">{{ i.cylinder_size }}</td>
                                             <td class="text-truncate">{{ i.cylinder_made_in }}</td>
                                             <td class="text-truncate">{{ i.pouch_size }}</td>
-                                            <td class="text-truncate">{{ i.pouch_open_size }}</td>
+                                           <td class="text-truncate">
+                                            
+                                            
+                                            {{ i.pouch_open_size }}</td>
 
                                             <td class="text-truncate">{{ i.pouch_combination }}</td>
 
@@ -189,9 +193,142 @@
                                                       <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
                                                     </svg>
                                                           </button>
-                                               
+                                         
+                                                        <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#emailModal{{i.id}}">
+                                                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope" viewBox="0 0 16 16">
+                                                              <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z"/>
+                                                            </svg>
+                                                          </button> 
+
                                             </td>
                                         </tr>
+
+
+
+                                      <div class="modal fade" id="emailModal{{i.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                          <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog modal-xl" role="document">
+                                            <div class="modal-content">
+                                              <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLongTitle"></h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                  <span aria-hidden="true">&times;</span>
+                                                </button>
+                                              </div>
+                                              <div class="modal-body">
+                                                <form method="post"  action="{% url "send_mail" %}" enctype="multipart/form-data" autocomplete="off">
+                                                                          {% csrf_token %}
+                                                                          <div class="row g-4">
+
+                                                                          <!-- Event Date -->
+                                                                          <div class="col-md-6">
+                                                                              <label for="date" class="form-label fw-bold">Event Date</label><span style="color:red;"> *</span>
+                                                                              <input type="date" class="form-control" id="date" name="date" value="{{ i.date|date:'Y-m-d' }}" required>
+                                                                              <div class="invalid-feedback" id="event_date_error">Please provide an event date.</div>
+                                                                          </div>
+
+                                                                          <!-- Bill No -->
+                                                                          <div class="col-md-6">
+                                                                              <label for="bill_no" class="form-label fw-bold">Bill No</label><span style="color:red;"> *</span>
+                                                                              <input type="text" class="form-control" id="bill_no" name="bill_no" value="{{ i.bill_no }}" required>
+                                                                              <div class="invalid-feedback" id="event_name_error">Please provide an event Bill No.</div>
+                                                                          </div>
+
+                                                                    
+
+                                                                          <!-- Company Name -->
+                                                                          <div class="col-md-6">
+                                                                      
+                                                                              <label for="company_name" class="form-label fw-bold">Company Name</label>
+                                                                              <input type="text" id="company_name" class="form-control" name="company_name" value="{{ i.company_name }}" readonly>
+                                                                          </div>
+
+
+                                                                          <div class="col-md-6">
+                                                                      
+                                                                              <label for="company_address" class="form-label fw-bold">Company Email Address</label>
+                                                                              <input type="email" id="company_address" class="form-control" name="company_address"  required>
+                                                                          </div>
+
+                                                                       
+                                                              
+
+                                                                          <!-- Job Name -->
+                                                                          <div class="col-md-6">
+                                                                              <label for="job_name" class="form-label fw-bold">Job Name</label>
+                                                                              <input type="text" id="job_name" class="form-control" name="job_name" value="{{ i.job_name }}" readonly>
+                                                                          </div>
+
+                                                                          <!-- NOC -->
+                                                                          <div class="col-md-6">
+                                                                              <label for="noc" class="form-label fw-bold">NOC (No. of Colors)</label>
+                                                                              <input type="number" id="noc" class="form-control" name="noc" value="{{ i.noc }}" readonly>
+                                                                          </div>
+
+                                                                        
+
+                                                                          <div class="col-md-6">
+                                                                              <label for="prpc" class="form-label fw-bold">PRPC Sell (Per Rate Per Cylinder )</label>
+                                                                              <input type="text" id="prpc" class="form-control" name="prpc_sell" onkeyup="formatNumberWithCommas(this)" value="{{ i.prpc_sell }}" >
+                                                                          </div>
+
+                                                                          <!-- Cylinder Size -->
+                                                                          <div class="col-md-6">
+                                                                              <label for="cylinder_size" class="form-label fw-bold">Cylinder Size</label>
+                                                                              <input type="text" id="cylinder_size" class="form-control" name="cylinder_size" value="{{ i.cylinder_size }}" readonly >
+                                                                          </div>
+
+                                                                          <!-- Pouch Size -->
+                                                                          <div class="col-md-6">
+                                                                              <label for="pouch_size" class="form-label fw-bold">Pouch Size</label>
+                                                                              <input type="text" id="pouch_size" class="form-control" name="pouch_size" value="{{ i.pouch_size }}"readonly>
+                                                                          </div>
+
+                                                                          <!-- Pouch Open Size -->
+                                                                          <div class="col-md-6">
+                                                                              <label for="pouch_open_size" class="form-label fw-bold">Pouch Open Size</label>
+                                                                              <input type="text" id="pouch_open_size" class="form-control" name="pouch_open_size" value="{{ i.pouch_open_size }}"readonly>
+                                                                          </div>
+
+                                                                          <!-- Pouch Combination -->
+                                                                          <div class="col-md-6">
+                                                                            <label for="pouch_combination" class="form-label fw-bold">Pouch Combination (thickness)</label>
+                                                                            <div class="col-md-12 d-flex justify-content-start">
+                                                                              
+                                                                                  {% with pc=i.pouch_combination|split_text %}
+                                                                                  
+                                                                                      <div class="d-flex align-items-center">
+                                                                                          <input type="text" id="pouch_combination" class="form-control " name="pouch_combination1" value="{{pc.0|cut:" " }}" readonly>
+                                                                                          <span class="input-group-text bg-light border-1 fw-bold">+</span>
+                                                                                          <input type="text" id="pouch_combination" class="form-control " name="pouch_combination2" value="{{pc.1|cut:" " }}" readonly>
+                                                                                          <span class="input-group-text bg-light border-1 fw-bold">+</span>
+                                                                                          <input type="text" id="pouch_combination" class="form-control " name="pouch_combination3" value="{{pc.2|cut:" " }}" readonly>
+                                                                                          <span class="input-group-text bg-light border-1 fw-bold">+</span>
+                                                                                          <input type="text" id="pouch_combination" class="form-control " name="pouch_combination4" value="{{pc.3|cut:" " }}" readonly>
+                                                                                      </div>
+                                                                                  {% endwith %}
+                                                                              </div>
+                                                                          </div>
+                                                                
+
+
+                                                                          <div class="col-md-6">
+                                                                              <label for="correction" class="form-label fw-bold">Correction</label>
+                                                                              <input type="textarea" class="form-control" id="correction" name="correction"  value="{{ i.correction }}" readonly>
+                                                                          </div>
+                                                              
+                                                                          <!-- Form Actions -->
+                                                                          <div class="col-12">
+                                                                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                              <button type="submit" class="btn btn-primary">Send Mail</button>
+                                                                          </div>
+
+                                                                          </div>
+                                                                    </form>
+                                                                  </div>
+                                            </div>
+                                          </div>
+                                        </div>
+
                                         {% comment %} Model {% endcomment %}
                                         <div class="modal fade" id="staticBackdrop{{i.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                                           <div class="modal-dialog modal-dialog-centered" role="document">
@@ -418,12 +555,7 @@
 
 
 
-              {% comment %} Current Page {{venues}}<br>
-              Previous:{{venues.has_previous}}<br> 
-              Next {{venues.has_next}}<br>
-              Current {{venues.number}}<br> 
-              Number of Page: {{venues.paginator.num_pages}} {% endcomment %}
-              
+       
              
             </div>
           </div>
