@@ -52,7 +52,7 @@
                                             </a></td> 
                                            
                                             <td class="text-truncate">
-                                                <form method="post" action="{% url "delete_user" user_id=i.id %}" class="d-inline">
+                                                <form method="post" action="{% url "delete_user" user_id=i.id %}" class="d-inline" autocomplete="off">
                                                 {% csrf_token %}
                                                 <button class="btn btn-sm btn-outline-danger ms-1" onclick="return confirm('Are you sure you want to delete this item?')">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
@@ -79,49 +79,49 @@
                                                               <div class="modal-dialog modal-lg modal-dialog-centered">
                                                                 <div class="modal-content ">
                                                                   <div class="modal-header bg-light">
-                                                                    <h5 class="modal-title">Edit User  Id</h5>
+                                                                    <h5 class="modal-title">Edit User</h5>
                                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                                   </div>
                                                                   <div class="modal-body form-datas">
                                                                   
-                                                                    <form method="post"  action="{% url "update_user" user_id=i.id %}" enctype="multipart/form-data">
+                                                                    <form method="post"  action="{% url "update_user" user_id=i.id %}" enctype="multipart/form-data" autocomplete="off">
                                                                           {% csrf_token %}
                                                                           <div class="row g-4">
 
-                                                                          <!-- Event Date -->
+                                                                     
                                                                           <div class="col-md-6">
-                                                                              <label for="user_name" class="form-label">Username</label><span style="color:red;"> *</span>
-                                                                              <input type="text" class="form-control" id="username" name="username" value="{{ i.username }}">
-                                                                              <div class="invalid-feedback" id="user_name_error">Please provide Username.</div>
+                                                                              <label for="user_name" class="form-label text-dark">Username</label><span style="color:red;">*</span>
+                                                                              <input type="text" class="form-control" id="username" name="username" placeholder="Username" value="{{ i.username }}" required>
+                                                                              <div class="invalid-feedback" id="user_name_error" >Please provide Username.</div>
                                                                           </div>
 
-                                                                          <!-- Bill No -->
                                                                           <div class="col-md-6">
-                                                                              <label for="first_name" class="form-label">First Name</label><span style="color:red;"> *</span>
-                                                                              <input type="text" class="form-control" id="first_name" name="first_name" value="{{ i.first_name }}">
-                                                                              <div class="invalid-feedback" id="first_name_error">Please provide an First name.</div>
+                                                                              <label for="first_name" class="form-label text-dark">First Name</label><span style="color:red;"> *</span>
+                                                                              <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Enetr First Name" value="{{ i.first_name }}" required>
+                                                                              <div class="invalid-feedback" id="firstname_error"  style="display: none;">Please provide an First name.</div>
                                                                           </div>
 
                                                                     
 
-                                                                          <!-- Company Name -->
                                                                           <div class="col-md-6">
-                                                                              <label for="last_name" class="form-label">Last Name</label><span style="color:red;"> *</span>
-                                                                              <input type="text" id="last_name" class="form-control" name="last_name" value="{{ i.last_name }}">
-                                                                              <div class="invalid-feedback" id="last_name_error">Please provide an Last name.</div>
+                                                                              <label for="last_name" class="form-label text-dark">Last Name</label><span style="color:red;"> *</span>
+                                                                              <input type="text" id="last_name" class="form-control" name="last_name" placeholder="Enetr Last Name" value="{{ i.last_name }}" required>
+                                                                              <div class="invalid-feedback" id="lastname_error"  style="display: none;">Please provide an Last name.</div>
                                                                           </div>
 
-                                                                          <!-- Job Type -->
+                                                                      
                                                                           <div class="col-md-6">
-                                                                              <label for="job_type" class="form-label">Email</label><span style="color:red;"> *</span>
-                                                                              <input type="email" id="email" class="form-control" name="email" value="{{ i.email }}" >
-                                                                               <div class="invalid-feedback" id="email_error">Please provide an Email.</div>
+                                                                              <label for="email" class="form-label text-dark">Email</label><span style="color:red;"> *</span>
+                                                                              <input type="email" id="email" class="form-control" name="email" placeholder="Enetr Valid Email Address" value="{{ i.email }}" required >
+                                                                               <div class="invalid-feedback"  id="email_error"  style="display: none;">Please provide an Email.</div>
                                                                           </div>
 
                                                                          
                                                                           <!-- Form Actions -->
                                                                           <div class="col-12">
-                                                                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                               <a href="{% url "edit_user_page" %}"><button type="button"  name="reset" class="btn btn-secondary" data-mdb-ripple-init>
+                               Reset
+                            </button></a>
                                                                               <button type="submit" class="btn btn-primary">Save changes</button>
                                                                           </div>
 
@@ -150,9 +150,65 @@
 
 {% block script %}
 
-<script>
-    
+{% comment %} <script>
+const FirstInput = document.getElementById('first_name'); 
+const FirstError = document.getElementById('firstname_error');
+
+function validateFirstName() {
+  const FirstNameValue = FirstInput.value;
+  if ( FirstNameValue === '') {
+    FirstError.style.display = 'block'; 
+  } else {
+    FirstError.style.display = 'none'; 
+  }
+}
+
+FirstInput.addEventListener('input', validateFirstName);
+FirstInput.addEventListener('blur', validateFirstName);
 </script>
+
+
+<script>
+const lastnameInput = document.getElementById('last_name'); 
+const lastnameError = document.getElementById('lastname_error');
+
+function validateLastName() {
+  const lastNameValue = lastnameInput.value;
+  if ( lastNameValue === '') {
+    lastnameError.style.display = 'block'; 
+  } else {
+    lastnameError.style.display = 'none'; 
+  }
+}
+lastnameInput.addEventListener('input', validateLastName);
+lastnameInput.addEventListener('blur', validateLastName);
+</script>
+
+
+
+<script>
+
+// Get references to the input and feedback elements
+const emailInput = document.getElementById('email');
+const emailFeedback = document.getElementById('email_error');
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validateEmail() {
+  const emailValue = emailInput.value;
+
+  if (emailRegex.test(emailValue)) {
+  
+    emailFeedback.style.display = 'none';
+  } else {
+  
+    emailFeedback.style.display = 'block';
+  }
+}
+
+emailInput.addEventListener('input', validateEmail);
+</script> {% endcomment %}
+
 {% endblock script %}
 
 

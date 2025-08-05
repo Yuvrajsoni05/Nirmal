@@ -37,27 +37,27 @@
                         <div class="row g-3">
                             
                             <div class="col-12 col-md-6">
-                                <label for="firstname" class="form-label fw-semibold text-dark">First Name</label>
-                                <input name="first_name"  type="text" class="form-control" id="first_name" value="{{ user.first_name }}">
+                                <label for="firstname" class="form-label fw-semibold text-dark">First Name</label><span style="color:red;"> *</span>
+                                <input name="first_name"  type="text" class="form-control" id="first_name" value="{{ user.first_name }}" maxlength="15" required>
                                 <div class="invalid-feedback" id="firstname_error">Please provide a First Name.</div>
                             </div>
 
                             <div class="col-12 col-md-6">
-                                <label for="lastname" class="form-label fw-semibold text-dark">Last Name</label>
-                                <input name="last_name" maxlength="15" type="text" class="form-control" id="last_name" value="{{user.last_name}}">
+                                <label for="lastname" class="form-label fw-semibold text-dark">Last Name</label><span style="color:red;"> *</span>
+                                <input name="last_name" maxlength="15" type="text" class="form-control" id="last_name" value="{{user.last_name}}" maxlength="15" required>
                                 <div class="invalid-feedback" id="lastname_error">Please provide a Last Name.</div>
                             </div>
 
                             <div class="col-12 col-md-6">
-                                <label for="username" class="form-label fw-semibold text-dark">Username</label>
-                                <input name="username" type="text" maxlength="20" class="form-control" id="username" value="{{user.username}}">
+                                <label for="username" class="form-label fw-semibold text-dark">Username</label><span style="color:red;"> *</span>
+                                <input name="username" type="text" maxlength="20" class="form-control" id="username" value="{{user.username}}"maxlength="15" required>
                                 <div   class="invalid-feedback"  id="username_error">Please provide a Username.</div>
                             </div>
 
 
                             <div class="col-12 col-md-6">
-                                <label for="email" class="form-label fw-semibold text-dark">Email</label>
-                                <input name="email" type="email" maxlength="40" class="form-control" id="email" value="{{user.email}}">
+                                <label for="email" class="form-label fw-semibold text-dark">Email</label><span style="color:red;"> *</span>
+                                <input name="email" type="email" maxlength="40" class="form-control" id="email" value="{{user.email}}" maxlength="15" required>
                                 <span class="invalid-feedback" id="email_error">Please provide Valid Email.</span>
                             </div>
 
@@ -66,12 +66,12 @@
                                     <button type="submit" class="btn btn-primary px-4">
                                         <i class="bi bi-save me-2"></i>Save Changes
                                     </button>
-                                    <button type="reset" class="btn btn-outline-secondary px-4">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
-                                      <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2z"/>
-                                      <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466"/>
-                                    </svg>&nbsp;Reset
-                                    </button>
+                                        <a href="{% url "profile_page" %}"><button type="button"  name="reset" class="btn btn-secondary" data-mdb-ripple-init>
+                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+                                          <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2z"/>
+                                          <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466"/>
+                                        </svg>&nbsp; Reset
+                            </button></a>
                                 </div>
                             </div>
                         </div>
@@ -87,7 +87,7 @@
                                   <div class="col-12 position-relative">
                                     <label for="old_password" class="form-label fw-semibold text-dark">Current Password</label>
                                     <div class="input-group">
-                                        <input name="old_password" type="password" class="form-control" id="old_password" placeholder="Old Password">
+                                        <input name="old_password" type="password" class="form-control" id="old_password" placeholder="Old Password" required>
                                         {% comment %} <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('old_password', this)">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
   <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
@@ -100,14 +100,14 @@
 
                                     <!-- New Password -->
                                     <div class="col-12 position-relative">
-                                    <label for="new_password" class="form-label fw-semibold text-dark">New Password</label>
+                                    <label for="new_password" class="form-label fw-semibold text-dark">New Password</label><span style="color:red;"> *</span>
                                     <div class="input-group">
-                                        <input name="new_password" type="password" minlength="8" maxlength="20" class="form-control" id="new_password" placeholder="New Password">
+                                        <input name="new_password" type="password" minlength="8" maxlength="20" class="form-control" id="new_password" placeholder="New Password" required>
                                         {% comment %} <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('new_password', this)">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
-  <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
-  <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
-</svg>
+                                        <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+                                        <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
+                            </svg>
                                         </button>  {% endcomment %}
                                     </div>
                                     <div style="color:red">{{ errors }}</div>
@@ -116,9 +116,9 @@
 
                                     <!-- Confirm Password -->
                                     <div class="col-12 position-relative">
-                                    <label for="confirm_password" class="form-label fw-semibold text-dark">Re-enter New Password</label>
+                                    <label for="confirm_password" class="form-label fw-semibold text-dark">Re-enter New Password</label><span style="color:red;"> *</span>
                                     <div class="input-group">
-                                    <input name="confirm_password" type="password" minlength="8" maxlength="20" class="form-control" id="confirm_password" placeholder="Confirm Password">
+                                    <input name="confirm_password" type="password" minlength="8" maxlength="20" class="form-control" id="confirm_password"  placeholder="Confirm Password" required >  
                                         {% comment %} <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('confirm_password', this)">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
   <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
@@ -133,12 +133,13 @@
                                     <button type="submit" class="btn btn-primary px-4">
                                         <i class="bi bi-key me-2"></i>Change Password
                                     </button>
-                                    <button type="reset" class="btn btn-outline-secondary px-4">
-                                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+                                     <a href="{% url "profile_page" %}"><button type="button"  name="reset" class="btn btn-secondary" data-mdb-ripple-init>
+                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
                                           <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2z"/>
                                           <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466"/>
-                                        </svg>&nbsp;</i>Reset
-                                    </button>
+                                        </svg>&nbsp; Reset
+                            </button></a>
+                                       
                                 </div>
                             </div>
                         </div>
@@ -243,26 +244,6 @@ lastnameInput.addEventListener('blur', validateLastName);
 </script>
 
 
-<script>
-
-const lastnameInput = document.getElementById('last_name'); 
-const lastnameError = document.getElementById('lastname_error');
-
-function validateLastName() {
-  const lastNameValue = lastnameInput.value;
-  if ( lastNameValue === '') {
-    lastnameError.style.display = 'block'; 
-  } else {
-    lastnameError.style.display = 'none'; 
-  }
-}
-
-
-lastnameInput.addEventListener('input', validateLastName);
-lastnameInput.addEventListener('blur', validateLastName);
-
-
-</script>
 
 
 

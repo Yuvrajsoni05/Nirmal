@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['*']
 
 LOGIN_URL = 'login_page'
 LOGIN_REDIRECT_URL = 'dashboard'
+LOGOUT_REDIRECT_URL = 'logout'
 
 MESSAGE_TAGS = {
     messages.ERROR: 'bg-danger  alert-danger', 

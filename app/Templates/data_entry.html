@@ -23,7 +23,7 @@
                         </h4>
                     </div>
                     <div class="card-body p-4">
-                        <form action="{% url 'add_data' %}" method="post" autocomplete="off" enctype="multipart/form-data">
+                        <form action="{% url 'add_data' %}" id="job_detail_form" method="post" autocomplete="off" enctype="multipart/form-data">
                             {% csrf_token %}
 
                             <!-- Basic Information Section -->
@@ -34,13 +34,17 @@
                                         <label for="job_date" class="form-label fw-semibold text-dark">
                                             Date <span class="text-danger">*</span>
                                         </label>
-                                        <input type="date" class="form-control  border-1" id="job_date" name="job_date" pattern="\d{2}-\d{2}-\d{4}" required>
+                                        <input type="date" class="form-control  border-1" id="job_date" name="job_date" pattern="\d{2}-\d{2}-\d{4}" required >
+                                        <div class="invalid-feedback" id="job_date_error">Please provide a Date.</div>
+
                                     </div>
                                     <div class="col-12 col-sm-6 col-lg-4">
                                         <label for="bill_no" class="form-label fw-semibold text-dark">
                                             Bill No. <span class="text-danger">*</span>
                                         </label>
                                         <input type="text" class="form-control border-1" id="bill_no" name="bill_no" placeholder="Enter Bill Number" required>
+                                        <div class="invalid-feedback" id="bill_no_error">Please provide  Bill No.</div>
+
                                     </div>
                                     <div class="col-12 col-lg-4">
                                         <label for="company_name" class="form-label fw-semibold text-dark">
@@ -55,6 +59,7 @@
                                             
                                             <input type="text" name="new_company" class="form-control  border-1" id="new_company" style="display: none;" placeholder="Enter New Company Name">
                                         </select>
+                                        <div class="invalid-feedback" id="company_name_error">Please provide Company Name.</div>
 
 
                                     </div>  
@@ -70,6 +75,7 @@
                                             Job Name <span class="text-danger">*</span>
                                         </label>
                                         <input type="text" class="form-control  border-1" id="job_name" name="job_name" placeholder="Enter Job Name" required>
+                                        <div class="invalid-feedback" id="job_name_error">Please prorovide Job Name</div>
                                     </div>
                                     <div class="col-12 col-sm-6 col-lg-4">
                                         <label for="job_type" class="form-label fw-semibold text-dark">
@@ -81,12 +87,16 @@
                                             <option value="Old Job">Old Job</option>
                                             <option value="Job Work">Job Work</option>
                                         </select>
+                                        <div class="invalid-feedback" id="job_type_error">Please provide Job Type</div>
+
                                     </div>
                                     <div class="col-12 col-lg-4">
                                         <label for="noc" class="form-label fw-semibold text-dark">
                                             No. of Colors <span class="text-danger">*</span>
                                         </label>
                                         <input type="number" class="form-control  border-1" id="noc" name="noc" placeholder="Enter Number of Colors" min="1" required>
+                                        <div class="invalid-feedback" id="noc_error">Please provide NOC</div>
+
                                     </div>
                                 </div>
                             </div>
@@ -101,7 +111,8 @@
                                         </label>
                                         <div class="input-group">
                                         <span class="input-group-text bg-light border-1">₹</span>
-                                        <input type="text" class="form-control border-1" id="prpc" name="prpc_purchase"  onkeyup="formatNumberWithCommas(this)" placeholder="00" required>
+                                        <input type="text" class="form-control border-1" id="prpc" name="prpc_purchase"  onkeyup="formatNumberWithCommas(this)" maxlength="10" placeholder="00" required>
+                                        <div class="invalid-feedback" id="prpc_purchase_error">Please provide PRPC Purchase</div>
                                     </div>
                                     </div>
                                     <div class="col-12 col-sm-6 col-lg-4">
@@ -110,7 +121,9 @@
                                         </label>
                                         <div class="input-group">
                                         <span class="input-group-text bg-light border-1">₹</span>
-                                        <input type="text" class="form-control border-1" id="prpc_sell" name="prpc_sell"  onkeyup="formatNumberWithCommas(this)" placeholder="00" required>
+                                        <input type="text" class="form-control border-1" id="prpc_sell" name="prpc_sell"  onkeyup="formatNumberWithCommas(this)" maxlength="10" placeholder="00" required>
+                                        <div class="invalid-feedback" id="prpc_sell_error">Please provide PRPC Sell</div>
+
                                     </div>
                                     </div>
                                     <div class="col-12 col-lg-4">
@@ -118,7 +131,7 @@
                                             Cylinder Size <span class="text-danger">*</span>
                                         </label>
                                         <div class="input-group ">
-                                            <input type="number" class="form-control border-1" id="cylinder_diameter" placeholder="Diameter" step="0.01" min="0" required>
+                                            <input type="number" class="form-control border-1" id="cylinder_diameter" placeholder="Diameter" step="0.01" min="0"  required>
                                             <span class="input-group-text bg-light border-1 fw-bold">×</span>
                                             <input type="number" class="form-control border-1" id="cylinder_height" placeholder="Height" step="0.01" min="0" required>
                                         </div>
@@ -227,6 +240,7 @@
         </div>
     </div>
   </div>
+  {% endblock main_block %}
  {% block script %}
 
  <script>
@@ -320,44 +334,43 @@
 function formatNumberWithCommas(input) {
     let value = input.value;
     
-    // Remove all commas first
+  
     value = value.replace(/,/g, '');
     
-    // Allow only numbers and decimal point
-    // Remove any character that is not a digit or decimal point
+ 
     value = value.replace(/[^0-9.]/g, '');
     
-    // Ensure only one decimal point
+
     const parts = value.split('.');
     if (parts.length > 2) {
         value = parts[0] + '.' + parts.slice(1).join('');
     }
     
-    // If the value is empty, clear the input
+
     if (value === '') {
         input.value = '';
         return;
     }
     
-    // If it's just a decimal point, allow it
+  
     if (value === '.') {
         input.value = '.';
         return;
     }
     
-    // Split into integer and decimal parts
+
     const [integerPart, decimalPart] = value.split('.');
     
-    // If there's no integer part, just show the decimal point
+
     if (!integerPart) {
         input.value = decimalPart !== undefined ? '.' + decimalPart : '';
         return;
     }
     
-    // Format the integer part with commas (Indian numbering system)
+
     const formattedInteger = parseInt(integerPart).toLocaleString('en-IN');
     
-    // Combine integer and decimal parts
+
     if (decimalPart !== undefined) {
         input.value = formattedInteger + '.' + decimalPart;
     } else {
@@ -366,87 +379,145 @@ function formatNumberWithCommas(input) {
 }
 </script>
 
-{% comment %} <script>
 
- 
-// Simple number validation function
-function validateNumber(input) {
-    input.addEventListener('input', function() {
-        // Remove non-numeric characters except dots and minus
-        this.value = this.value.replace(/[^0-9.-]/g, '');
-    });
-}
+ <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const JobInput = document.getElementById('job_date'); 
+            const JobError = document.getElementById('job_date_error');
 
-// Apply to all pouch inputs
-function initPouchValidation() {
-    const inputs = [
-        'cylinder_diameter',
-        'cylinder_height', 
-        'pouch_diameter',
-        'pouch_height',
-        'pouch_open_diameter',
-        'pouch_open_height'
-    ];
-    
-    inputs.forEach(name => {
-        const input = document.querySelector(`input[name="${name}"]`);
-        if (input) {
-            validateNumber(input);
-        }
-    });
-}
+            const BillInput = document.getElementById('bill_no'); 
+            const BillError = document.getElementById('bill_no_error');
 
-// Get all values
-function getPouchValues() {
-    const values = {};
-    const inputs = ['cylinder_diameter', 'cylinder_height', 'pouch_diameter', 'pouch_height','pouch_open_diameter','pouch_open_height'];
-    
-    inputs.forEach(name => {
-        const input = document.querySelector(`input[name="${name}"]`);
-        if (input) {
-            values[name] = input.value ? parseFloat(input.value) : null;
-        }
-    });
-    
-    return values;
-}
+            const CompanyInput = document.getElementById('company_name'); 
+            const CompanyError = document.getElementById('company_name_error');
 
-// Initialize when page loads
-document.addEventListener('DOMContentLoaded', initPouchValidation);
-</script> {% endcomment %}
 
+            const Job_Name_Input = document.getElementById('job_name'); 
+            const Job_Name_Error= document.getElementById('job_name_error');
+
+            const Job_Type_Input = document.getElementById('job_type'); 
+            const Job_Type_Error= document.getElementById('job_type_error');
+
+            const NOC_Input = document.getElementById('noc'); 
+            const NOC_Error= document.getElementById('noc_error');
+
+
+
+            const myForm = document.getElementById('job_detail_form'); 
+
+            function validateNOC() {
+                const noc_Value = NOC_Input.value;
+                if (noc_Value === '') {
+                    NOC_Error.style.display = 'block'; 
+                    return false;
+                } else {
+                    NOC_Error.style.display = 'none'; 
+                    return true;
+                }
+            }
+
+
+            function validateNOC() {
+                const noc_Value = NOC_Input.value;
+                if (noc_Value === '') {
+                    NOC_Error.style.display = 'block'; 
+                    return false;
+                } else {
+                    NOC_Error.style.display = 'none'; 
+                    return true;
+                }
+            }
+
+            function validateJobType() {
+                const job_type_Value = Job_Type_Input.value;
+                if (job_type_Value === '') {
+                    Job_Type_Error.style.display = 'block'; 
+                    return false;
+                } else {
+                    Job_Type_Error.style.display = 'none'; 
+                    return true;
+                }
+            }
+
+            function validateJobName() {
+                const job_Name_Value = Job_Name_Input.value;
+                if (job_Name_Value === '') {
+                    Job_Name_Error.style.display = 'block'; 
+                    return false;
+                } else {
+                    Job_Name_Error.style.display = 'none'; 
+                    return true;
+                }
+            }
+
+            function validateJob() {
+                const job_date_Value = JobInput.value;
+                if (job_date_Value === '') {
+                    JobError.style.display = 'block'; 
+                    return false;
+                } else {
+                    JobError.style.display = 'none'; 
+                    return true;
+                }
+            }
+
+            function validateBill() {
+                const Bill_Value = BillInput.value;
+                if (Bill_Value === '') {
+                    BillError.style.display = 'block'; 
+                    return false;
+                } else {
+                    BillError.style.display = 'none'; 
+                    return true;
+                }
+            }
+
+
+            function validateCompany() {
+                const Company_Value = CompanyInput.value;
+                if (Company_Value === '') {
+                    CompanyError.style.display = 'block'; 
+                    return false;
+                } else {
+                    CompanyError.style.display = 'none'; 
+                    return true;
+                }
+            }
+
+           
+            function validateForm() {
+                const isJobValid = validateJob();
+                const isBillValid = validateBill();
+                return isJobValid && isBillValid && isvalidateCompany && isvalidateJobName ;
+            }
+            validateJob();
+            validateBill();
+            validateCompany();
+            validateJobName();
+            validateJobType();
+            validateNOC();
+        
+            JobInput.addEventListener('input', validateJob);
+            JobInput.addEventListener('blur', validateJob);
+            BillInput.addEventListener('input', validateBill);
+            BillInput.addEventListener('blur', validateBill);
+            CompanyInput.addEventListener('input',  validateCompany);
+            CompanyInput.addEventListener('blur',  validateCompany);
+            Job_Name_Input.addEventListener('input',  validateJobName);
+            Job_Name_Input.addEventListener('blur',  validateJobName);
+            Job_Type_Input.addEventListener('input',  validateJobType);
+            Job_Type_Input.addEventListener('blur',  validateJobType);
+            NOC_Input.addEventListener('input',  validateNOC);
+            NOC_Input.addEventListener('blur',  validateNOC);
+
+            myForm.addEventListener('submit', function(event) {
+                event.preventDefault(); 
+
+                
+            });
+        });
+    </script>
 
 {% endblock script %}
-{% endblock main_block %}
-                      <label for="old_password" class="form-label fw-semibold text-dark">Current Password</label>
-                        <div class="input-group">
-                            <input name="old_password" type="password" class="form-control" id="old_password" placeholder="Old Password">
-                            <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('old_password', this)">
-                            <i class="bi bi-eye"></i>
-                            </button>
-                        </div>
-                        <div class="invalid-feedback" id="password_error">Please provide Old Password.</div>
-                        </div>
 
-                        <!-- New Password -->
-                        <div class="col-12 position-relative">
-                        <label for="new_password" class="form-label fw-semibold text-dark">New Password</label>
-                        <div class="input-group">
-                            <input name="new_password" type="password" minlength="8" maxlength="20" class="form-control" id="new_password" placeholder="New Password">
-                            <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('new_password', this)">
-                            <i class="bi bi-eye"></i>
-                            </button>
-                        </div>
-                        <div class="invalid-feedback" id="new_password_error">At least 8 characters, one uppercase, and one special character.</div>
-                        </div>
-
-                        <!-- Confirm Password -->
-                        <div class="col-12 position-relative">
-                        <label for="confirm_password" class="form-label fw-semibold text-dark">Re-enter New Password</label>
-                        <div class="input-group">
-                            <input name="confirm_password" type="password" minlength="8" maxlength="20" class="form-control" id="confirm_password" placeholder="Confirm Password">
-                            <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('confirm_password', this)">
-                            <i class="bi bi-eye"></i>
-                            </button>
-                        </div>
-                        </div>
+                    

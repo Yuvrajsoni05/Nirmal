@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render,redirect
 from django.core.validators import EmailValidator
 from django.core.exceptions import ValidationError
-
+from django.views.decorators.cache import cache_control
 from datetime import datetime
 # from torch import t
 from .models import *
@@ -15,7 +15,8 @@ from googleapiclient.http import MediaFileUpload
 from decimal import Decimal
 from django.core.paginator import Paginator
 
-
+from django.contrib.sessions.models import Session
+from django.utils.timezone import now
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
@@ -49,6 +50,8 @@ from django.contrib.auth.views import (
 # Create your views here.
 import os
 from django.conf import settings
+
+
 
 
 class CustomPasswordResetView(PasswordResetView):
@@ -107,9 +110,9 @@ def usernmae_validator(username):
 def email_validator(email):
     try:
         EmailValidator()(email)
-        return None
+        return "Invalid Email format"
     except ValidationError:
-        return "Invalid email format"
+        return "Invalid email formatsss"
 
 def validator_password(password):
     if len(password) < 8:
@@ -127,9 +130,12 @@ def validator_password(password):
         return "Password must contain at least one special character."
     
     
-    
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)   
 @login_required(redirect_field_name=None)
 def register_page(request):
+    if not request.user.is_authenticated:
+        return redirect('login_page')
+    
     if request.method == 'POST':
         username = request.POST.get('username')
         first_name = request.POST.get('firstName')
@@ -186,17 +192,21 @@ def register_page(request):
         
         return redirect('edit_user_page')
     return render(request,'Registration/register.html')
-
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(redirect_field_name=None)
 def edit_user_page(request):
-    user_info = Registration.objects.exclude(is_superuser=True).exclude(id=request.user.id)
+    if not request.user.is_authenticated:
+        return redirect('login_page')
+    user_info = Registration.objects.exclude(is_superuser=True).exclude(id=request.user.id).order_by('username')
     context = {
         'users':user_info
     }
     return render(request,'Registration/edit_user.html',context)
-
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(redirect_field_name=None)
 def delete_user(request,user_id):
+    if not request.user.is_authenticated:
+        return redirect('login_page')
     if request.method == 'POST':
         
         Delete_user = get_object_or_404(Registration,id = user_id)
@@ -205,20 +215,49 @@ def delete_user(request,user_id):
         messages.success(request,"User Deleted")
         return redirect('edit_user_page')
     
+    
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)    
+@login_required(redirect_field_name=None)    
 def update_user(request, user_id):
+    if not request.user.is_authenticated:
+        return redirect('login_page')
     
     try:
-        
         if request.method == 'POST':
-            
             update_user = get_object_or_404(Registration, id=user_id)
-
-        
             username = request.POST.get('username')
             email = request.POST.get('email')
             first_name = request.POST.get('first_name')
             last_name = request.POST.get('last_name')
+            
+            
+            # email_error = email_validator(email)
+            # if email_error:
+            #     messages.error(request,email_error,extra_tags="custom-success-style")
+            #     return redirect('edit_user_page')
+            
+            
+            
+            print(user_id)
+            required_fields = {
+                'Username': username,
+                'Firstname': first_name,
+                'Lastname': last_name,
+                'Email': email,
+            }
 
+            for field_name, value in required_fields.items():
+                if not value:
+                    messages.error(request, f"{field_name} is required.",extra_tags="custom-success-style")
+                    return redirect('edit_user_page')
+                
+                
+            email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+            if not re.match(email_regex, email):
+                messages.error(request, "Enter a valid email address.",extra_tags="custom-success-style") 
+                return redirect('edit_user_page')
+                
+                
             if username != update_user.username and Registration.objects.filter(username=username).exists():
                 messages.error(request, "Username already exists.", extra_tags="custom-success-style")
                 return redirect('edit_user_page')
@@ -248,9 +287,23 @@ def update_user(request, user_id):
         
             update_user.first_name = first_name
             update_user.last_name = last_name
+            
+            
+
+            logout_user = Registration.objects.get(id=user_id)
+            for session in Session.objects.all():
+                session_data = session.get_decoded()
+                print(session_data)
+                if str(session_data.get('_auth_user_id')) == str(logout_user.id):
+                    session.delete()
+                    
+           
+           
+           
+           
+            
             update_user.save()
 
-            # Success message and redirect
             messages.success(request, "User updated successfully.")
             return redirect('edit_user_page')
     except Exception:
@@ -260,12 +313,12 @@ def update_user(request, user_id):
         
         
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(redirect_field_name=None)
 def dashboard_page(request):
+    if not request.user.is_authenticated:
+        return redirect('login_page')
     try:
-        
-        
         get_q = request.GET.get('q')
         date_s = request.GET.get('date')
 
@@ -290,8 +343,22 @@ def dashboard_page(request):
         company_name = CompanyName.objects.all()
         cylinder_company_names = CylinderMadeIn.objects.all()
         nums = "a" * datas.paginator.num_pages  
+        
+        
+        # sessions = Session.objects.filter(expire_date__gte=now())
+    
+        # user_ids = [session.get_decoded().get("_auth_user_id") for session in sessions]
+        # print(user_ids)
+        # active_users = Registration.objects.filter(id__in=user_ids)
+        # print(active_users) 
 
-       
+        # active_user_names = [f"{user.first_name} {user.last_name}" for user in active_users]
+        # active_users_count = Registration.objects.filter(is_active=True).count()
+
+        # active_users_count = active_users.count()
+        # print(user_ids)
+        # print(active_user_names)
+        # print(active_users_count)
 
         data = Job_detail.objects.values_list('prpc_sell')
         print(data)
@@ -311,9 +378,11 @@ def dashboard_page(request):
     return render(request, 'dashboard.html', context)
 
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(redirect_field_name=None)   
 def delete_data(request,delete_id):
+    if not request.user.is_authenticated:
+        return redirect('login_page')
     try:
         
         id = delete_id
@@ -327,14 +396,15 @@ def delete_data(request,delete_id):
         messages.warning(request,"Something went Wrong")
         return redirect('dashboard_page')
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(redirect_field_name=None)  
 def base_html(request):
     return render(request,'Base/base.html')
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(redirect_field_name=None)
 def data_entry(request):
-    
+    if not request.user.is_authenticated:
+        return redirect('login_page')
     comapny_name = CompanyName.objects.all()
     cylinder_company_names = CylinderMadeIn.objects.all()
     context =  {
@@ -425,20 +495,24 @@ def data_entry(request):
 #         folder_url = f"https://drive.google.com/drive/folders/{folder_id}"
 #         return folder_id, folder_url
 
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(redirect_field_name=None)
 def normalize_job_name(job_name):
     return re.sub(r'\s+', ' ', job_name.strip()).lower()
-
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(redirect_field_name=None)
 def check_company_name(company_name):
     return re.sub(r'\s+',' ',company_name.strip()).lower()
-            
-            
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)          
+@login_required(redirect_field_name=None)      
 def normalize_cylinder_company_name(cylinder_company_name):
     return re.sub(r'\s+',' ',cylinder_company_name.strip()).lower()
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(redirect_field_name=None)
 def add_data(request):
+    if not request.user.is_authenticated:
+        return redirect('login_page')
     try:
         
         if request.method == 'POST':
@@ -660,9 +734,7 @@ def add_data(request):
             #     os.remove(temp_file.name) 
             # Gauth=GoogleAuth()
             
-            
-                
-        
+
                 
         data  =  {
                 'date':date,
@@ -681,8 +753,6 @@ def add_data(request):
                 'correction':correction
         }
 
-
-        
         response = requests.post('http://localhost:5678/webhook/create-data',data=data,files=file_dic)
         print(response.status_code)
         try:
@@ -725,9 +795,11 @@ def add_data(request):
     #     return redirect('data_entry')
     
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(redirect_field_name=None)      
 def  update_job(request,update_id):
+    if not request.user.is_authenticated:
+        return redirect('login_page')
     try:
         
         if request.method == 'POST':
@@ -826,9 +898,11 @@ def  update_job(request,update_id):
     except Exception as e:
         messages.error(request,f'Something went wrong try again {e}')
         return redirect('dashboard_page')
-   
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(redirect_field_name=None)
 def user_logout(request):
+    if not request.user.is_authenticated:
+        return redirect('login_page')
     
     try:
         logout(request)
@@ -837,13 +911,17 @@ def user_logout(request):
     except Exception as e:
         messages.error(request,f"Something went Wrong try again {e}")
         return redirect('dashboard_page')
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 @login_required(redirect_field_name=None)
 def profile_page(request):
+    if not request.user.is_authenticated:
+        return redirect('login_page')
     return render(request,'profile.html')
-
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(redirect_field_name=None)
 def update_profile(request,users_id):
+    if not request.user.is_authenticated:
+        return redirect('login_page')
     try:
         update_profile = get_object_or_404(Registration,id=users_id)
         if request.method == 'POST':
@@ -860,7 +938,7 @@ def update_profile(request,users_id):
             'Username':username
         } 
         
-        
+        print(users_id)
         for filed,required in required_filed.items():
             if not required:
                 messages.error(request,f"{filed} is Required" ,extra_tags="custom-success-style")
@@ -883,12 +961,19 @@ def update_profile(request,users_id):
         update_profile.save()
         
         
+        
         messages.success(request,"Profile Will Updated",)
         return redirect('profile_page')
     except Exception:
         messages.error(request,'Something went wrong try again')
         return redirect('profile_page')
+    
+    
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)    
+@login_required(redirect_field_name=None)
 def user_password(request):
+    if not request.user.is_authenticated:
+        return redirect('login_page')
     if request.method == 'POST':
         
         old_password = request.POST.get('old_password').strip()
@@ -902,7 +987,6 @@ def user_password(request):
             
         user_password = request.user
         if not user_password.check_password(old_password):
-            
             messages.error(request,'Old Password is Incorrect',extra_tags='custom-success-style')
             return redirect('profile_page')
         
@@ -913,9 +997,16 @@ def user_password(request):
             return render (request,'profile.html',context={'errors':errors})
         
         
+       
+        
+        
         if len(new_password) < 8 or not any(i.isupper() for i in new_password) or not any (i in "!@#$%^&*()_+-={}[]\\:;\"'<>,.?/~`" for i in new_password):
             messages.error(request,"Password Must be 8 Char and One Upercase or one spicial Symboal ",extra_tags='custom-success-style')
             return redirect("profile_page")
+                
+        if old_password == new_password:
+            messages.error(request,"Your Current Passsword or New Password will same Add some Diffrent",extra_tags='custom-success-style')
+            return redirect('profile_page')
 
         if new_password != confirm_password:
             messages.error(request,"new password or confirm Passworsd Must be same ",extra_tags='custom-success-style')
@@ -923,10 +1014,10 @@ def user_password(request):
         
         user_password.set_password(new_password)
         user_password.save()
-        messages.success(request,'Password Updated Successfully',)
-        
-        update_session_auth_hash(request,user_password)
-        return redirect('profile_page')
+        # messages.success(request,'Password Updated Successfully',)
+        print("Password Update")
+        # update_session_auth_hash(request,user_password)
+        return redirect('login_page')
     
 
 
@@ -935,8 +1026,11 @@ def user_password(request):
 def offline_page(request):
     return render(request,'Base/offline_page.html')
 
-
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@login_required(redirect_field_name=None)
 def send_mail_data(request):
+    if not request.user.is_authenticated:
+        return redirect('login_page')
     if request.method == 'POST':
         date = request.POST.get('date')
         bill_no = request.POST.get('bill_no')
@@ -951,6 +1045,30 @@ def send_mail_data(request):
         correction = request.POST.get('correction')
     print(date,bill_no,company_name,company_email_address,job_name,noc,prpc_sell,cylinder_size,pouch_size,pouch_open_size,correction)
     
+    required_field = {
+                    'Date' :date,
+                    'Bill no':bill_no,
+                    'Company_Name': company_name,
+                    'job name' : job_name,
+                    'Noc':noc,
+                    'Cylinder Size':cylinder_size,
+                    'Pouch size':pouch_size,
+                    'Prpc Sell':prpc_sell,
+                    'Pouch Open Size':pouch_open_size,
+                    'Company Email Address':company_email_address , 
+                    
+            }
+    for i ,r in required_field.items():
+        if not  r:
+            messages.error(request,f"This {i} Field Was Required",extra_tags="custom-success-style")
+            return redirect('dashboard_page')
+    
+    
+    email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+    if not re.match(email_regex, company_email_address):
+        messages.error(request, "Enter a valid email address.",extra_tags="custom-success-style")
+        error = "Enter Valid Email Address"
+        return redirect('dashboard_page')
     
     
     job_info = {
@@ -965,9 +1083,7 @@ def send_mail_data(request):
                 "pouch_size":pouch_size,
                 "pouch_open_size":pouch_open_size,
                 "correction":correction,
-                
-                
-                
+
         }
     
     receiver_email = company_email_address
@@ -990,5 +1106,23 @@ def send_mail_data(request):
     messages.success(request,"Mail Send successfully")
     return redirect('dashboard_page')
     
+
+
+
+
+# def check_user_active_session(user_id):
+#     try:
+#         user = User.objects.get(pk=user_id)  # Retrieve the User object by ID
+#     except User.DoesNotExist:
+#         # Handle the case where no user with that ID exists
+#         return False
+
+#     # Check for active sessions associated with this user
+#     sessions = Session.objects.filter(expire_date__gt=datetime.now()) # Filter for active sessions
     
-   # LF will be replaced by CRLF the next time Git touches it
+#     for session in sessions:
+#         decoded_session = session.get_decoded()  # Decode the session data
+#         if decoded_session.get('_auth_user_id') == user.id:  # Check if the session belongs to the given user
+#             return True  # User is currently logged in via an active session
+    
+#     return False

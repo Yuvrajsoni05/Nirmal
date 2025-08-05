@@ -21,38 +21,48 @@
           </h5>
         </div>
         <div class="card-body">
-          <form action="{% url 'register_page' %}" method="post">
+          <form action="{% url 'register_page' %}" method="post" autocomplete="off">
             {% csrf_token %}
 
             <div class="row mb-3">
               <div class="col-md-6">
-                <label for="firstName" class="form-label fw-semibold text-dark">First Name</label>
-                <input type="text" id="firstName" name="firstName" class="form-control" placeholder="First Name" required>
+                <label for="firstName" class="form-label fw-semibold text-dark">First Name</label><span style="color:red;"> *</span>
+                <input type="text" id="first_name" name="firstName" class="form-control" maxlength="15" placeholder="First Name" required>
+                <div class="invalid-feedback" id="firstname_error">Please provide a First Name.</div>
+
               </div>
               <div class="col-md-6">
-                <label for="lastName" class="form-label fw-semibold text-dark">Last Name</label>
-                <input type="text" id="lastName" name="lastName" class="form-control" placeholder="Last Name" required />
+                <label for="lastName" class="form-label fw-semibold text-dark">Last Name</label><span style="color:red;"> *</span>
+                <input type="text" id="last_name" name="lastName" class="form-control" maxlength="15" placeholder="Last Name" required />
+                <div class="invalid-feedback" id="lastname_error">Please provide a Last Name.</div>
+
               </div>
             </div>
 
             <div class="row mb-3">
               <div class="col-md-6">
-                <label for="username" class="form-label fw-semibold text-dark">Username</label>
-                <input type="text" id="username" name="username" class="form-control"  placeholder="Username" required/>
+                <label for="username" class="form-label fw-semibold text-dark">Username</label><span style="color:red;"> *</span>
+                <input type="text" id="username" name="username" class="form-control" maxlength="15" placeholder="Username" required/>
+                <div   class="invalid-feedback"  id="username_error">Please provide a Username.</div>
+
               </div>
               <div class="col-md-6">
-                <label for="emailAddress" class="form-label fw-semibold text-dark">Email</label>
-                <input type="email" id="emailAddress" name="emailAddress" class="form-control" placeholder="Enter Email" required />
+                <label for="email" class="form-label fw-semibold text-dark">Email</label><span style="color:red;"> *</span>
+                <input type="email" id="email" name="emailAddress" class="form-control" maxlength="15" placeholder="Enter Email" required />
+                <span class="invalid-feedback" id="email_error">Please provide Valid Email.</span>
+
               </div>
             </div>
 
             <div class="row mb-3">
               <div class="col-md-6">
-                <label for="password" class="form-label fw-semibold text-dark">Password</label>
+                <label for="password" class="form-label fw-semibold text-dark">Password</label><span style="color:red;"> *</span>
                 <input type="password" id="password" name="password" minlength="8" maxlength="20" class="form-control" placeholder="Password" required />
+                <span class="invalid-feedback" id="password_error">Please Provide Valid Password</span>
+
               </div>
               <div class="col-md-6">
-                <label for="confirm_password" class="form-label fw-semibold text-dark">Confirm Password</label>
+                <label for="confirm_password" class="form-label fw-semibold text-dark">Confirm Password</label><span style="color:red;"> *</span>
                 <input type="password" id="confirm_password" name="confirm_password" minlength="8" maxlength="20" placeholder="Confirm Password" required class="form-control" />
               </div>
 
@@ -95,6 +105,133 @@
     
   });
 </script>
+
+
+<script>
+
+const FirstInput = document.getElementById('first_name');
+const FirstError = document.getElementById('firstname_error');
+
+function validateFirstName() {
+  const FirstNameValue = FirstInput.value.trim(); // Trim whitespace
+
+  if (FirstNameValue === '') {
+    FirstError.style.display = 'block'; 
+  } else {
+    FirstError.style.display = 'none';
+  }
+}
+
+// Call validateFirstName initially to show error if field is empty on page load
+validateFirstName(); 
+
+FirstInput.addEventListener('input', validateFirstName);
+FirstInput.addEventListener('blur', validateFirstName);
+
+
+</script>
+
+
+
+
+<script>
+const LastInput = document.getElementById('last_name');
+const LastError = document.getElementById('lastname_error');
+
+function validateLastName() {
+  const LastNameValue = FirstInput.value.trim(); 
+
+  if (LastNameValue === '') {
+    LastError.style.display = 'block'; 
+  } else {
+    LastError.style.display = 'none';
+  }
+}
+
+validateLastName(); 
+
+LastInput.addEventListener('input', validateLastName);
+LastInput.addEventListener('blur', validateLastName);
+
+</script>
+
+
+
+<script>
+
+const UserInput = document.getElementById('username');
+const UserError = document.getElementById('username_error');
+
+function validateUserName() {
+  const UserNameValue = FirstInput.value.trim(); 
+
+  if (UserNameValue === '') {
+    UserError.style.display = 'block'; 
+  } else {
+    UserError.style.display = 'none';
+  }
+}
+
+
+validateUserName(); 
+
+UserInput.addEventListener('input', validateUserName);
+UserInput.addEventListener('blur', validateUserName);
+
+
+</script>
+
+<script>
+  const emailInput = document.getElementById('email');
+const emailFeedback = document.getElementById('email_error');
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+
+function validateEmail() {
+  const emailValue = emailInput.value.trim(); 
+
+  if (emailValue === '' || !emailRegex.test(emailValue)) {  
+    emailFeedback.style.display = 'block'; 
+  } else {
+    emailFeedback.style.display = 'none';
+  }
+}
+
+validateEmail();
+
+emailInput.addEventListener('input', validateEmail); 
+emailInput.addEventListener('blur', validateEmail); 
+</script>
+
+
+
+
+<script>
+
+const PasswordInput = document.getElementById('password');
+const PasswordError = document.getElementById('password_error');
+
+function validatePassword() {
+  const PasswordValue = PasswordInput.value.trim(); 
+
+  if (PasswordValue === '') {
+    PasswordError.style.display = 'block'; 
+  } else {
+    PasswordError.style.display = 'none';
+  }
+}
+
+validatePassword(); 
+
+UserInput.addEventListener('input', validatePassword);
+UserInput.addEventListener('blur', validatePassword);
+
+
+</script>
+
+
+
+
 
 {% endblock script %}
 
