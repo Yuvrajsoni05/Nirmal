@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, render,redirect
 from django.core.validators import EmailValidator
 from django.core.exceptions import ValidationError
 from django.views.decorators.cache import cache_control
+from django.views.decorators.cache import cache_control, never_cache
 from datetime import datetime
 # from torch import t
 from .models import *
@@ -130,7 +131,8 @@ def validator_password(password):
         return "Password must contain at least one special character."
     
     
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)   
+@never_cache
+@cache_control(no_store=True, no_cache=True, must_revalidate=True, max_age=0) 
 @login_required(redirect_field_name=None)
 def register_page(request):
     if not request.user.is_authenticated:
@@ -158,12 +160,11 @@ def register_page(request):
                 messages.error(request,f" {i} field is Required",extra_tags="custom-success-style")
                 return redirect('register_page')
         
-        
-        email_error = email_validator(email)
-        if email_error:
-            messages.error(request, email_error, extra_tags="custom-success-style")
+        email_regex = r"(?!.*([.-])\1)(?!.*([.-])$)(?!.*[.-]$)(?!.*[.-]{2})[a-zA-Z0-9_%+-][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        if not re.match(email_regex, email):
+            messages.error(request, "Enter a valid email address.",extra_tags="custom-success-style") 
             return redirect('register_page')
-            
+       
         if Registration.objects.filter(username=username).exists():
                 messages.error(request,'Username Alredy Exist',extra_tags="custom-success-style")
                 return redirect('register_page')
@@ -192,7 +193,9 @@ def register_page(request):
         
         return redirect('edit_user_page')
     return render(request,'Registration/register.html')
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+
+@never_cache
+@cache_control(no_store=True, no_cache=True, must_revalidate=True, max_age=0)
 @login_required(redirect_field_name=None)
 def edit_user_page(request):
     if not request.user.is_authenticated:
@@ -202,7 +205,9 @@ def edit_user_page(request):
         'users':user_info
     }
     return render(request,'Registration/edit_user.html',context)
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+
+@never_cache
+@cache_control(no_store=True, no_cache=True, must_revalidate=True, max_age=0)
 @login_required(redirect_field_name=None)
 def delete_user(request,user_id):
     if not request.user.is_authenticated:
@@ -216,7 +221,8 @@ def delete_user(request,user_id):
         return redirect('edit_user_page')
     
     
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)    
+@never_cache
+@cache_control(no_store=True, no_cache=True, must_revalidate=True, max_age=0)
 @login_required(redirect_field_name=None)    
 def update_user(request, user_id):
     if not request.user.is_authenticated:
@@ -252,7 +258,7 @@ def update_user(request, user_id):
                     return redirect('edit_user_page')
                 
                 
-            email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+            email_regex = r"(?!.*([.-])\1)(?!.*([.-])$)(?!.*[.-]$)(?!.*[.-]{2})[a-zA-Z0-9_%+-][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
             if not re.match(email_regex, email):
                 messages.error(request, "Enter a valid email address.",extra_tags="custom-success-style") 
                 return redirect('edit_user_page')
@@ -313,7 +319,8 @@ def update_user(request, user_id):
         
         
 
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@never_cache
+@cache_control(no_store=True, no_cache=True, must_revalidate=True, max_age=0)
 @login_required(redirect_field_name=None)
 def dashboard_page(request):
     if not request.user.is_authenticated:
@@ -322,10 +329,30 @@ def dashboard_page(request):
         get_q = request.GET.get('q')
         date_s = request.GET.get('date')
 
-        # Start with all Job_detail objects
+       
         db_sqlite3 = Job_detail.objects.all().order_by('id')
+        total_purchse_floats = [] 
+        total_purchse = Job_detail.objects.values_list('prpc_purchase')
+        for i in total_purchse:
+            data_string = i[0]  
+            cleaned_string = data_string.replace(",", "")
+            float_value = float(cleaned_string)
+            total_purchse_floats.append(float_value)
+
+        a = sum(total_purchse_floats)
+        print(a)
+        total_sell_floats = []
+        total_sell = Job_detail.objects.values_list('prpc_sell')
+        for  i in total_sell:
+            sell_data = i[0]
+            cleaned_data = sell_data.replace(",","")
+            sell_float = float(cleaned_data)
+            total_sell_floats.append(sell_float)
         
-         
+        b =  sum(total_sell_floats)
+        print(b)
+        print(b)
+        
         
         if get_q and date_s:
             db_sqlite3 = db_sqlite3.filter(
@@ -360,8 +387,8 @@ def dashboard_page(request):
         # print(active_user_names)
         # print(active_users_count)
 
-        data = Job_detail.objects.values_list('prpc_sell')
-        print(data)
+        # data = Job_detail.objects.values_list('prpc_sell')
+        # print(data)
  
         context = {
             'nums': nums,
@@ -369,6 +396,8 @@ def dashboard_page(request):
             'total_job': total_job,
             'company_name': company_name,
             'cylinder_company_names': cylinder_company_names,
+            'total_sales':b,
+            'total_purchase':a
         }
 
     except Exception as e:
@@ -378,7 +407,8 @@ def dashboard_page(request):
     return render(request, 'dashboard.html', context)
 
 
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@never_cache
+@cache_control(no_store=True, no_cache=True, must_revalidate=True, max_age=0)
 @login_required(redirect_field_name=None)   
 def delete_data(request,delete_id):
     if not request.user.is_authenticated:
@@ -396,11 +426,14 @@ def delete_data(request,delete_id):
         messages.warning(request,"Something went Wrong")
         return redirect('dashboard_page')
 
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+
 @login_required(redirect_field_name=None)  
 def base_html(request):
     return render(request,'Base/base.html')
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+
+
+@never_cache
+@cache_control(no_store=True, no_cache=True, must_revalidate=True, max_age=0)
 @login_required(redirect_field_name=None)
 def data_entry(request):
     if not request.user.is_authenticated:
@@ -495,24 +528,24 @@ def data_entry(request):
 #         folder_url = f"https://drive.google.com/drive/folders/{folder_id}"
 #         return folder_id, folder_url
 
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+
 @login_required(redirect_field_name=None)
 def normalize_job_name(job_name):
     return re.sub(r'\s+', ' ', job_name.strip()).lower()
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+
 @login_required(redirect_field_name=None)
 def check_company_name(company_name):
     return re.sub(r'\s+',' ',company_name.strip()).lower()
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)          
+          
 @login_required(redirect_field_name=None)      
 def normalize_cylinder_company_name(cylinder_company_name):
     return re.sub(r'\s+',' ',cylinder_company_name.strip()).lower()
 
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+@never_cache
+@cache_control(no_store=True, no_cache=True, must_revalidate=True, max_age=0)
 @login_required(redirect_field_name=None)
 def add_data(request):
-    if not request.user.is_authenticated:
-        return redirect('login_page')
+
     try:
         
         if request.method == 'POST':
@@ -541,16 +574,20 @@ def add_data(request):
             
             
             if Job_detail.objects.filter(job_name = job_name).exists():
-                messages.error(request,"Job are alredy Exsits kidnly apdate job")
+                messages.error(request,"Job are alredy Exsits kidnly Update job",extra_tags='custom-success-style')
                 return redirect('data_entry')
             
-           
-            normalized_name = normalize_job_name(job_name)
-            exsting_job_name = Job_detail.objects.all()
-            for i in exsting_job_name:
-                if normalize_job_name(i.job_name) == normalized_name:
-                    messages.error(request,"Job Name Alredy Exsits",extra_tags="custom-success-style")
-                    return redirect('data_entry')             
+            num_str = prpc_purchase
+            num_str_cleaned = num_str.replace(",", "")  # Remove commas using replace()
+            num_int = int(num_str_cleaned)
+            print(num_int)
+            
+            # normalized_name = normalize_job_name(job_name)
+            # exsting_job_name = Job_detail.objects.all()
+            # for i in exsting_job_name:
+            #     if normalize_job_name(i.job_name) == normalized_name:
+            #         messages.error(request,"Job Name Alredy Exsits",extra_tags="custom-success-style")
+            #         return redirect('data_entry')             
             
             
             required_filed = {
@@ -560,7 +597,7 @@ def add_data(request):
                     'job name' : job_name,
                     'job type':job_type,
                     'Noc':noc,
-                    'Prpc Purchase':prpc_purchase,
+                    'Prpc Purchase':num_str,
                     'Cylinder Size':cylinder_size,
                     'Cylinder Made in':cylinder_made_in_s,
                     'Pouch size':pouch_size,
@@ -787,6 +824,7 @@ def add_data(request):
             return redirect('data_entry')
     except Exception as e:
         messages.error(request,f"Something went wrong {e}")
+        print(e)
         return redirect('data_entry')
     
         
@@ -795,7 +833,7 @@ def add_data(request):
     #     return redirect('data_entry')
     
 
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+
 @login_required(redirect_field_name=None)      
 def  update_job(request,update_id):
     if not request.user.is_authenticated:
@@ -827,6 +865,7 @@ def  update_job(request,update_id):
             pouch_combination = f"{pouch_combination1} + {pouch_combination2} + {pouch_combination3} + {pouch_combination4}"
             # print(pouch_combination)
             print(prpc_purchase)
+            
         
         # print(update_id)
         
@@ -892,13 +931,13 @@ def  update_job(request,update_id):
         if response.status_code == 200:
             messages.success(request,'Data Updated Sussfully',)
         else:
-            messages.error(request,'Something went Wrong',)
+            messages.error(request,'Something went Wrong',extra_tags="custom-success-style")
      
         return redirect('dashboard_page')
     except Exception as e:
         messages.error(request,f'Something went wrong try again {e}')
         return redirect('dashboard_page')
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+
 @login_required(redirect_field_name=None)
 def user_logout(request):
     if not request.user.is_authenticated:
@@ -911,13 +950,13 @@ def user_logout(request):
     except Exception as e:
         messages.error(request,f"Something went Wrong try again {e}")
         return redirect('dashboard_page')
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+
 @login_required(redirect_field_name=None)
 def profile_page(request):
     if not request.user.is_authenticated:
         return redirect('login_page')
     return render(request,'profile.html')
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+
 @login_required(redirect_field_name=None)
 def update_profile(request,users_id):
     if not request.user.is_authenticated:
@@ -949,9 +988,19 @@ def update_profile(request,users_id):
             messages.error(request,"Email alredy exists" ,extra_tags="custom-success-style")
             return redirect('profile_page')
         
+        
+        
+        
         if username !=  update_profile.username and Registration.objects.filter(username=username).exists():
             messages.error(request,"Username alredy exists",extra_tags="custom-success-style")
             return redirect('profile_page')
+        
+        
+        email_regex = r"(?!.*([.-])\1)(?!.*([.-])$)(?!.*[.-]$)(?!.*[.-]{2})[a-zA-Z0-9_%+-][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        if not re.match(email_regex, email):
+            messages.error(request, "Enter a valid email address.",extra_tags="custom-success-style") 
+            return redirect('profile_page')
+                
             
         
         update_profile.username = username
@@ -969,7 +1018,7 @@ def update_profile(request,users_id):
         return redirect('profile_page')
     
     
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)    
+    
 @login_required(redirect_field_name=None)
 def user_password(request):
     if not request.user.is_authenticated:
@@ -1026,7 +1075,7 @@ def user_password(request):
 def offline_page(request):
     return render(request,'Base/offline_page.html')
 
-@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+
 @login_required(redirect_field_name=None)
 def send_mail_data(request):
     if not request.user.is_authenticated:
@@ -1064,10 +1113,10 @@ def send_mail_data(request):
             return redirect('dashboard_page')
     
     
-    email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+    email_regex = r"(?!.*([.-])\1)(?!.*([.-])$)(?!.*[.-]$)(?!.*[.-]{2})[a-zA-Z0-9_%+-][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
     if not re.match(email_regex, company_email_address):
         messages.error(request, "Enter a valid email address.",extra_tags="custom-success-style")
-        error = "Enter Valid Email Address"
+        
         return redirect('dashboard_page')
     
     

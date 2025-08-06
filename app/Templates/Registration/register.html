@@ -21,20 +21,20 @@
           </h5>
         </div>
         <div class="card-body">
-          <form action="{% url 'register_page' %}" method="post" autocomplete="off">
+          <form action="{% url 'register_page' %}" id="user_form" method="post" autocomplete="off">
             {% csrf_token %}
 
             <div class="row mb-3">
               <div class="col-md-6">
                 <label for="firstName" class="form-label fw-semibold text-dark">First Name</label><span style="color:red;"> *</span>
-                <input type="text" id="first_name" name="firstName" class="form-control" maxlength="15" placeholder="First Name" required>
-                <div class="invalid-feedback" id="firstname_error">Please provide a First Name.</div>
+                <input type="text" id="first_name" name="firstName" class="form-control" maxlength="15" placeholder="First Name"  >
+                <div class="invalid-feedback" id="first_name_error">Please provide a First Name.</div>
 
               </div>
               <div class="col-md-6">
                 <label for="lastName" class="form-label fw-semibold text-dark">Last Name</label><span style="color:red;"> *</span>
-                <input type="text" id="last_name" name="lastName" class="form-control" maxlength="15" placeholder="Last Name" required />
-                <div class="invalid-feedback" id="lastname_error">Please provide a Last Name.</div>
+                <input type="text" id="last_name" name="lastName" class="form-control" maxlength="15" placeholder="Last Name"  />
+                <div class="invalid-feedback" id="last_name_error">Please provide a Last Name.</div>
 
               </div>
             </div>
@@ -42,13 +42,13 @@
             <div class="row mb-3">
               <div class="col-md-6">
                 <label for="username" class="form-label fw-semibold text-dark">Username</label><span style="color:red;"> *</span>
-                <input type="text" id="username" name="username" class="form-control" maxlength="15" placeholder="Username" required/>
+                <input type="text" id="username" name="username" class="form-control" maxlength="15" placeholder="Username" />
                 <div   class="invalid-feedback"  id="username_error">Please provide a Username.</div>
 
               </div>
               <div class="col-md-6">
                 <label for="email" class="form-label fw-semibold text-dark">Email</label><span style="color:red;"> *</span>
-                <input type="email" id="email" name="emailAddress" class="form-control" maxlength="15" placeholder="Enter Email" required />
+                <input type="email" id="email" name="emailAddress" class="form-control" maxlength="50" placeholder="Enter Email"  />
                 <span class="invalid-feedback" id="email_error">Please provide Valid Email.</span>
 
               </div>
@@ -57,16 +57,18 @@
             <div class="row mb-3">
               <div class="col-md-6">
                 <label for="password" class="form-label fw-semibold text-dark">Password</label><span style="color:red;"> *</span>
-                <input type="password" id="password" name="password" minlength="8" maxlength="20" class="form-control" placeholder="Password" required />
+                <input type="password" id="password" name="password" minlength="8" maxlength="20" class="form-control" placeholder="Password"  />
                 <span class="invalid-feedback" id="password_error">Please Provide Valid Password</span>
 
               </div>
               <div class="col-md-6">
                 <label for="confirm_password" class="form-label fw-semibold text-dark">Confirm Password</label><span style="color:red;"> *</span>
-                <input type="password" id="confirm_password" name="confirm_password" minlength="8" maxlength="20" placeholder="Confirm Password" required class="form-control" />
+                <input type="password" id="confirm_password" name="confirm_password" minlength="8" maxlength="20" placeholder="Confirm Password" class="form-control" />
+                <span class="invalid-feedback" id="confirm_password_error">Please Provide Confirm Password Password</span>
+
               </div>
 
-              <div class="mb-3">
+            <div class="col-md-6">
               <div class="form-check">
                 <input type="checkbox" class="form-check-input" id="showPassword">
                 <label class="form-check-label" for="showPassword">View  Password</label>
@@ -75,9 +77,9 @@
             </div>
 
             <div class="d-flex justify-content-end gap-2 border-top pt-3">
-              <button type="reset" class="btn btn-outline-secondary">
+             <a href="{% url "register_page" %}"><button type="button" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-clockwise me-1"></i>Reset
-              </button>
+              </button></a>
               <button type="submit" class="btn btn-primary">
                 <i class="bi bi-check-circle me-1"></i>Create
               </button>
@@ -107,6 +109,141 @@
 </script>
 
 
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+    const usernameInput = document.getElementById('username');
+    const usernameError = document.getElementById('username_error');
+
+    const firstNameInput = document.getElementById('first_name');
+    const firstNameError = document.getElementById('first_name_error');
+
+    const lastNameInput = document.getElementById('last_name');
+    const lastNameError = document.getElementById('last_name_error');
+
+    const emailInput = document.getElementById('email');
+    const emailError = document.getElementById('email_error');
+
+    const passwordInput = document.getElementById('password');
+    const passwordError = document.getElementById('password_error');
+
+    const confirmPasswordInput = document.getElementById('confirm_password');
+    const confirmPasswordError = document.getElementById('confirm_password_error');
+
+    const myForm = document.getElementById('user_form');
+
+    function validateUsername() {
+        if (usernameInput.value.trim() === '') {
+            usernameError.style.display = 'block';
+            return false;
+        } else {
+            usernameError.style.display = 'none';
+            return true;
+        }
+    }
+
+    function validateFirstName() {
+        if (firstNameInput.value.trim() === '') {
+            firstNameError.style.display = 'block';
+            return false;
+        } else {
+            firstNameError.style.display = 'none';
+            return true;
+        }
+    }
+
+    function validateLastName() {
+        if (lastNameInput.value.trim() === '') {
+            lastNameError.style.display = 'block';
+            return false;
+        } else {
+            lastNameError.style.display = 'none';
+            return true;
+        }
+    }
+
+    function validateEmail() {
+        const email = emailInput.value.trim();
+        const emailPattern = /^(?!.*([.-])\1)(?!.*([.-])$)(?!.*[.-]$)(?!.*[.-]{2})[a-zA-Z0-9_%+-][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (email === '' || !emailPattern.test(email)) {
+            emailError.style.display = 'block';
+            return false;
+        } else {
+            emailError.style.display = 'none';
+            return true;
+        }
+    }
+
+    function validatePassword() {
+        if (passwordInput.value.trim() === '') {
+            passwordError.style.display = 'block';
+            return false;
+        } else {
+            passwordError.style.display = 'none';
+            return true;
+        }
+    }
+
+    function validateConfirmPassword() {
+        if (confirmPasswordInput.value.trim() !== passwordInput.value.trim()) {
+            confirmPasswordError.style.display = 'block';
+            return false;
+        } else {
+            confirmPasswordError.style.display = 'none';
+            return true;
+        }
+    }
+
+    function validateForm() {
+        const isUsernameValid = validateUsername();
+        const isFirstNameValid = validateFirstName();
+        const isLastNameValid = validateLastName();
+        const isEmailValid = validateEmail();
+        const isPasswordValid = validatePassword();
+        const isConfirmPasswordValid = validateConfirmPassword();
+
+        return (
+            isUsernameValid &&
+            isFirstNameValid &&
+            isLastNameValid &&
+            isEmailValid &&
+            isPasswordValid &&
+            isConfirmPasswordValid
+        );
+    }
+
+  
+    usernameInput.addEventListener('input', validateUsername);
+    firstNameInput.addEventListener('input', validateFirstName);
+    lastNameInput.addEventListener('input', validateLastName);
+    emailInput.addEventListener('input', validateEmail);
+    passwordInput.addEventListener('input', validatePassword);
+    confirmPasswordInput.addEventListener('input', validateConfirmPassword);
+    usernameInput.addEventListener('blur', validateUsername);
+    firstNameInput.addEventListener('blur', validateFirstName);
+    lastNameInput.addEventListener('blur', validateLastName);
+    emailInput.addEventListener('blur', validateEmail);
+    passwordInput.addEventListener('blur', validatePassword);
+    confirmPasswordInput.addEventListener('blur', validateConfirmPassword);
+
+    myForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        if (validateForm()) {
+            myForm.submit();
+        } else {
+            const firstError = document.querySelector('[style*="display: block"]');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    });
+});
+</script>
+
+
+
+{% comment %} 
 <script>
 
 const FirstInput = document.getElementById('first_name');
@@ -223,13 +360,36 @@ function validatePassword() {
 
 validatePassword(); 
 
-UserInput.addEventListener('input', validatePassword);
-UserInput.addEventListener('blur', validatePassword);
+PasswordInput.addEventListener('input', validatePassword);
+PasswordInput.addEventListener('blur', validatePassword);
 
 
 </script>
 
+<script>
 
+const CFPasswordInput = document.getElementById('confirm_password');
+const CFPasswordError = document.getElementById('cf_password_error');
+
+function validateCFPassword() {
+  const CFPasswordValue = PasswordInput.value.trim(); 
+
+  if (CFPasswordValue === '') {
+    CFPasswordError.style.display = 'block'; 
+  } else {
+    CFPasswordError.style.display = 'none';
+  }
+}
+
+validateCFPassword(); 
+
+CFPasswordInput.addEventListener('input', validateCFPassword);
+CFPasswordInput.addEventListener('blur', validateCFPassword);
+
+
+</script>
+
+ {% endcomment %}
 
 
 

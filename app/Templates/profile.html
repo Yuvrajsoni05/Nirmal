@@ -57,7 +57,7 @@
 
                             <div class="col-12 col-md-6">
                                 <label for="email" class="form-label fw-semibold text-dark">Email</label><span style="color:red;"> *</span>
-                                <input name="email" type="email" maxlength="40" class="form-control" id="email" value="{{user.email}}" maxlength="15" required>
+                                <input name="email" type="email" maxlength="40" class="form-control" id="email" value="{{user.email}}" maxlength="50" required>
                                 <span class="invalid-feedback" id="email_error">Please provide Valid Email.</span>
                             </div>
 
@@ -80,71 +80,69 @@
 
                 <!-- Change Password Tab -->
                 <div class="tab-pane fade" id="profile-change-password" role="tabpanel">
-                    <form method="post" autocomplete="off" action="{% url "update_password" %}">
-                      {% csrf_token %}
-                        <div class="row g-3">
-                            
-                                  <div class="col-12 position-relative">
-                                    <label for="old_password" class="form-label fw-semibold text-dark">Current Password</label>
-                                    <div class="input-group">
-                                        <input name="old_password" type="password" class="form-control" id="old_password" placeholder="Old Password" required>
-                                        {% comment %} <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('old_password', this)">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
-  <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
-  <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
-</svg>
-                                        </button>  {% endcomment %}
-                                  </div>
-                                    <div style="color:red" id="password_error">{{ error }}</div>
-                                    </div>
+    <form method="post" autocomplete="off" id="password_form" action="{% url 'update_password' %}">
+        {% csrf_token %}
+        <div class="row g-3">
 
-                                    <!-- New Password -->
-                                    <div class="col-12 position-relative">
-                                    <label for="new_password" class="form-label fw-semibold text-dark">New Password</label><span style="color:red;"> *</span>
-                                    <div class="input-group">
-                                        <input name="new_password" type="password" minlength="8" maxlength="20" class="form-control" id="new_password" placeholder="New Password" required>
-                                        {% comment %} <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('new_password', this)">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
-                                        <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
-                                        <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
-                            </svg>
-                                        </button>  {% endcomment %}
-                                    </div>
-                                    <div style="color:red">{{ errors }}</div>
-                                    {% comment %} <div class="invalid-feedback" id="new_password_error">At least 8 characters, one uppercase, and one special character.</div> {% endcomment %}
-                                    </div>
-
-                                    <!-- Confirm Password -->
-                                    <div class="col-12 position-relative">
-                                    <label for="confirm_password" class="form-label fw-semibold text-dark">Re-enter New Password</label><span style="color:red;"> *</span>
-                                    <div class="input-group">
-                                    <input name="confirm_password" type="password" minlength="8" maxlength="20" class="form-control" id="confirm_password"  placeholder="Confirm Password" required >  
-                                        {% comment %} <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('confirm_password', this)">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
-  <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
-  <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
-</svg>
-                                        </button>  {% endcomment %}
-                                    </div>
-                          </div>
-
-                            <div class="col-12">
-                                <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
-                                    <button type="submit" class="btn btn-primary px-4">
-                                        <i class="bi bi-key me-2"></i>Change Password
-                                    </button>
-                                     <a href="{% url "profile_page" %}"><button type="button"  name="reset" class="btn btn-secondary" data-mdb-ripple-init>
-                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
-                                          <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2z"/>
-                                          <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466"/>
-                                        </svg>&nbsp; Reset
-                            </button></a>
-                                       
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+            <!-- Current Password -->
+            <div class="col-12 position-relative">
+                <label for="old_password" class="form-label fw-semibold text-dark">Current Password</label>
+                <div class="input-group">
+                    <input name="old_password" type="password" class="form-control" id="old_password" placeholder="Old Password" required>
+                    <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('old_password', this)">
+                        <i class="fa fa-eye"></i>
+                    </button>
                 </div>
+                <div style="color:red" id="password_error">{{ error }}</div>
+            </div>
+
+            <!-- New Password -->
+            <div class="col-12 position-relative">
+                <label for="new_password" class="form-label fw-semibold text-dark">New Password</label><span style="color:red;"> *</span>
+                <div class="input-group">
+                    <input name="new_password" type="password" minlength="8" maxlength="20" class="form-control" id="new_password" placeholder="New Password" >
+                    <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('new_password', this)">
+                        <i class="fa fa-eye"></i>
+                    </button>
+                </div>
+                <div class="invalid-feedback" id="new_password_error">Please provide a First Name.</div>
+
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="col-12 position-relative">
+                <label for="confirm_password" class="form-label fw-semibold text-dark">Re-enter New Password</label><span style="color:red;"> *</span>
+                <div class="input-group">
+                    <input name="confirm_password" type="password" minlength="8" maxlength="20" class="form-control" id="confirm_password" placeholder="Confirm Password" >
+                    <button type="button" class="btn btn-outline-secondary" onclick="togglePassword('confirm_password', this)">
+                        <i class="fa fa-eye"></i>
+                    </button>
+                </div>
+                <div class="invalid-feedback" id="confirm_password_error">Please provide A Confirm Password</div>
+
+            </div>
+
+            <!-- Submit Button -->
+            <div class="col-12">
+                <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="bi bi-key me-2"></i>Change Password
+                    </button>
+                    <a href="{% url 'profile_page' %}">
+                        <button type="button" name="reset" class="btn btn-secondary" data-mdb-ripple-init>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2z"/>
+                                <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466"/>
+                            </svg>&nbsp; Reset
+                        </button>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
             </div>
         </div>
     </div>
@@ -157,30 +155,31 @@
 
 
 <script>
-  function togglePassword(inputId, btn) {
-    const input = document.getElementById(inputId);
-    const icon = btn.querySelector('i');
+    function togglePassword(inputId, button) {
+        var input = document.getElementById(inputId);
+        var icon = button.querySelector('i');
 
-    if (input.type === 'password') {
-      input.type = 'text';
-      icon.classList.remove('bi-eye');
-      icon.classList.add('fa fa-eye-slash');
-    } else {
-      input.type = 'password';
-      icon.classList.remove('fa fa-eye-slash');
-      icon.classList.add('bi-eye');
+        // Toggle input type between password and text
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+        } else {
+            input.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+        }
     }
-  }
 </script>
+
 
 <script>
 
-// Get references to the input and feedback elements
 const emailInput = document.getElementById('email');
 const emailFeedback = document.getElementById('email_error');
 
 
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const emailRegex = /^(?!.*([.-])\1)(?!.*([.-])$)(?!.*[.-]$)(?!.*[.-]{2})[a-zA-Z0-9_%+-][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 
 function validateEmail() {
@@ -270,23 +269,77 @@ FirstInput.addEventListener('blur', validateFirstName);
 
 <script>
 
-
-const new_password = document.getElementById('new_password'); 
-const new_password_error = document.getElementById('new_password_error');
-
-function NewPasswordValid() {
-  const newpasswordvalue = new_password.value;
-  if ( newpasswordvalue == '') {
-    new_password_error.style.display = 'block'; 
-  } else {
-    new_password_error.style.display = 'none'; 
-  }
-}
+document.addEventListener('DOMContentLoaded', function () {
 
 
-new_password.addEventListener('blur', NewPasswordValid);
+    const passwordInput = document.getElementById('new_password');
+    const passwordError = document.getElementById('new_password_error');
+
+    const confirmPasswordInput = document.getElementById('confirm_password');
+    const confirmPasswordError = document.getElementById('confirm_password_error');
+
+    const myForm = document.getElementById('password_form');
+
+
+   
+
+   
+
+
+    function validatePassword() {
+        if (passwordInput.value.trim() === '') {
+            passwordError.style.display = 'block';
+            return false;
+        } else {
+            passwordError.style.display = 'none';
+            return true;
+        }
+    }
+
+    function validateConfirmPassword() {
+        if (confirmPasswordInput.value.trim() !== passwordInput.value.trim()) {
+            confirmPasswordError.style.display = 'block';
+            return false;
+        } else {
+            confirmPasswordError.style.display = 'none';
+            return true;
+        }
+    }
+
+    function validateForm() {
+
+        const isPasswordValid = validatePassword();
+        const isConfirmPasswordValid = validateConfirmPassword();
+
+        return (
+     
+            isPasswordValid &&
+            isConfirmPasswordValid
+        );
+    }
+
+  
+   
+    passwordInput.addEventListener('input', validatePassword);
+    confirmPasswordInput.addEventListener('input', validateConfirmPassword);
+  
+    passwordInput.addEventListener('blur', validatePassword);
+    confirmPasswordInput.addEventListener('blur', validateConfirmPassword);
+
+    myForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        if (validateForm()) {
+            myForm.submit();
+        } else {
+            const firstError = document.querySelector('[style*="display: block"]');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    });
+});
 </script>
-
 
 {% endblock script %}
 

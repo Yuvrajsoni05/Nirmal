@@ -48,8 +48,8 @@
                       
                       <div class="col col-stats ms-3 ms-sm-0">
                         <div class="numbers">
-                          <p class="card-category">Total Rate</p>
-                          <h4 class="card-title"></h4>
+                          <p class="card-category">Total Purchase</p>
+                          <h4 class="card-title">{{ total_purchase|indian_currency_format }}</h4>
                         </div>
                       </div>
                     </div>
@@ -63,8 +63,8 @@
                       
                       <div class="col col-stats ms-3 ms-sm-0">
                         <div class="numbers">
-                          <p class="card-category">Sales</p>
-                          <h4 class="card-title">No Sale</h4>
+                          <p class="card-category">Total Sales</p>
+                          <h4 class="card-title">{{ total_sales|indian_currency_format }}</h4>
                         </div>
                       </div>
                     </div>
@@ -94,25 +94,31 @@
                     <div class="card-head-row card-tools-still-right">
                       <div class="card-title">Job Details</div>
                       <div class="card-tools">
-                        <form method="get" class="d-flex align-items-center" action="{% url "dashboard_page" %}">  
-                            <div class="form-outline me-2" data-mdb-input-init>  
-                              <input type="date" name="date" id="date" class="form-control" value="{{ request.GET.date }}" >
-                              </div>
-                            <div class="form-outline me-2" data-mdb-input-init>  
-                                <input type="text" name="q" id="q" class="form-control" value="{{request.GET.q}}" placeholder="Search Filed"/>
-                            </div>
-                            <button type="submit"  class="btn btn-primary me-2" data-mdb-ripple-init> 
-                                <i class="fa fa-search"></i>
-                            </button>
-                            <a href="{% url "dashboard_page" %}"><button type="button"  name="reset" class="btn btn-secondary" data-mdb-ripple-init>
-                               Reset
-                            </button></a>
-                        </form>
-                     
-                      </div>
+                        <form method="get" class="d-flex flex-wrap align-items-center" action="{% url 'dashboard_page' %}">
+                          
+                          <div class="form-outline me-2 mb-2 mb-sm-0 col-12 col-md-auto" data-mdb-input-init>
+                            <input type="date" name="date" id="date" class="form-control" value="{{ request.GET.date }}">
+                          </div>
 
+                          <div class="form-outline me-2 mb-2 mb-sm-0 col-12 col-md-auto" data-mdb-input-init>
+                            <input type="text" name="q" id="q" class="form-control" value="{{request.GET.q}}" placeholder="Search Field">
+                          </div>
+
+                          <button type="submit" class="btn btn-primary me-2 mb-2 mb-sm-0 col-12 col-md-auto" data-mdb-ripple-init>
+                            <i class="fa fa-search"></i>
+                          </button>
+
+                          <a href="{% url 'dashboard_page' %}">
+                            <button type="button" name="reset" class="btn btn-secondary col-12 col-md-auto mb-2 mb-sm-0" data-mdb-ripple-init>
+                              Reset
+                            </button>
+                          </a>
+                          
+                        </form>
+                      </div>
                     </div>
                   </div>
+
                   <div class="card-body p-0">
                     <div class="table-responsive" >
                       <!-- Projects table -->
@@ -127,7 +133,7 @@
                             <th scope="col">Job Name</th>
                             <th scope="col">Noc</th>
                             <th scope="col">Rate/Cylinder Purchase</th>
-                            <th scope="col">Rate/Cylinder Sell</th>
+                            <th scope="col">Rate/Cylinder sales</th>
                             <th scope="col">Cylinder Size</th>
                             <th scope="col">Made In</th>
                             <th scope="col">Pouch Size</th>
@@ -168,7 +174,7 @@
                                             <td class="text-truncate" data-bs-toggle="modal" data-bs-target="#staticBackdrop{{i.id}}" title="{{i.correction}}">{{ i.correction|truncatechars:20 }}</td>
 
                                             {% else %}
-                                                <td class="text-truncate"><span class="badge bg-light fw-bold" >No Data<span></td>
+                                                <td class="text-truncate"><span class=fw-bold" >-<span></td>
 
 
                                             {% endif %}
@@ -209,8 +215,8 @@
                                           <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog modal-xl" role="document">
                                             <div class="modal-content">
                                               <div class="modal-header">
-                                                <h5 class="modal-title" id="exampleModalLongTitle">Send Mail </h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <h5 class="modal-title" id="exampleModalLongTitle">Send Mail</h5>
+                                                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                                   <span aria-hidden="true">&times;</span>
                                                 </button>
                                               </div>
@@ -247,7 +253,7 @@
                                                                           <div class="col-md-6">
                                                                       
                                                                               <label for="company_address" class="form-label fw-bold">Company Email Address</label>
-                                                                              <input type="email" id="company_address" class="form-control" name="company_address" placeholder="Enter Company Email Address"  required>
+                                                                              <input type="email" id="company_address" class="form-control" name="company_address" placeholder="Enter Company Email Address" maxlength="50"  required>
                                                                               <div class="" style="color:red">{{error}}</div>
                                                                           </div>
 
@@ -269,7 +275,7 @@
                                                                         
 
                                                                           <div class="col-md-6">
-                                                                              <label for="prpc" class="form-label fw-bold">PRPC Sell (Per Rate Per Cylinder )</label>
+                                                                              <label for="prpc" class="form-label fw-bold">PRPC Sales (Per Rate Per Cylinder )</label>
                                                                               <input type="text" id="prpc" class="form-control" name="prpc_sell" onkeyup="formatNumberWithCommas(this)" value="{{ i.prpc_sell }}" >
                                                                           </div>
 
@@ -417,12 +423,12 @@
                                                                           <!-- PRPC -->
                                                                           <div class="col-md-6">
                                                                               <label for="prpc" class="form-label fw-bold">PRPC Purchase (Per Rate Per Cylinder )</label>
-                                                                              <input type="text" id="prpc" class="form-control" name="prpc_purchase" onkeyup="formatNumberWithCommas(this)" value="{{ i.prpc_purchase }}"required>
+                                                                              <input type="text" id="prpc" class="form-control" name="prpc_purchase" onkeyup="formatNumberWithCommas(this)" value="{{ i.prpc_purchase|indian_currency_format }}"required>
                                                                           </div>
 
                                                                           <div class="col-md-6">
                                                                               <label for="prpc" class="form-label fw-bold">PRPC Sell (Per Rate Per Cylinder )</label>
-                                                                              <input type="text" id="prpc" class="form-control" name="prpc_sell" onkeyup="formatNumberWithCommas(this)" value="{{ i.prpc_sell }}"required>
+                                                                              <input type="text" id="prpc" class="form-control" name="prpc_sell" onkeyup="formatNumberWithCommas(this)" value="{{ i.prpc_sell|indian_currency_format  }}"required>
                                                                           </div>
 
                                                                           <!-- Cylinder Size -->

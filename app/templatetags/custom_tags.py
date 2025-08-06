@@ -21,28 +21,38 @@ def get_data_time():
 
 @register.filter
 def indian_currency_format(value):
+    try:
+       
+        num = float(value) 
         
-        try:
-            # Convert to integer to remove floating point
-            num = int(value)
-            s = str(num)
-            if len(s) <= 3:
-                return s
+        
+        integer_part, decimal_part = str(num).split('.') 
+        
+    
+        formatted_integer = ""
+        
+     
+        formatted_integer = integer_part[-3:]  
+        
+        
+        remaining_integer = integer_part[:-3] 
+        
+        while len(remaining_integer) > 0:
+            if len(remaining_integer) > 2:
+                formatted_integer = remaining_integer[-2:] + "," + formatted_integer
+                remaining_integer = remaining_integer[:-2]
             else:
-                last_three = s[-3:]
-                remaining = s[:-3]
-                formatted_remaining = ""
-                # Add commas for lakhs and crores
-                while len(remaining) > 0:
-                    if len(remaining) > 2:
-                        formatted_remaining = remaining[-2:] + "," + formatted_remaining
-                        remaining = remaining[:-2]
-                    else:
-                        formatted_remaining = remaining + "," + formatted_remaining
-                        remaining = ""
-                return formatted_remaining + last_three
-        except (ValueError, TypeError):
-            return value
+                formatted_integer = remaining_integer + "," + formatted_integer
+                remaining_integer = ""
+
+     
+        if decimal_part:
+            return formatted_integer + "." + decimal_part
+        else:
+            return formatted_integer
+
+    except (ValueError, TypeError):
+        return value
 
 @register.filter
 def split_text(value):
