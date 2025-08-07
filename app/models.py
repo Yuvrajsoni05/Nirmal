@@ -19,7 +19,7 @@ class Job_detail(models.Model):
         company_name = models.CharField(max_length=300)
         job_name = models.CharField(max_length=200)
         job_type  = models.CharField(max_length=200)
-        noc =  models.IntegerField()
+        noc =  models.TextField(blank=True, null=True)
         prpc_purchase = models.CharField(max_length=200)
         prpc_sell = models.CharField(max_length=200,blank=True, null=True)
         cylinder_size = models.CharField(max_length=200)
@@ -30,6 +30,9 @@ class Job_detail(models.Model):
         correction = models.TextField(blank=True, null=True)
         folder_url = models.URLField()
         image_links = models.CharField(max_length=1000,blank=True, null=True)
+        cylinder_date = models.DateField(blank=True, null=True)
+        cylinder_bill_no = models.CharField(blank=True, null=True)
+        
         
         
         

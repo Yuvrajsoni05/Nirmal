@@ -12,7 +12,7 @@ from django.contrib.auth import login, authenticate, logout
 import requests 
 from django.contrib.auth import update_session_auth_hash
 from googleapiclient.http import MediaFileUpload
-
+import json
 from decimal import Decimal
 from django.core.paginator import Paginator
 
@@ -356,12 +356,12 @@ def dashboard_page(request):
         
         if get_q and date_s:
             db_sqlite3 = db_sqlite3.filter(
-            Q(date__icontains=date_s) &(Q(job_name__icontains=get_q) | Q(company_name__icontains=get_q))).order_by('id')
+            Q(date__icontains=date_s) &(Q(job_name__icontains=get_q) | Q(company_name__icontains=get_q)) | Q(cylinder_made_in__icontains=get_q)).order_by('id')
         elif date_s:
             db_sqlite3 = Job_detail.objects.filter(Q(date__icontains=date_s)).order_by('id')
             
         elif  get_q:
-            db_sqlite3 = Job_detail.objects.filter(Q(job_name__icontains=get_q) | Q(company_name__icontains=get_q)).order_by('id')
+            db_sqlite3 = Job_detail.objects.filter(Q(job_name__icontains=get_q) | Q(company_name__icontains=get_q)| Q(cylinder_made_in__icontains=get_q) ).order_by('id')
             
         p = Paginator(db_sqlite3, 10)
         page = request.GET.get('page')
@@ -559,6 +559,8 @@ def add_data(request):
             prpc_sell = request.POST.get('prpc_sell')
             cylinder_size = request.POST.get('cylinder_size')
             cylinder_made_in_s = request.POST.get('cylinder_select')
+            cylinder_date = request.POST.get('cylinder_date')
+            cylinder_bill_no = request.POST.get('cylinder_bill_no')
             pouch_size = request.POST.get('pouch_size')
             pouch_open_size = request.POST.get('pouch_open_size')
             pouch_combination_1 = request.POST.get('pouch_combination1')
@@ -571,16 +573,20 @@ def add_data(request):
             files = request.FILES.getlist('files') 
             pouch_combination_total  = f"{pouch_combination_1} + {pouch_combination_2} + {pouch_combination_3} + {pouch_combination_4}"
             print(prpc_purchase)
+            # print(cylinder_date)
+            # print(cylinder_bill_no)
+            
+       
+            if Job_detail.objects.filter(job_name = job_name,date  =date).exists():
+                    messages.error(request,"Job Name are alredy Exsits on this date  kidnly Update job",extra_tags='custom-success-style')
+                    return redirect('data_entry')
             
             
-            if Job_detail.objects.filter(job_name = job_name).exists():
-                messages.error(request,"Job are alredy Exsits kidnly Update job",extra_tags='custom-success-style')
-                return redirect('data_entry')
             
-            num_str = prpc_purchase
-            num_str_cleaned = num_str.replace(",", "")  # Remove commas using replace()
-            num_int = int(num_str_cleaned)
-            print(num_int)
+            # num_str = prpc_purchase
+            # num_str_cleaned = num_str.replace(",", "")  # Remove commas using replace()
+            # num_int = int(num_str_cleaned)
+            # print(num_int)
             
             # normalized_name = normalize_job_name(job_name)
             # exsting_job_name = Job_detail.objects.all()
@@ -597,11 +603,14 @@ def add_data(request):
                     'job name' : job_name,
                     'job type':job_type,
                     'Noc':noc,
-                    'Prpc Purchase':num_str,
+                    'Prpc Purchase':prpc_purchase,
                     'Cylinder Size':cylinder_size,
                     'Cylinder Made in':cylinder_made_in_s,
                     'Pouch size':pouch_size,
                     'Pouch Open Size':pouch_open_size,
+                    'Cylinder Bill No':cylinder_bill_no,
+                    'Cylinder Date':cylinder_date
+                    
                     
             }
             for i ,r in required_filed.items():
@@ -622,7 +631,7 @@ def add_data(request):
             
             pouch_combination = pouch_combination_total
             if len(files) >= 3: 
-                messages.error(request,"You can upload only 2 file")
+                messages.error(request,"You can upload only 2 file",extra_tags="custom-success-style"   )
                 return redirect('data_entry')
             
             valid_extension = [".jpeg", ".jpg", ".png" ,".ai"]
@@ -632,43 +641,52 @@ def add_data(request):
                 if ext.lower() not in valid_extension:
                     messages.error(request,"Invalid file  Only .jpg, .jpeg, .png and .ai are allowed." ,extra_tags="custom-success-style")
                     return redirect("data_entry")
+           
+            #     company_name_normalize = check_company_name(company_name)
+            #     exsting_company_name  = CompanyName.objects.all()
+            #     for i in exsting_company_name:
+            #         if check_company_name(i.company_name) == company_name_normalize:
+            #             messages.error(request,'Company Name Alredy Exsits',extra_tags='custom-success-style')
+            #             return redirect('data_entry')
             if new_company != '':
-                company_name = new_company
-                company_name_normalize = check_company_name(company_name)
-                exsting_company_name  = CompanyName.objects.all()
-                for i in exsting_company_name:
-                    if check_company_name(i.company_name) == company_name_normalize:
-                        messages.error(request,'Company Name Alredy Exsits',extra_tags='custom-success-style')
-                        return redirect('data_entry')
-                        
-                if CompanyName.objects.filter(company_name__icontains=company_name).exists():
+                
+                           
+                if CompanyName.objects.filter(company_name__icontains=new_company).exists():
                     messages.error(request,"Company Name Alredy Exists",extra_tags='custom-success-style')
                     return redirect('data_entry')
                 add_company = CompanyName.objects.create(
-                    company_name=company_name
+                    company_name=new_company
                 )
                 add_company.save()
+            
+           
+                company_name = new_company
 
-            if  new_cylinder_company_name != '':
-                cylinder_made_in_s = new_cylinder_company_name
-                cylinder_company_name_normalize = normalize_cylinder_company_name(cylinder_made_in_s)
-                exsting_cylinder_company_name = CylinderMadeIn.objects.all()
-                for i in exsting_cylinder_company_name:
-                    if normalize_cylinder_company_name(i.cylinder_made_in) == cylinder_company_name_normalize:
-                        messages.error(request,"Cylinder Company Name Alrdy Exsits",extra_tags='custom-success-style')
-                        return redirect('data-entry')
+            # if  new_cylinder_company_name != '':
+            #     cylinder_made_in_s = new_cylinder_company_name
+            #     cylinder_company_name_normalize = normalize_cylinder_company_name(cylinder_made_in_s)
+            #     exsting_cylinder_company_name = CylinderMadeIn.objects.all()
+            #     for i in exsting_cylinder_company_name:
+            #         if normalize_cylinder_company_name(i.cylinder_made_in) == cylinder_company_name_normalize:
+            #             messages.error(request,"Cylinder Company Name Alrdy Exsits",extra_tags='custom-success-style')
+            #             return redirect('data-entry')
                                     
                 
-                
-                if CylinderMadeIn.objects.filter(cylinder_made_in__icontains = cylinder_made_in_s).exists():
+            if new_cylinder_company_name != '': 
+                if CylinderMadeIn.objects.filter(cylinder_made_in__icontains = new_cylinder_company_name).exists():
                     messages.error(request,"Company Name Alredy Exists",extra_tags='custom-success-style')
                     return redirect('data_entry')
                 add_new_cylinder_company = CylinderMadeIn.objects.create(
-                    cylinder_made_in = cylinder_made_in_s
+                    cylinder_made_in = new_cylinder_company_name
                 )
                 add_new_cylinder_company.save()
+            
+            
+                cylinder_made_in_s = new_cylinder_company_name
                 
-           
+
+            
+            print(cylinder_made_in_s)
                  
 
             # print(cylinder_made_in_s)
@@ -792,9 +810,24 @@ def add_data(request):
 
         response = requests.post('http://localhost:5678/webhook/create-data',data=data,files=file_dic)
         print(response.status_code)
+     
+        print(response.text)
+        data_string  = response.text
+        data_dict = json.loads(data_string)
+        id_number = data_dict['id']
+        print(id_number)
         try:
+
             
             if response.status_code == 200:
+                
+                cylinder_data = Job_detail.objects.all().get(id=id_number)
+                cylinder_data.cylinder_date = cylinder_date
+                cylinder_data.cylinder_bill_no = cylinder_bill_no
+                cylinder_data.save()
+                
+                
+                
                 messages.success(request,"New Job Create Successfully ")
                 return redirect('dashboard_page')
             else:
@@ -819,8 +852,9 @@ def add_data(request):
                 db_sql_3.save()
                 messages.error(request,"Data  Sussfully Add on dbsqlite 3")
                 return redirect('dashboard_page')
-        except Exception:
-            messages.error(request,"Some thing went worng")
+        except Exception as e:
+            messages.error(request,f"Some thing went worng {e}")
+            print(e)
             return redirect('data_entry')
     except Exception as e:
         messages.error(request,f"Something went wrong {e}")
@@ -851,6 +885,11 @@ def  update_job(request,update_id):
             prpc_sell = request.POST.get('prpc_sell')
             cylinder_size = request.POST.get('cylinder_size')
             cylinder_made_in = request.POST.get('cylinder_made_in')
+            
+            cylinder_date  = request.POST.get('cylinder_date')
+            cylinder_bill_no = request.POST.get('cylinder_bill_no')
+            
+            
             pouch_size = request.POST.get('pouch_size')
             pouch_open_size = request.POST.get('pouch_open_size')
             # pouch_combination = request.POST.get('pouch_combination')
@@ -929,6 +968,14 @@ def  update_job(request,update_id):
             
         )
         if response.status_code == 200:
+            
+            cylinder_data = Job_detail.objects.all().get(id=update_id)
+            cylinder_data.cylinder_date = cylinder_date
+            cylinder_data.cylinder_bill_no = cylinder_bill_no
+            cylinder_data.save()
+            
+            
+            
             messages.success(request,'Data Updated Sussfully',)
         else:
             messages.error(request,'Something went Wrong',extra_tags="custom-success-style")

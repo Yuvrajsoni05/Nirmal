@@ -53,7 +53,7 @@
                                            <select id="company_name" name="company_name" class="form-control form-select border-1" >
                                             <option value="">Select Company</option>
                                             {% for company in comapany_name  %}
-                                                    <option value="{{ company.company_name }}">{{ company.company_name }}</option>
+                                                    <option value="{{ company.company_name }}">{{ company.company_name }}  </option>
                                             {% endfor %}
                                              <option value="other">Other</option>
                                             
@@ -75,7 +75,7 @@
                                             Job Name <span class="text-danger">*</span>
                                         </label>
                                         <input type="text" class="form-control  border-1" id="job_name" name="job_name" placeholder="Enter Job Name" >
-                                        <div class="invalid-feedback" id="job_name_error">Please prorovide Job Name</div>
+                                        <div class="invalid-feedback" id="job_name_error">Please provide Job Name</div>
                                     </div>
                                     <div class="col-12 col-sm-6 col-lg-4">
                                         <label for="job_type" class="form-label fw-semibold text-dark">
@@ -94,12 +94,14 @@
                                         <label for="noc" class="form-label fw-semibold text-dark">
                                             No. of Colors <span class="text-danger">*</span>
                                         </label>
-                                        <input type="number" class="form-control  border-1" id="noc" name="noc" placeholder="Enter Number of Colors" min="1" >
+                                        <input type="textarea" class="form-control  border-1" id="noc" name="noc" placeholder="Enter Number of Colors" >
                                         <div class="invalid-feedback" id="noc_error">Please provide NOC</div>
 
                                     </div>
                                 </div>
                             </div>
+
+
 
                             <!-- Cylinder Information Section -->
                             <div class="mb-4">
@@ -149,13 +151,29 @@
                                         <select name="cylinder_select" id="cylinder_made_in" class="form-control form-select border-1">
                                             <option value="">Select Company</option>
                                             {% for i in  cylinder_company_names %}
-                                                <option value="{{i.cylinder_made_in}}"> {{i.cylinder_made_in}} </option>
+                                                <option value="{{i.cylinder_made_in}}"> {{i.cylinder_made_in}} </option> 
                                             {% endfor %}
                                             <option value="others">Other</option>
                                         </select>
                                         <div class="invalid-feedback" id="cylinder_made_in_error">Please provide Cylinder Made In</div>
 
                                         <input type="text" class="form-control border-1" style="display: none;" id="cylinder_made_in_company_name" name="cylinder_made_in_company_name" placeholder="Cylinder Made In">
+                                    </div>
+                                    <div class="col-12 col-sm-6 col-lg-4">
+                                        <label for="cylinder_date" class="form-label fw-semibold text-dark">
+                                            Cylinder Date <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="date" class="form-control  border-1" id="cylinder_dates" name="cylinder_date" pattern="\d{2}-\d{2}-\d{4}"  >
+                                        <div class="invalid-feedback" id="cylinder_date_error">Please provide a Cylinder Date.</div>
+
+                                    </div>
+                                    <div class="col-12 col-sm-6 col-lg-4">
+                                        <label for="bill_no" class="form-label fw-semibold text-dark">
+                                         Cylinder Bill No. <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control border-1" id="cylinder_bill_no" name="cylinder_bill_no" placeholder="Enter Cylinder Bill Number" >
+                                        <div class="invalid-feedback" id="cylinder_bill_no_error">Please provide Cylinder Bill No.</div>
+
                                     </div>
                                 </div>
 
@@ -256,7 +274,7 @@
  {% block script %}
 
 
-<script {% static 'js/data_entry.js' %}></script>
+
 
  <script>
         const diameterInput = document.getElementById('cylinder_diameter');
@@ -330,8 +348,8 @@
             });
     </script>
 
-     <script>
-        const cylinder_select = document.getElementById('cylinder_select');
+    <script>
+        const cylinder_select = document.getElementById('cylinder_made_in');
         const new_company_cylinder = document.getElementById('cylinder_made_in_company_name');
 
             cylinder_select.addEventListener('change', function() {
@@ -397,6 +415,15 @@ function formatNumberWithCommas(input) {
 
  <script>
 document.addEventListener('DOMContentLoaded', function () {
+
+
+    const Cylinder_Bill_no = document.getElementById('cylinder_bill_no');
+    const Cylinder_Bill_no_Error = document.getElementById('cylinder_bill_no_error');
+
+    const Cylinder_Date_Input = document.getElementById('cylinder_dates');
+    const Cylinder_Date_Error = document.getElementById('cylinder_date_error');
+
+
     const JobInput = document.getElementById('job_date');
     const JobError = document.getElementById('job_date_error');
 
@@ -451,6 +478,33 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const myForm = document.getElementById('job_detail_form');
 
+
+
+    function validateCylinderBillNo() {
+        if (Cylinder_Bill_no.value.trim() === '') {
+            Cylinder_Bill_no_Error.style.display = 'block';
+            return false;
+        } else {
+            Cylinder_Bill_no_Error.style.display = 'none';
+            return true;
+        }
+    }
+
+
+
+ function validateCylinderDate() {
+    if (Cylinder_Date_Input.value.trim() === '') {
+        Cylinder_Date_Error.style.display = 'block';
+        return false;
+    } else {
+        Cylinder_Date_Error.style.display = 'none';
+        return true;
+    }
+}
+
+
+
+ 
 
 
     function validateCylinderMade() {
@@ -639,6 +693,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const isJobValid = validateJob();
         const isBillValid = validateBill();
         const isCompanyValid = validateCompany();
+        
         const isJobNameValid = validateJobName();
         const isJobTypeValid = validateJobType();
         const isNOCValid = validateNOC();
@@ -653,6 +708,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const isPouchOpenHeightValid = validatePouchOpenHeight(); 
         const isPouchCombination1 = validatePouchCombination1();
         const isPouchCombination2 = validatePouchCombination2(); 
+        const isCylinderBillNo = validateCylinderBillNo();
+        const isCylinderDate = validateCylinderDate();
+
+
         return (
             isJobValid &&
             isBillValid &&
@@ -670,11 +729,16 @@ document.addEventListener('DOMContentLoaded', function () {
             isPouchOpenDiameterValid &&
             isPouchOpenHeightValid &&
             isPouchCombination1 &&
-            isPouchCombination2 
+            isPouchCombination2 &&
+            isCylinderDate &&
+            isCylinderBillNo
 
         );
     }
 
+
+    Cylinder_Date_Input.addEventListener('input', validateCylinderDate);
+    Cylinder_Date_Input.addEventListener('blur', validateCylinderDate);
 
     JobInput.addEventListener('input', validateJob);
     JobInput.addEventListener('blur', validateJob);
@@ -729,6 +793,10 @@ document.addEventListener('DOMContentLoaded', function () {
     pouch_combination2_Input.addEventListener('input',validatePouchCombination2);
     pouch_combination2_Input.addEventListener('blur', validatePouchCombination2);
 
+    
+    Cylinder_Bill_no.addEventListener('input',validateCylinderBillNo);
+    Cylinder_Bill_no.addEventListener('blur', validateCylinderBillNo);
+
 
 
     myForm.addEventListener('submit', function (event) {
@@ -747,6 +815,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+
+
 
 
 {% endblock script %}
