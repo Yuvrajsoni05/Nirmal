@@ -69,6 +69,28 @@
                   </ul>
                 </div>
               </li>
+
+              <li class="nav-item">
+                <a data-bs-toggle="collapse" href="#sidebarLayouts">
+                  <i class="fas fa-th-list"></i>
+                  <p>Comapny Details </p>
+                  <span class="caret"></span>
+                </a>
+                <div class="collapse" id="sidebarLayouts">
+                  <ul class="nav nav-collapse">
+                    <li>
+                      <a href="{% url "register_page" %}">
+                        <span class="sub-item">Manage Company Details</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="{% url "edit_user_page" %}">
+                        <span class="sub-item">Add New Company Name</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
             </ul>
           </div>
         </div>

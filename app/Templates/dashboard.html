@@ -104,6 +104,10 @@
                             <input type="text" name="q" id="q" class="form-control" value="{{request.GET.q}}" placeholder="Search Field">
                           </div>
 
+                          <div class="form-outline me-2 mb-2 mb-sm-0 col-12 col-md-auto" data-mdb-input-init>
+                            <input type="text" name="cylinder_company" id="cylinder_comapany" class="form-control" value="{{request.GET.cylinder_comapany}}" placeholder="Search Cylinder Company Name">
+                          </div>
+
                           <button type="submit" class="btn btn-primary me-2 mb-2 mb-sm-0 col-12 col-md-auto" data-mdb-ripple-init>
                             <i class="fa fa-search"></i>
                           </button>
@@ -151,8 +155,9 @@
                         <tbody>
                            
                             {% for i in  venues %}
-                              {% if i.id !=  none %}
-                                        <tr class="text-center" data-bs-toggle="modal" data-bs-target="#viewModal{{i.id}}">
+                              {% if i.id !=  none %}      <tr class="text-center" data-bs-toggle="modal" data-bs-target="#viewModal{{i.id}}">
+
+                                        
                                             <td class="text-truncate">{{ forloop.counter }}</td>
                                             {% comment %} <td class="text-truncate">{{ i.id }}</td> {% endcomment %}
                                             <td class="text-truncate"> {{ i.date }}</td>
@@ -220,83 +225,107 @@
 
                                         <!-- Full-Width Job Details Modal -->
 <div class="modal fade" id="viewModal{{i.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-    <div class="modal-content w-100">
-      
-      <!-- Modal Header -->
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title" id="exampleModalLongTitle">Job Details</h5>
-            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                                                  <span aria-hidden="true">&times;</span>
-                                                </button>
-      </div>
+   <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+            <div class="modal-content">
+                
+              <form  >
+               <!-- Modal Header -->
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Job Details</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
 
-      <!-- Modal Body -->
-                  <div class="modal-body">
+                <!-- Modal Body -->
+                <div class="modal-body">
                     <div class="container-fluid">
-                      <div class="row">
-            
-                              <!-- Column 1 -->
-                              <div class="col-md-4 mb-3">
+                        <div class="row">
+                          
+                            <!-- Column 1 -->
+                            <div class="col-md-4 mb-3">
                                 <p><strong>Date:</strong> {{ i.date }}</p>
                                 <p><strong>Bill No:</strong> {{ i.bill_no }}</p>
-                              </div>
+                            </div>
 
-                              <!-- Column 2 -->
-                              <div class="col-md-4 mb-3">
+                            <!-- Column 2 -->
+                            <div class="col-md-4 mb-3">
                                 <p><strong>Job Name:</strong> {{ i.job_name }}</p>
                                 <p><strong>Job Type:</strong> {{ i.job_type }}</p>
-                              </div>
+                            </div>
 
-                              <!-- Column 3 -->
-                              <div class="col-md-4 mb-3">
+                            <!-- Column 3 -->
+                            <div class="col-md-4 mb-3">
                                 <p><strong>Company Name:</strong> {{ i.company_name }}</p>
                                 <p><strong>No. of Colors (NOC):</strong> {{ i.noc }}</p>
-                              </div>
+                            </div>
 
-                              <!-- Column 4 -->
-                              <div class="col-md-4 mb-3">
+                            <!-- Column 4 -->
+                            <div class="col-md-4 mb-3">
                                 <p><strong>Rate/Cylinder (Purchase):</strong> ₹ {{ i.prpc_purchase|indian_currency_format }}</p>
                                 <p><strong>Rate/Cylinder (Sales):</strong> ₹ {{ i.prpc_sell|indian_currency_format }}</p>
-                              </div>
+                            </div>
 
-                              <!-- Column 5 -->
-                              <div class="col-md-4 mb-3">
+                            <!-- Column 5 -->
+                            <div class="col-md-4 mb-3">
                                 <p><strong>Cylinder Size:</strong> {{ i.cylinder_size }}</p>
                                 <p><strong>Made In:</strong> {{ i.cylinder_made_in }}</p>
-                              </div>
+                            </div>
 
-                              <!-- Column 6 -->
-                              <div class="col-md-4 mb-3">
+                            <!-- Column 6 -->
+                            <div class="col-md-4 mb-3">
                                 <p><strong>Cylinder Bill No:</strong> {{ i.cylinder_bill_no }}</p>
                                 <p><strong>Cylinder Date:</strong> {{ i.cylinder_date }}</p>
-                              </div>
+                            </div>
 
-                              <!-- Column 7 -->
-                              <div class="col-md-4 mb-3">
+                            <!-- Column 7 -->
+                            <div class="col-md-4 mb-3">
                                 <p><strong>Pouch Size:</strong> {{ i.pouch_size }}</p>
                                 <p><strong>Open Size:</strong> {{ i.pouch_open_size }}</p>
-                              </div>
+                            </div>
 
-                              <!-- Column 8 -->
-                              <div class="col-md-4 mb-3">
+                            <!-- Column 8 -->
+                            <div class="col-md-4 mb-3">
                                 <p><strong>Pouch Combination:</strong> {{ i.pouch_combination }}</p>
                                 <p><strong>Correction:</strong> {{ i.correction }}</p>
-                              </div>
-
-                              <!-- Column 9 -->
-                              <div class="col-md-4 mb-3">
-                                <p><strong>Link:</strong>   <a href="{{ i.folder_url }}" target="_blank" class="btn btn-outline-primary btn-sm">Open Folder</a></p>
-                              </div>
-
                             </div>
-                          </div>
+
+                            <!-- Column 9 -->
+                            <div class="col-md-4 mb-3">
+                                <p><strong>Link:</strong> <a href="{{ i.folder_url }}" target="_blank" class="btn btn-outline-primary btn-sm">Open Folder</a></p>
+                            </div>
+
                         </div>
-
-                      </div>
                     </div>
-                  </div>
+                </div>
 
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+    <button class="btn btn-secondary" onclick="printJobDetails(this)"
+  data-id="{{ i.id }}"
+  data-job_name="{{ i.job_name }}"
+  data-job_bill_no="{{ i.bill_no }}"
+  data-company_name="{{ i.company_name }}"
+  data-prpc_purchase="{{ i.prpc_purchase }}"
+  data-prpc_sell="{{ i.prpc_sell }}"
+  data-cylinder_size="{{ i.cylinder_size }}"
+  data-cylinder_made_in="{{ i.cylinder_made_in }}"
+  data-cylinder_bill_no ="{{ i.cylinder_bill_no  }}"
+  data-cylinder_date ="{{ i.cylinder_date  }}"
+  data-pouch_size ="{{ i.pouch_size }}"
+  data-pouch_open_size ="{{ i.pouch_open_size  }}"
+  data-pouch_combination ="{{ i.pouch_combination}}"
+  data-correction ="{{ i.correction  }}"
+  data-folder_url ="{{ i.folder_url  }}"
+
+
+
+
+>Print</button>
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+              </form>
+            </div>
+        </div>
                                         </div>
 
                                       <div class="modal fade" id="emailModal{{i.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -357,7 +386,7 @@
                                                                           <!-- NOC -->
                                                                           <div class="col-md-6">
                                                                               <label for="noc" class="form-label fw-bold">NOC (No. of Colors)</label>
-                                                                              <input type="number" id="noc" class="form-control" name="noc" value="{{ i.noc }}" readonly>
+                                                                              <input type="textarea" id="noc" class="form-control" name="noc" value="{{ i.noc }}" readonly>
                                                                           </div>
 
                                                                         
@@ -411,7 +440,16 @@
                                                                               <label for="correction" class="form-label fw-bold">Correction</label>
                                                                               <input type="textarea" class="form-control" id="correction" name="correction"  value="{{ i.correction }}" readonly>
                                                                           </div>
-                                                              
+
+
+                                                                    
+
+                                                                          <div class="col-md-6">
+                                                                              <label for="attachment" class="form-label fw-bold">Attachment</label>
+                                                                              <input type="file" class="form-control" id="attachment" name="attachment" accept=".jpeg , .png, .jpg .ai"  multiple>
+                                                                          </div>
+                                  
+                                  
                                                                           <!-- Form Actions -->
                                                                           <div class="col-12">
                                                                               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -438,10 +476,7 @@
                                               <div class="modal-body">
                                                 {{i.correction}}
                                               </div>
-                                              {% comment %} <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                <button type="button" class="btn btn-primary">Save changes</button>
-                                              </div> {% endcomment %}
+                                           
                                             </div>
                                           </div>
                                         </div>
@@ -593,7 +628,7 @@
                                                                          
                                                                           <div class="col-md-6">
                                                                               <label for="image" class="form-label fw-bold">Upload Images</label>
-                                                                              <input type="file" class="form-control" id="files" name="files" multiple>
+                                                                              <input type="file" class="form-control" id="files" name="files"  multiple accept=".jpeg , .png, .jpg .ai" >
                                                                           </div>
 
 
@@ -601,16 +636,13 @@
                                                                               <label for="correction" class="form-label fw-bold">Correction</label>
                                                                               <input type="textarea" class="form-control" id="correction" name="correction"  value="{{ i.correction }}">
                                                                           </div>
-                                                                          {% comment %} 
-                                                                            <div class="col-md-6">
-                                                                              <input type="hidden" class="form-control" id="demo1" name="demo1"  value="">
-                                                                              <input type="hidden" class="form-control" id="demo2" name="demo2"  value="">
-                                                                            </div> 
-                                                                          {% endcomment %}
+                                                                        
 
                                                                           <!-- Form Actions -->
                                                                           <div class="col-12">
-                                                                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                              <a href="{% url "dashboard_page" %}">
+                                                                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                              </a>
                                                                               <button type="submit" class="btn btn-primary">Save changes</button>
                                                                           </div>
 
@@ -771,5 +803,163 @@ function getPouchValues() {
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', initPouchValidation);
 </script>
+
+
+
+
+ <script>
+        function printJobDetails(btn) {
+            const jobId = btn.dataset.id || 'N/A';
+            const job_name = btn.dataset.job_name || 'N/A';
+            const job_bill_no = btn.dataset.job_bill_no || 'N/A';
+            const company_name = btn.dataset.company_name || 'N/A';
+            const prpc_purchase = btn.dataset.prpc_purchase || 'N/A';
+            const prpc_sell = btn.dataset.prpc_sell || 'N/A';
+            const cylinder_size = btn.dataset.cylinder_size || 'N/A';
+            const cylinder_made_in = btn.dataset.cylinder_made_in || 'N/A';
+            const cylinder_bill_no = btn.dataset.cylinder_bill_no || 'N/A';
+            const cylinder_date = btn.dataset.cylinder_date || 'N/A';
+            const pouch_size = btn.dataset.pouch_size || 'N/A';
+            const pouch_open_size = btn.dataset.pouch_open_size || 'N/A';
+            const pouch_combination = btn.dataset.pouch_combination || 'N/A';
+            const correction = btn.dataset.correction || 'N/A';
+            const folder_url = btn.dataset.folder_url || 'N/A';
+
+            // Create iframe for silent printing
+            const iframe = document.createElement('iframe');
+            iframe.style.position = 'absolute';
+            iframe.style.top = '-1000px';
+            iframe.style.left = '-1000px';
+            document.body.appendChild(iframe);
+
+            const doc = iframe.contentWindow.document;
+            doc.open();
+            doc.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Job Details - Print</title>
+                    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; margin: 0; }
+                        @page { margin: 20px; }
+                    </style>
+                </head>
+                <body>
+                    <div class="text-center mb-4">
+                        <h2 style="color: #0d6efd; margin-bottom: 5px;">Nirmal Group</h2>
+                        <h4 style="margin-bottom: 20px;">Job Details Report</h4>
+                        <hr>
+                    </div>
+                    
+                    <table class="table table-bordered" style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: #212529; color: white;">
+                                <th style="width: 30%; padding: 12px; border: 1px solid #dee2e6;">Field</th>
+                                <th style="padding: 12px; border: 1px solid #dee2e6;">Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;"><strong>Job ID</strong></td>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">${jobId}</td>
+                            </tr>
+                            <tr style="background-color: #f8f9fa;">
+                                <td style="padding: 8px; border: 1px solid #dee2e6;"><strong>Job Name</strong></td>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">${job_name}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;"><strong>Job Bill No</strong></td>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">${job_bill_no}</td>
+                            </tr>
+                            <tr style="background-color: #f8f9fa;">
+                                <td style="padding: 8px; border: 1px solid #dee2e6;"><strong>Company Name</strong></td>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">${company_name}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;"><strong>PRPC Purchase</strong></td>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">${prpc_purchase}</td>
+                            </tr>
+                            <tr style="background-color: #f8f9fa;">
+                                <td style="padding: 8px; border: 1px solid #dee2e6;"><strong>PRPC Sell</strong></td>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">${prpc_sell}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;"><strong>Cylinder Size</strong></td>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">${cylinder_size}</td>
+                            </tr>
+                            <tr style="background-color: #f8f9fa;">
+                                <td style="padding: 8px; border: 1px solid #dee2e6;"><strong>Cylinder Made In</strong></td>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">${cylinder_made_in}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;"><strong>Cylinder Bill No</strong></td>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">${cylinder_bill_no}</td>
+                            </tr>
+                            <tr style="background-color: #f8f9fa;">
+                                <td style="padding: 8px; border: 1px solid #dee2e6;"><strong>Cylinder Date</strong></td>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">${cylinder_date}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;"><strong>Pouch Size</strong></td>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">${pouch_size}</td>
+                            </tr>
+                            <tr style="background-color: #f8f9fa;">
+                                <td style="padding: 8px; border: 1px solid #dee2e6;"><strong>Pouch Open Size</strong></td>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">${pouch_open_size}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;"><strong>Pouch Combination</strong></td>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">${pouch_combination}</td>
+                            </tr>
+                            <tr style="background-color: #f8f9fa;">
+                                <td style="padding: 8px; border: 1px solid #dee2e6;"><strong>Correction</strong></td>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;">${correction}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; border: 1px solid #dee2e6;"><strong>Folder URL</strong></td>
+                                <td style="padding: 8px; border: 1px solid #dee2e6; word-break: break-all;">${folder_url}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="text-center mt-4">
+                        <small style="color: #6c757d;">Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</small>
+                    </div>
+                </body>
+                </html>
+            `);
+            doc.close();
+
+            // Wait for content to load then print silently
+            iframe.onload = function() {
+                try {
+                    // Try to print without dialog
+                    iframe.contentWindow.focus();
+                    iframe.contentWindow.print();
+                } catch (e) {
+                    // Fallback: create blob and download as PDF
+                    const printContent = doc.documentElement.outerHTML;
+                    const blob = new Blob([printContent], { type: 'text/html' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Job_Details_${jobId}_${new Date().getTime()}.html`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }
+                
+                // Clean up iframe
+                setTimeout(() => {
+                    document.body.removeChild(iframe);
+                }, 1000);
+            };
+        }
+    </script>
+
+
+
 
 {% endblock script %}

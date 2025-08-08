@@ -34,6 +34,8 @@ import mimetypes
 import io
 import re
 
+
+from django.core.mail import EmailMessage
 from pydrive2.auth import GoogleAuth 
 from pydrive2.drive import GoogleDrive
 
@@ -99,7 +101,7 @@ def login_page(request):
             messages.success(request,'You are Login')
             return redirect('dashboard_page') 
         else:
-            print('Invalid Login')
+            messages.error(request,"Invalid Username and Password ",)
             return redirect('login_page')
     return render(request, 'Registration/login_page.html')  
 
@@ -326,10 +328,17 @@ def dashboard_page(request):
     if not request.user.is_authenticated:
         return redirect('login_page')
     try:
+        
+        if 'print_button' in request.POST:
+            print(id)
+        else:
+            print("Hiii")
+            
         get_q = request.GET.get('q')
         date_s = request.GET.get('date')
+        cylinder_company = request.GET.get('cylinder_company')
 
-       
+    
         db_sqlite3 = Job_detail.objects.all().order_by('id')
         total_purchse_floats = [] 
         total_purchse = Job_detail.objects.values_list('prpc_purchase')
@@ -363,6 +372,10 @@ def dashboard_page(request):
         elif  get_q:
             db_sqlite3 = Job_detail.objects.filter(Q(job_name__icontains=get_q) | Q(company_name__icontains=get_q)| Q(cylinder_made_in__icontains=get_q) ).order_by('id')
             
+        elif cylinder_company:
+            db_sqlite3 = Job_detail.objects.filter(Q(cylinder_made_in__icontains=cylinder_company)).order_by('id')
+            
+            
         p = Paginator(db_sqlite3, 10)
         page = request.GET.get('page')
         datas = p.get_page(page)
@@ -389,7 +402,7 @@ def dashboard_page(request):
 
         # data = Job_detail.objects.values_list('prpc_sell')
         # print(data)
- 
+    
         context = {
             'nums': nums,
             'venues': datas,
@@ -577,7 +590,7 @@ def add_data(request):
             # print(cylinder_bill_no)
             
        
-            if Job_detail.objects.filter(job_name = job_name,date  =date).exists():
+            if Job_detail.objects.filter(job_name__icontains = job_name,date__icontains  =date).exists():
                     messages.error(request,"Job Name are alredy Exsits on this date  kidnly Update job",extra_tags='custom-success-style')
                     return redirect('data_entry')
             
@@ -908,17 +921,31 @@ def  update_job(request,update_id):
         
         # print(update_id)
         
-        get_data =  Job_detail.objects.all().get(id=update_id)
-        # print(get_data)
+        demo = Job_detail.objects.values('date').get(id=update_id)
+        date_formatte = demo['date'].strftime("%Y-%m-%d")
+       
+      
+        print(date_formatte)
         
+        if date != date_formatte:
+            if Job_detail.objects.filter(date = date, job_name =job_name).exists() :
+                messages.error(request,"Job is Alredy exists from this date ",extra_tags="custom-success-style")
+                return redirect('dashboard_page')
+
+        
+        # if Job_detail.objects.filter(date = date, job_name =  job_name):
+        #     print("Both Same")
+        get_data =  Job_detail.objects.all().get(id=update_id)
+      
+
         get_combinations = get_data.pouch_combination.replace(" ","").split("+")
-        print(get_combinations)
+        # print(get_combinations)
         while len(get_combinations) < 4:
             get_combinations.append('')
             
-        print(get_combinations[0])
-        print(get_combinations[1])
-        print(get_combinations[2])
+        # print(get_combinations[0])
+        # print(get_combinations[1])
+        # print(get_combinations[2])
 
         data  =  {
             'date':date,
@@ -1122,7 +1149,7 @@ def user_password(request):
 def offline_page(request):
     return render(request,'Base/offline_page.html')
 
-
+from django.core.mail import EmailMultiAlternatives
 @login_required(redirect_field_name=None)
 def send_mail_data(request):
     if not request.user.is_authenticated:
@@ -1139,8 +1166,14 @@ def send_mail_data(request):
         pouch_size = request.POST.get('pouch_size')
         pouch_open_size = request.POST.get('pouch_open_size')
         correction = request.POST.get('correction')
-    print(date,bill_no,company_name,company_email_address,job_name,noc,prpc_sell,cylinder_size,pouch_size,pouch_open_size,correction)
+        attachments  = request.FILES.getlist('attachment')
     
+    # if len(attachments) >= 3 :
+    #             messages.error(request,"You can upload only 2 file")
+    #             return redirect('dashboard_page')
+    
+    print(date,bill_no,company_name,company_email_address,job_name,noc,prpc_sell,cylinder_size,pouch_size,pouch_open_size,correction)
+    print(attachments)
     required_field = {
                     'Date' :date,
                     'Bill no':bill_no,
@@ -1189,23 +1222,51 @@ def send_mail_data(request):
     context=job_info
 
     )
-    plain_message  = strip_tags(convert_to_html_content)
-    send_mail(
-        subject= "Mail From Nirmal Ventuers",
-        message = plain_message,
-        from_email = request.user.email,
-        recipient_list=[receiver_email],
-        html_message=convert_to_html_content,
-        fail_silently=False
-        
+    email = EmailMultiAlternatives(
+    subject="Mail From Nirmal Ventuers",
+    body='plain_message',
+    from_email=request.user.email,
+    to=[receiver_email],
+
     )
+    email.attach_alternative(convert_to_html_content, "text/html")
+    for  i in attachments:
+        email.attach(i.name, i.read(), i.content_type)
+    email.send()
+        
     messages.success(request,"Mail Send successfully")
     return redirect('dashboard_page')
     
 
 
+# def job_detail_print(request,job_id):
+#     print(job_id)
+    
+#     try:
+        
+#         item = Job_detail.objects.get(id = job_id)
+#         data = {
+#             'id': item.id,
+#             'description': item.correction,
+            
+#         }
+#         return JsonResponse(data)
+#     except Job_detail.DoesNotExist:
+#             return JsonResponse({'error': 'Item not found'}, status=404)
 
+# email = EmailMessage(
+#                 'Subject of the email',
+#                 'Body of the email',
+#                 'sender@example.com',  # From email address
+#                 ['recipient@example.com'], # To email address(es)
+#             )
 
+#             # Attach each file
+#             for uploaded_file in attachments:
+#                 email.attach(uploaded_file.name, uploaded_file.read(), uploaded_file.content_type)
+
+#             email.send()
+#             return render(request, 'success.html')
 # def check_user_active_session(user_id):
 #     try:
 #         user = User.objects.get(pk=user_id)  # Retrieve the User object by ID

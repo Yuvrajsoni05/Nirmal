@@ -26,6 +26,8 @@ urlpatterns = [
     
     path('send_mail',send_mail_data,name='send_mail'),
     
+    # path('print_job/<int:job_id>/',job_detail_print,name='job_detail_print'),
+    
     path('password_reset',CustomPasswordResetView.as_view(),name="password_reset"),
     path('password_reset_done/',CustomPasswordResetDoneView.as_view(), name='password_reset_done'),
     path('reset/<uidb64>/<token>',CustomPasswordResetConfirm.as_view(),name="password_reset_confirm"),
