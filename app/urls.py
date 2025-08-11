@@ -21,7 +21,9 @@ urlpatterns = [
     path('delete_user/<uuid:user_id>/',delete_user,name='delete_user'),
     path('update_user/<uuid:user_id>/',update_user,name="update_user"),
     
-  
+    path('company_add_page',comapny_add_page,name='company_add_page'),
+    path('new_cdr_upload',cdr_add,name='new_cdr_upload'),
+    
     path('offline_page',offline_page,name='offline-page'),
     
     path('send_mail',send_mail_data,name='send_mail'),
@@ -32,4 +34,5 @@ urlpatterns = [
     path('password_reset_done/',CustomPasswordResetDoneView.as_view(), name='password_reset_done'),
     path('reset/<uidb64>/<token>',CustomPasswordResetConfirm.as_view(),name="password_reset_confirm"),
     path('reset_done',password_reset_done , name="password_reset_complete"),
+    
 ]

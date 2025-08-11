@@ -1,0 +1,206 @@
+{% extends "Base/base.html" %}
+{% block title %}
+Company New Page
+{% endblock title %}
+{% load static %}
+
+
+
+{% block main_block %}
+
+<div class="container-fluid py-4">
+  <div class="row justify-content-center">
+    <div class="col-11">
+      <div class="d-flex justify-content-between align-items-center mb-4 ">
+        <h3 class="fw-bold mb-0">Upload CDR</h3>
+      </div>
+
+      <div class="card shadow col-12 col-xl-12 col-xxl-12">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="bi bi-plus-circle me-2"></i>Upload CDR File
+          </h5>
+        </div>
+        <div class="card-body">
+          <form action="{% url "new_cdr_upload" %}" id="cdr_form" method="post" autocomplete="off" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="comapany_name" class="form-label fw-semibold text-dark">Company Name</label><span style="color:red;"> *</span>
+                <input type="text" id="company_name" name="company_name" class="form-control" maxlength="15" placeholder="Company Name"  >
+                <div class="invalid-feedback" id="company_name_error">Please provide a Company Name</div>
+
+              </div>
+
+
+
+              <div class="col-md-6">
+                <label for="company_email" class="form-label fw-semibold text-dark">Company Email</label><span style="color:red;"> *</span>
+                <input type="email" id="company_email" name="company_email" class="form-control" maxlength="50" placeholder="Enter Email Address"  />
+                <span class="invalid-feedback" id="company_email_error">Please provide Valid Email Address.</span>
+              </div>
+            </div>
+
+
+            
+          <div class="row mb-3">
+
+            <div class="col-md-6">
+                <label for="cdr_date" class="form-label fw-semibold text-dark">CDR Upload Date </label><span style="color:red;"> *</span>
+                <input type="date" id="cdr_upload_date" name="cdr_upload_date" class="form-control"  />
+                <span class="invalid-feedback" id="cdr_upload_date_error">Please Provide Date</span>
+            </div>
+
+              <div class="col-md-6">
+                <label for="cdr_files" class="form-label fw-semibold text-dark">Upload CDR File</label><span style="color:red;"> *</span>
+                <input type="file" id="cdr_files" name="cdr_files" class="form-control"  />
+                <span class="invalid-feedback" id="password_error">Please Provide Valid Password</span>
+              </div>
+            </div>
+
+
+            <div class="d-flex justify-content-end gap-2 border-top pt-3">
+             <a href="{% url "company_add_page" %}"><button type="button" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-clockwise me-1"></i>Reset
+              </button></a>
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-check-circle me-1"></i>Create
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+                  <div class="card-body p-0">
+                    <div class="table-responsive" >
+                      <!-- Projects table -->
+                      <table class="table align-items-center table-striped">
+                        <thead class="thead-light">
+                          <tr class="text-nowrap text-center">
+                            <th scope="col">Sr No.</th>
+                            <th scope="col">Comapany Name</th>
+                            <th scope="col">Comapany Email Address</th>
+                            <th scope="col">CDR Upload Date</th>
+                            <th scope="col">CDR Folder id</th>
+                            <th scope="col">Actions</th>
+                            
+                           
+                          </tr>
+                        </thead>
+                        <tbody>
+                        {% for i in cdr_details %}
+                        <tr class="text-nowrap text-center">
+                          <td>{{ forloop.counter }}</td>
+                          <td>{{ i.company_name  }}</td>
+                          <td>{{ i.company_email }}</td>
+                          <td>{{ i.date }}</td>
+                   
+                          <td>{{ i.file_url }}</td>
+                            <td></td>       
+                        </tr>  
+                        {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+
+
+
+
+
+</div>
+
+{% endblock main_block %}
+{% block script %}
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const company_name = document.getElementById('company_name');
+    const company_name_error = document.getElementById('company_name_error');
+
+    const company_email_input = document.getElementById('company_email');
+    const company_email_error = document.getElementById('company_email_error');
+
+    const company_date = document.getElementById('cdr_upload_date');
+    const cdr_upload_date = document.getElementById('cdr_upload_date_error');
+
+    const myForm = document.getElementById('cdr_form');
+
+    function validateCompanyName() {
+        if (company_name.value.trim() === '') {
+            company_name_error.style.display = 'block';
+            return false;
+        } else {
+            company_name_error.style.display = 'none';
+            return true;
+        }
+    }
+
+    function validateEmail() {
+        const email = company_email_input.value.trim();
+        const emailPattern = /^(?!.*([.-])\1)(?!.*([.-])$)(?!.*[.-]$)(?!.*[.-]{2})[a-zA-Z0-9_%+-][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (email === '' || !emailPattern.test(email)) {
+            company_email_error.style.display = 'block';
+            return false;
+        } else {
+            company_email_error.style.display = 'none';
+            return true;
+        }
+    }
+
+    function validateCDRDate() {
+        if (company_date.value.trim() === '') {
+            cdr_upload_date.style.display = 'block';
+            return false;
+        } else {
+            cdr_upload_date.style.display = 'none';
+            return true;
+        }
+    }
+
+    function validateForm() {
+        const isCompanyNameValid = validateCompanyName();
+        const isEmailValid = validateEmail();
+        const isCDRDateValid = validateCDRDate();
+
+        return (
+            isCompanyNameValid &&
+            isEmailValid &&
+            isCDRDateValid
+        );
+    }
+
+    company_name.addEventListener('input', validateCompanyName);
+    company_name.addEventListener('blur', validateCompanyName);
+
+    company_email_input.addEventListener('input', validateEmail);
+    company_email_input.addEventListener('blur', validateEmail);
+
+    company_date.addEventListener('input', validateCDRDate);
+    company_date.addEventListener('blur', validateCDRDate);
+
+    myForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        if (validateForm()) {
+            myForm.submit();
+        } else {
+            const firstError = document.querySelector('[style*="display: block"]');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    });
+
+});
+</script>
+
+
+
+{% endblock script %}

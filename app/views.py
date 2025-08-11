@@ -33,6 +33,7 @@ from googleapiclient.http import MediaIoBaseUpload
 import mimetypes
 import io
 import re
+import pickle
 
 
 from django.core.mail import EmailMessage
@@ -329,10 +330,7 @@ def dashboard_page(request):
         return redirect('login_page')
     try:
         
-        if 'print_button' in request.POST:
-            print(id)
-        else:
-            print("Hiii")
+       
             
         get_q = request.GET.get('q')
         date_s = request.GET.get('date')
@@ -363,18 +361,23 @@ def dashboard_page(request):
         print(b)
         
         
-        if get_q and date_s:
-            db_sqlite3 = db_sqlite3.filter(
-            Q(date__icontains=date_s) &(Q(job_name__icontains=get_q) | Q(company_name__icontains=get_q)) | Q(cylinder_made_in__icontains=get_q)).order_by('id')
-        elif date_s:
-            db_sqlite3 = Job_detail.objects.filter(Q(date__icontains=date_s)).order_by('id')
-            
-        elif  get_q:
-            db_sqlite3 = Job_detail.objects.filter(Q(job_name__icontains=get_q) | Q(company_name__icontains=get_q)| Q(cylinder_made_in__icontains=get_q) ).order_by('id')
-            
-        elif cylinder_company:
-            db_sqlite3 = Job_detail.objects.filter(Q(cylinder_made_in__icontains=cylinder_company)).order_by('id')
-            
+        filters = Q()
+
+        if get_q:
+            filters &= (Q(job_name__icontains=get_q) | Q(company_name__icontains=get_q) | Q(cylinder_made_in__icontains=get_q)
+            )
+
+        if date_s:
+            filters &= Q(date__icontains=date_s)
+
+        if cylinder_company:
+            filters &= Q(cylinder_made_in__icontains=cylinder_company)
+
+        if get_q or date_s or cylinder_company:
+            db_sqlite3 = db_sqlite3.filter(filters)
+
+        
+        db_sqlite3 = db_sqlite3.order_by('id')
             
         p = Paginator(db_sqlite3, 10)
         page = request.GET.get('page')
@@ -402,6 +405,10 @@ def dashboard_page(request):
 
         # data = Job_detail.objects.values_list('prpc_sell')
         # print(data)
+        
+        
+
+
     
         context = {
             'nums': nums,
@@ -1142,10 +1149,58 @@ def user_password(request):
         # update_session_auth_hash(request,user_password)
         return redirect('login_page')
     
+def comapny_add_page(request):
+    
+    cdr_data = CDRDetail.objects.all()
+    
+    context = {
+        'cdr_details':cdr_data
+    }
+    return render(request,'CDR/add_company.html',context)
 
 
+def cdr_add(request):
+    if request.method == 'POST':
+        company_name = request.POST.get('company_name')
+        company_email = request.POST.get('company_email')
+        cdr_upload_date = request.POST.get('cdr_upload_date')
+        cdr_files  =       request.FILES.getlist('cdr_files')
 
+        
 
+        
+        if CDRDetail.objects.filter(company_email = company_email).exists():
+            messages.error(request,"Company Email is Alredy exists",extra_tags='custom-success-style')
+            return redirect('company_add_page')
+        
+        
+        email_regex = r"(?!.*([.-])\1)(?!.*([.-])$)(?!.*[.-]$)(?!.*[.-]{2})[a-zA-Z0-9_%+-][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        if not re.match(email_regex, company_email):
+            messages.error(request, "Enter a valid email address.",extra_tags="custom-success-style") 
+            return redirect('company_add_page')
+        
+        cdr_upload =  CDRDetail.objects.create(
+                date = cdr_upload_date,
+                company_email = company_email,
+                company_name = company_name,
+                
+        )
+        
+        for cdr_file in cdr_files:
+  
+            file_name = cdr_file.name
+            file_path = os.path.join(settings.MEDIA_ROOT, file_name) 
+
+            os.makedirs(os.path.dirname(file_path), exist_ok=True) 
+            with open(file_path, 'wb+') as destination:
+                for chunk in cdr_file.chunks():   
+                    destination.write(chunk)
+            messages.success(request, "New Company Add Successfully")
+
+    return redirect('company_add_page')
+    
+    
+    
 def offline_page(request):
     return render(request,'Base/offline_page.html')
 
@@ -1187,7 +1242,7 @@ def send_mail_data(request):
                     'Company Email Address':company_email_address , 
                     
             }
-    for i ,r in required_field.items():
+    for i ,r in required_field.items(): 
         if not  r:
             messages.error(request,f"This {i} Field Was Required",extra_tags="custom-success-style")
             return redirect('dashboard_page')
@@ -1283,3 +1338,206 @@ def send_mail_data(request):
 #             return True  # User is currently logged in via an active session
     
 #     return False
+
+
+# # views.py
+
+# import os
+# import io
+# from django.shortcuts import redirect, render
+# from django.conf import settings
+# from django.core.files.storage import default_storage
+# from google_auth_oauthlib.flow import Flow
+# from googleapiclient.discovery import build
+# from googleapiclient.http import MediaIoBaseUpload
+# from django.views.decorators.csrf import csrf_exempt
+
+# # Scopes for Drive
+# SCOPES = ['https://www.googleapis.com/auth/drive.file']
+
+# # Temp in-memory user session token storage (for demo)
+# user_credentials = {}
+
+# def authorize(request):
+#     flow = Flow.from_client_config(
+#         {
+#             "web": {
+#                 "client_id": settings.GOOGLE_OAUTH2_CLIENT_ID,
+#                 "client_secret": settings.GOOGLE_OAUTH2_CLIENT_SECRET,
+#                 "redirect_uris": [settings.GOOGLE_OAUTH2_REDIRECT_URI],
+#                 "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+#                 "token_uri": "https://oauth2.googleapis.com/token",
+#             }
+#         },
+#         scopes=SCOPES,
+#     )
+#     flow.redirect_uri = settings.GOOGLE_OAUTH2_REDIRECT_URI
+#     authorization_url, state = flow.authorization_url(
+#         access_type='offline',
+#         include_granted_scopes='true',
+#         prompt='consent'
+#     )
+#     request.session['state'] = state
+#     return redirect(authorization_url)
+
+
+# def oauth2callback(request):
+#     state = request.session['state']
+#     flow = Flow.from_client_config(
+#         {
+#             "web": {
+#                 "client_id": settings.GOOGLE_OAUTH2_CLIENT_ID,
+#                 "client_secret": settings.GOOGLE_OAUTH2_CLIENT_SECRET,
+#                 "redirect_uris": [settings.GOOGLE_OAUTH2_REDIRECT_URI],
+#                 "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+#                 "token_uri": "https://oauth2.googleapis.com/token",
+#             }
+#         },
+#         scopes=SCOPES,
+#         state=state
+#     )
+#     flow.redirect_uri = settings.GOOGLE_OAUTH2_REDIRECT_URI
+#     flow.fetch_token(authorization_response=request.build_absolute_uri())
+#     credentials = flow.credentials
+
+#     # Save credentials for later use
+#     request.session['credentials'] = {
+#         'token': credentials.token,
+#         'refresh_token': credentials.refresh_token,
+#         'token_uri': credentials.token_uri,
+#         'client_id': credentials.client_id,
+#         'client_secret': credentials.client_secret,
+#         'scopes': credentials.scopes
+#     }
+
+#     return redirect('upload_file')
+
+
+# @csrf_exempt
+# def upload_file(request):
+#     if request.method == 'POST':
+#         file = request.FILES['file']
+#         credentials_data = request.session.get('credentials')
+
+#         if not credentials_data:
+#             return redirect('authorize')
+
+#         from google.oauth2.credentials import Credentials
+
+#         credentials = Credentials(
+#             **credentials_data
+#         )
+
+#         service = build('drive', 'v3', credentials=credentials)
+
+#         file_metadata = {'name': file.name}
+#         media = MediaIoBaseUpload(file, mimetype=file.content_type)
+
+#         uploaded_file = service.files().create(
+#             body=file_metadata,
+#             media_body=media,
+#             fields='id'
+#         ).execute()
+
+#         return render(request, 'upload.html', {
+#             'message': f"File uploaded successfully to Google Drive with ID: {uploaded_file.get('id')}"
+#         })
+
+#     return render(request, 'upload.html')
+       # import re
+# from django.shortcuts import redirect
+# from django.contrib import messages
+# from .models import CDRDetail
+# from .google_drive_service import get_drive_service, create_company_folder
+
+
+# def cdr_add(request):
+#     if request.method == 'POST':
+#         company_name = request.POST.get('company_name')
+#         company_email = request.POST.get('company_email')
+#         cdr_upload_date = request.POST.get('cdr_upload_date')
+#         cdr_files = request.FILES.getlist('cdr_files')  # assuming multiple files
+
+#         # Validate required fields
+#         required_fields = {
+#             'Company Name': company_name,
+#             'Company Email': company_email,
+#             'Upload Date': cdr_upload_date,
+#         }
+
+#         for field_name, value in required_fields.items():
+#             if not value:
+#                 messages.error(request, f'{field_name} is required.')
+#                 return redirect('company_add_page')
+
+#         # Check for existing email
+#         if CDRDetail.objects.filter(company_email=company_email).exists():
+#             messages.error(request, "Company Email already exists.", extra_tags='custom-success-style')
+#             return redirect('company_add_page')
+
+#         # Validate email format
+#         email_regex = r"(?!.*([.-])\1)(?!.*([.-])$)(?!.*[.-]$)(?!.*[.-]{2})[a-zA-Z0-9_%+-][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+#         if not re.match(email_regex, company_email):
+#             messages.error(request, "Enter a valid email address.", extra_tags="custom-success-style")
+#             return redirect('company_add_page')
+
+#         # Create database record
+#         cdr_upload = CDRDetail.objects.create(
+#             date=cdr_upload_date,
+#             company_email=company_email,
+#             company_name=company_name
+#         )
+
+#         # Google Drive folder creation
+#         try:
+#             service = get_drive_service()
+#             parent_folder_id = 'YOUR_PARENT_FOLDER_ID'  # Replace with your actual parent folder ID
+#             folder_id, folder_link = create_company_folder(service, company_name, parent_folder_id)
+
+#             # Save folder link
+#             cdr_upload.google_drive_folder = folder_link
+#             cdr_upload.save()
+#         except Exception as e:
+#             messages.error(request, f"Google Drive folder creation failed: {str(e)}")
+#             return redirect('company_add_page')
+
+#         messages.success(request, "New company added successfully.")
+#         return redirect('company_add_page')
+
+#     return redirect('company_add_page')
+
+
+# import os
+# import pickle
+# from google_auth_oauthlib.flow import InstalledAppFlow
+# from googleapiclient.discovery import build
+
+# SCOPES = ['https://www.googleapis.com/auth/drive.file']
+
+# def get_drive_service():
+#     creds = None
+#     if os.path.exists('token.pickle'):
+#         with open('token.pickle', 'rb') as token:
+#             creds = pickle.load(token)
+
+#     if not creds or not creds.valid:
+#         flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
+#         creds = flow.run_local_server(port=0)
+#         with open('token.pickle', 'wb') as token:
+#             pickle.dump(creds, token)
+
+#     return build('drive', 'v3', credentials=creds)
+
+
+# def create_company_folder(service, company_name, parent_folder_id=None):
+#     file_metadata = {
+#         'name': company_name,
+#         'mimeType': 'application/vnd.google-apps.folder',
+#     }
+#     if parent_folder_id:
+#         file_metadata['parents'] = [parent_folder_id]
+
+#     folder = service.files().create(body=file_metadata, fields='id').execute()
+#     folder_id = folder.get('id')
+#     folder_link = f"https://drive.google.com/drive/folders/{folder_id}"
+#     return folder_id, folder_link

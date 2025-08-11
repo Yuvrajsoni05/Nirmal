@@ -71,21 +71,21 @@
               </li>
 
               <li class="nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarLayouts">
+                <a data-bs-toggle="collapse" href="#sidebarLayouts_">
                   <i class="fas fa-th-list"></i>
-                  <p>Comapny Details </p>
+                  <p>CDR </p>
                   <span class="caret"></span>
                 </a>
-                <div class="collapse" id="sidebarLayouts">
+                <div class="collapse" id="sidebarLayouts_">
                   <ul class="nav nav-collapse">
                     <li>
-                      <a href="{% url "register_page" %}">
-                        <span class="sub-item">Manage Company Details</span>
+                      <a href="{% url "company_add_page" %}">
+                        <span class="sub-item">Add new CDR File</span>
                       </a>
                     </li>
                     <li>
                       <a href="{% url "edit_user_page" %}">
-                        <span class="sub-item">Add New Company Name</span>
+                        <span class="sub-item">manage CDR Files</span>
                       </a>
                     </li>
                   </ul>

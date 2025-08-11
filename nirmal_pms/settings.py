@@ -104,8 +104,20 @@ DATABASES = {
     }
 }
 
-# In settings.py
+
+
+
+
+# GOOGLE_OAUTH2_CLIENT_ID = 'your-client-id.apps.googleusercontent.com'
+# GOOGLE_OAUTH2_CLIENT_SECRET = 'your-client-secret'
+# GOOGLE_OAUTH2_REDIRECT_URI = 'http://localhost:8000/oauth2callback/'
+
+
 GOOGLE_CREDENTIALS_PATH = os.path.join(BASE_DIR, 'config', 'credentials.json')
+GOOGLE_DRIVE_PARENT_FOLDER_ID = "1px2ebSxnQkJi3_-cszvqWE76Lg2-F6gI"
+CREDENTIALS_PATH = os.path.join(BASE_DIR, "app", "Google", "credentials.json")
+TOKEN_PATH = os.path.join(BASE_DIR, "token.pickle")
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -144,6 +156,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static'
 
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media') 
+MEDIA_URL = '/media/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -157,3 +172,6 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER =  'soniyuvraj9499@gmail.com'
 EMAIL_HOST_PASSWORD = 'oidy ftot bgqu lgeu'
+
+
+

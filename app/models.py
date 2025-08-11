@@ -37,10 +37,23 @@ class Job_detail(models.Model):
         
         
 class CompanyName(models.Model):
+    # date = models.DateField(auto_now_add=True,blank=True, null=True)
     company_name = models.CharField(max_length=300,unique=True,)
+    # job_name = models.CharField(max_length=200,blank=True, null=True)
+    # file_url = models.models.URLField(max_length=200,blank=True, null=True)
+    
     
     
 class CylinderMadeIn(models.Model):
     cylinder_made_in =  models.CharField(max_length=300,unique=True,blank=True, null=True)
     
     
+
+class CDRDetail(models.Model):
+    date = models.DateField()
+    company_name = models.CharField(max_length=200)
+    company_email = models.EmailField(blank=True, null=True)
+    # cdr_upload = models.FileField(upload_to='cdr_file/',blank=True, null=True)
+    file_url = models.URLField(max_length=200,blank=True, null=True)
+     
+     
