@@ -26,7 +26,7 @@ Company New Page
             {% csrf_token %}
 
             <div class="row mb-3">
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <label for="comapany_name" class="form-label fw-semibold text-dark">Company Name</label><span style="color:red;"> *</span>
                 <input type="text" id="company_name" name="company_name" class="form-control" maxlength="15" placeholder="Company Name"  >
                 <div class="invalid-feedback" id="company_name_error">Please provide a Company Name</div>
@@ -35,7 +35,13 @@ Company New Page
 
 
 
-              <div class="col-md-6">
+              <div class="col-md-4">
+                <label for="job_name" class="form-label fw-semibold text-dark">Job name</label><span style="color:red;"> *</span>
+                <input type="text" id="job_name" name="job_name" class="form-control"  placeholder="Enter Job Name"  />
+                <span class="invalid-feedback" id="job_name_error">Please provide Job Name.</span>
+              </div>
+
+              <div class="col-md-4">
                 <label for="company_email" class="form-label fw-semibold text-dark">Company Email</label><span style="color:red;"> *</span>
                 <input type="email" id="company_email" name="company_email" class="form-control" maxlength="50" placeholder="Enter Email Address"  />
                 <span class="invalid-feedback" id="company_email_error">Please provide Valid Email Address.</span>
@@ -54,7 +60,7 @@ Company New Page
 
               <div class="col-md-6">
                 <label for="cdr_files" class="form-label fw-semibold text-dark">Upload CDR File</label><span style="color:red;"> *</span>
-                <input type="file" id="cdr_files" name="cdr_files" class="form-control"  />
+                <input type="file" id="cdr_files" name="cdr_files" class="form-control" multiple  />
                 <span class="invalid-feedback" id="password_error">Please Provide Valid Password</span>
               </div>
             </div>
@@ -77,11 +83,12 @@ Company New Page
                   <div class="card-body p-0">
                     <div class="table-responsive" >
                       <!-- Projects table -->
-                      <table class="table align-items-center table-striped">
+                      <table class="table table-striped">
                         <thead class="thead-light">
                           <tr class="text-nowrap text-center">
                             <th scope="col">Sr No.</th>
                             <th scope="col">Comapany Name</th>
+                            <th scope="col">Job Name</th>
                             <th scope="col">Comapany Email Address</th>
                             <th scope="col">CDR Upload Date</th>
                             <th scope="col">CDR Folder id</th>
@@ -95,11 +102,24 @@ Company New Page
                         <tr class="text-nowrap text-center">
                           <td>{{ forloop.counter }}</td>
                           <td>{{ i.company_name  }}</td>
+                          <td>{{ i.job_name  }}</td>
                           <td>{{ i.company_email }}</td>
                           <td>{{ i.date }}</td>
-                   
-                          <td>{{ i.file_url }}</td>
-                            <td></td>       
+                          {% if i.file_url == '' %}
+                           No Data
+                          {% else %}
+                          <td> <a class="icon-link" href="{{ i.file_url }}"></a></td>
+
+                          {% endif %}
+                          
+                            <td><form method='POST' action= "{% url "delete_cdr" delete_id=i.id  %}">
+                              {% csrf_token %}
+                                                <button class="btn btn-sm btn-outline-danger ms-1 " onclick="return confirm('Are you sure you want to delete this item?')">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                                                      <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
+                                                    </svg>
+                                                </button>
+                            </form></td>       
                         </tr>  
                         {% endfor %}
                         </tbody>

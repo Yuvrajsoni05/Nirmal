@@ -24,6 +24,12 @@ admin.site.register(Job_detail,AdminJobDetails)
 class AdminCompanyDetail(admin.ModelAdmin):
     list_display  = ["id" ,"company_name"]
 admin.site.register(CompanyName,AdminCompanyDetail)
+
+
+class AdminCDRDetail(admin.ModelAdmin):
+    list_display = ["id" , 'company_name']
+admin.site.register(CDRDetail,AdminCDRDetail)
+
     
 # class AdminCompanyName(admin.ModelAdmin):
 #     list_display = ("company_name")

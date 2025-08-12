@@ -384,7 +384,10 @@ def dashboard_page(request):
         datas = p.get_page(page)
         total_job = db_sqlite3.count()
         company_name = CompanyName.objects.all()
+        count_of_company =  company_name.count()
+       
         cylinder_company_names = CylinderMadeIn.objects.all()
+        count_of_cylinder_compnay = cylinder_company_names.count() 
         nums = "a" * datas.paginator.num_pages  
         
         
@@ -416,6 +419,8 @@ def dashboard_page(request):
             'total_job': total_job,
             'company_name': company_name,
             'cylinder_company_names': cylinder_company_names,
+            'count_of_company':count_of_company,
+            'count_of_cylinder_compnay':count_of_cylinder_compnay,
             'total_sales':b,
             'total_purchase':a
         }
@@ -669,8 +674,7 @@ def add_data(request):
             #             messages.error(request,'Company Name Alredy Exsits',extra_tags='custom-success-style')
             #             return redirect('data_entry')
             if new_company != '':
-                
-                           
+       
                 if CompanyName.objects.filter(company_name__icontains=new_company).exists():
                     messages.error(request,"Company Name Alredy Exists",extra_tags='custom-success-style')
                     return redirect('data_entry')
@@ -1165,6 +1169,7 @@ def cdr_add(request):
         company_email = request.POST.get('company_email')
         cdr_upload_date = request.POST.get('cdr_upload_date')
         cdr_files  =       request.FILES.getlist('cdr_files')
+        job_name = request.POST.get('job_name')
 
         
 
@@ -1179,27 +1184,64 @@ def cdr_add(request):
             messages.error(request, "Enter a valid email address.",extra_tags="custom-success-style") 
             return redirect('company_add_page')
         
-        cdr_upload =  CDRDetail.objects.create(
-                date = cdr_upload_date,
-                company_email = company_email,
-                company_name = company_name,
+        data = {
+            'company_name':company_name,
+            'company_email':company_email,
+            'cdr_upload_date':cdr_upload_date,
+            'job_name':job_name
+        }
+        file_dic = {}
+        for i ,file in enumerate(cdr_files):
+            if file.name:
+                file_name_without  = file.name.rsplit('.',1)[0]
+                file_key = f"file_{i}_{file_name_without}"
+            else:
+                file_key = f"file_{i}"
                 
-        )
+            file_dic[file_key] = (file.name, file, file.content_type)
+            
+            
+        response = requests.post('http://localhost:5678/webhook/b85c2653-dc7d-40cb-923d-5b12b18fbff8',data=data,files=file_dic)
+        print(response.status_code)
         
-        for cdr_file in cdr_files:
+        
+        
+        # cdr_upload =  CDRDetail.objects.create(
+        #         date = cdr_upload_date,
+        #         company_email = company_email,
+        #         company_name = company_name,
+                
+        # )
+        
+        # for cdr_file in cdr_files:
   
-            file_name = cdr_file.name
-            file_path = os.path.join(settings.MEDIA_ROOT, file_name) 
+        #     file_name = cdr_file.name
+        #     file_path = os.path.join(settings.MEDIA_ROOT, file_name) 
 
-            os.makedirs(os.path.dirname(file_path), exist_ok=True) 
-            with open(file_path, 'wb+') as destination:
-                for chunk in cdr_file.chunks():   
-                    destination.write(chunk)
-            messages.success(request, "New Company Add Successfully")
+        #     os.makedirs(os.path.dirname(file_path), exist_ok=True) 
+        #     with open(file_path, 'wb+') as destination:
+        #         for chunk in cdr_file.chunks():   
+        #             destination.write(chunk)
+        messages.success(request, "New Company Add Successfully")
 
     return redirect('company_add_page')
     
+
+
+def cdr_delete(request,delete_id):
     
+    id = delete_id
+    print(id)
+    response = requests.delete(f"http://localhost:5678/webhook-test/d51a7064-e3b9-41f5-a76f-264e19f60b70/cdr/delete/{id}")
+    print(response.status_code)
+    if response.status_code != '200':
+        print("Delete")
+        delete_cdr = get_object_or_404(CDRDetail,id=id)
+        delete_cdr.delete()
+        messages.success(request,'CDR File Deleted')
+        return redirect('company_add_page')
+    
+    return redirect('company_add_page')
     
 def offline_page(request):
     return render(request,'Base/offline_page.html')

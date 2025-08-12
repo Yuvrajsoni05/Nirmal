@@ -23,6 +23,8 @@ urlpatterns = [
     
     path('company_add_page',comapny_add_page,name='company_add_page'),
     path('new_cdr_upload',cdr_add,name='new_cdr_upload'),
+    path('delete_cdr/<int:delete_id>/',cdr_delete,name='delete_cdr'),
+    
     
     path('offline_page',offline_page,name='offline-page'),
     

@@ -48,8 +48,8 @@
                       
                       <div class="col col-stats ms-3 ms-sm-0">
                         <div class="numbers">
-                          <p class="card-category">Total Purchase</p>
-                          <h4 class="card-title">{{ total_purchase|indian_currency_format }}</h4>
+                          <p class="card-category">Total Company</p>
+                          <h4 class="card-title">{{ count_of_company }}</h4>
                         </div>
                       </div>
                     </div>
@@ -63,8 +63,8 @@
                       
                       <div class="col col-stats ms-3 ms-sm-0">
                         <div class="numbers">
-                          <p class="card-category">Total Sales</p>
-                          <h4 class="card-title">{{ total_sales|indian_currency_format }}</h4>
+                          <p class="card-category">Total Cylinder Company</p>
+                          <h4 class="card-title">{{ count_of_cylinder_compnay }}</h4>
                         </div>
                       </div>
                     </div>
@@ -97,16 +97,16 @@
                         <form method="get" class="d-flex flex-wrap align-items-center" action="{% url 'dashboard_page' %}">
                           
                           <div class="form-outline me-2 mb-2 mb-sm-0 col-12 col-md-auto" data-mdb-input-init>
-                            <input type="date" name="date" id="date" class="form-control" value="{{ request.GET.date }}">
+                            <input type="month" name="date" id="date" class="form-control" value="{{ request.GET.date }}">
                           </div>
 
                           <div class="form-outline me-2 mb-2 mb-sm-0 col-12 col-md-auto" data-mdb-input-init>
                             <input type="text" name="q" id="q" class="form-control" value="{{request.GET.q}}" placeholder="Search Field">
                           </div>
 
-                          <div class="form-outline me-2 mb-2 mb-sm-0 col-12 col-md-auto" data-mdb-input-init>
+                          {% comment %} <div class="form-outline me-2 mb-2 mb-sm-0 col-12 col-md-auto" data-mdb-input-init>
                             <input type="text" name="cylinder_company" id="cylinder_comapany" class="form-control" value="{{request.GET.cylinder_comapany}}" placeholder="Search Cylinder Company Name">
-                          </div>
+                          </div> {% endcomment %}
 
                           <button type="submit" class="btn btn-primary me-2 mb-2 mb-sm-0 col-12 col-md-auto" data-mdb-ripple-init>
                             <i class="fa fa-search"></i>
@@ -525,12 +525,12 @@
                                                                                <select id="job_type" name="job_type" class="form-control form-select border-1" required>
                                                                                   <option value="{{ i.job_type }}">{{ i.job_type }}</option>
                                                                                   <option value="New Job" {% if i.job_type == "New Job" %}disabled {% endif %}>New Job</option>
-                                                                                  <option value="Old Job"{% if i.job_type == "Old Job" %}disabled {% endif %}>Old Job</option>
+                                                                                  <option value="Damage Repair"{% if i.job_type == "Damage Repair" %}disabled {% endif %}>Damage Repair</option>
                                                                                   <option value="Job Work"{% if i.job_type == "Job Work" %}disabled {% endif %}>Job Work</option>
                                                                               </select>
                                                                               
                                                                           </div>
-
+<option value="Damage Repair">Damage Repair</option>
                                                                           <!-- Job Name -->
                                                                           <div class="col-md-6">
                                                                               <label for="job_name" class="form-label fw-bold">Job Name</label>
