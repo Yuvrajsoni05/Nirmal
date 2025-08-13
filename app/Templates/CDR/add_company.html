@@ -28,7 +28,7 @@ Company New Page
             <div class="row mb-3">
               <div class="col-md-4">
                 <label for="comapany_name" class="form-label fw-semibold text-dark">Company Name</label><span style="color:red;"> *</span>
-                <input type="text" id="company_name" name="company_name" class="form-control" maxlength="15" placeholder="Company Name"  >
+                <input type="text" id="company_name" name="company_name" class="form-control" placeholder="Company Name"  >
                 <div class="invalid-feedback" id="company_name_error">Please provide a Company Name</div>
 
               </div>
@@ -52,16 +52,22 @@ Company New Page
             
           <div class="row mb-3">
 
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <label for="cdr_date" class="form-label fw-semibold text-dark">CDR Upload Date </label><span style="color:red;"> *</span>
                 <input type="date" id="cdr_upload_date" name="cdr_upload_date" class="form-control"  />
                 <span class="invalid-feedback" id="cdr_upload_date_error">Please Provide Date</span>
             </div>
 
-              <div class="col-md-6">
+              <div class="col-md-4">
                 <label for="cdr_files" class="form-label fw-semibold text-dark">Upload CDR File</label><span style="color:red;"> *</span>
-                <input type="file" id="cdr_files" name="cdr_files" class="form-control" multiple  />
+                <input type="file" id="cdr_files" name="cdr_files"  class="form-control" multiple accept=".jpeg , .png, .jpg .ai"  />
                 <span class="invalid-feedback" id="password_error">Please Provide Valid Password</span>
+              </div>
+
+              <div class="col-md-4">
+                <label for="cdr_files" class="form-label fw-semibold text-dark">CDR Correction</label>
+                <input type="textarea" id="cdr_corrections" name="cdr_corrections" placeholder="Enter CDR Corrections"  class="form-control"/>
+                
               </div>
             </div>
 
@@ -78,7 +84,41 @@ Company New Page
         </div>
       </div>
     </div>
-  </div>
+  </div><div class="row">
+              <div class="col-md-12">
+                <div class="card card-round">
+                  <div class="card-header">
+                    <div class="card-head-row card-tools-still-right">
+                      <div class="card-title">Job Details</div>
+                      <div class="card-tools">
+                        <form method="get" class="d-flex flex-wrap align-items-center" action="{% url 'company_add_page' %}">
+                          
+                          <div class="form-outline me-2 mb-2 mb-sm-0 col-12 col-md-auto" data-mdb-input-init>
+                            <input type="month" name="date" id="date" class="form-control" value="{{ request.GET.date }}">
+                          </div>
+
+                          <div class="form-outline me-2 mb-2 mb-sm-0 col-12 col-md-auto" data-mdb-input-init>
+                            <input type="text" name="search" id="search" class="form-control" value="{{request.GET.search}}" placeholder="Search Field">
+                          </div>
+
+                          {% comment %} <div class="form-outline me-2 mb-2 mb-sm-0 col-12 col-md-auto" data-mdb-input-init>
+                            <input type="text" name="cylinder_company" id="cylinder_comapany" class="form-control" value="{{request.GET.cylinder_comapany}}" placeholder="Search Cylinder Company Name">
+                          </div> {% endcomment %}
+
+                          <button type="submit" class="btn btn-primary me-2 mb-2 mb-sm-0 col-12 col-md-auto" data-mdb-ripple-init>
+                            <i class="fa fa-search"></i>
+                          </button>
+
+                          <a href="{% url 'company_add_page' %}">
+                            <button type="button" name="reset" class="btn btn-secondary col-12 col-md-auto mb-2 mb-sm-0" data-mdb-ripple-init>
+                              Reset
+                            </button>
+                          </a>
+                          
+                        </form>
+                      </div>
+                    </div>
+                  </div>
 
                   <div class="card-body p-0">
                     <div class="table-responsive" >
@@ -92,7 +132,7 @@ Company New Page
                             <th scope="col">Comapany Email Address</th>
                             <th scope="col">CDR Upload Date</th>
                             <th scope="col">CDR Folder id</th>
-                            <th scope="col">Actions</th>
+                            <th scope="col"  colspan="3">Actions</th>
                             
                            
                           </tr>
@@ -100,9 +140,9 @@ Company New Page
                         <tbody>
                         {% for i in cdr_details %}
                         <tr class="text-nowrap text-center">
-                          <td>{{ forloop.counter }}</td>
+                          <td>{{ forloop.counter|add:page_obj.start_index|add:"-1" }}</td>
                           <td>{{ i.company_name  }}</td>
-                          <td>{{ i.job_name  }}</td>
+                          <td title="{{i.job_name}}">{{ i.job_name|truncatechars:20  }}</td>
                           <td>{{ i.company_email }}</td>
                           <td>{{ i.date }}</td>
                           {% if i.file_url == '' %}
@@ -112,23 +152,132 @@ Company New Page
 
                           {% endif %}
                           
-                            <td><form method='POST' action= "{% url "delete_cdr" delete_id=i.id  %}">
-                              {% csrf_token %}
+                            <td><td class="text-truncate">
+                                                <form method="post" action="{% url "delete_cdr" delete_id=i.id %}" class="d-inline">
+                                                {% csrf_token %}
                                                 <button class="btn btn-sm btn-outline-danger ms-1 " onclick="return confirm('Are you sure you want to delete this item?')">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
                                                       <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
                                                     </svg>
                                                 </button>
-                            </form></td>       
+                                                </form>
+                                          
+                                               
+                                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#cdrupdate{{i.id}}">
+                                                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                                      <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+                                                    </svg>
+                                                          </button>
+                                         
+                                                        <button type="button" class="btn btn-sm btn-outline-success " data-bs-toggle="modal" data-bs-target="#emailModal{{i.id}}">
+                                                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope" viewBox="0 0 16 16">
+                                                              <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z"/>
+                                                            </svg>
+                                                          </button> 
+
+                                            </td> 
+                                                      <div class="modal fade"  id="cdrupdate{{i.id}}" tabindex="-1" aria-hidden="true">
+                                                              <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog modal-xl">
+                                                                <div class="modal-content ">
+                                                                  <div class="modal-header bg-light">
+                                                                    <h5 class="modal-title">Update CDR </h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                  </div>
+                                                                  <div class="modal-body form-datas">
+                                                                  
+                                                                    <form method="post"  action="{% url "update_cdr" update_id=i.id %}" enctype="multipart/form-data">
+                                                                          {% csrf_token %}
+                                                                          <div class="row g-4">
+
+                                                                          <!-- Event Date -->
+                                                                          <div class="col-md-6">
+                                                                              <label for="date" class="form-label fw-bold">Event Date</label><span style="color:red;"> *</span>
+                                                                              <input type="date" class="form-control" id="cdr_upload_date" name="cdr_upload_date" value="{{ i.date|date:'Y-m-d' }}" required>
+                                                                              <div class="invalid-feedback" id="event_date_error">Please provide an event date.</div>
+                                                                          </div>
+                                                                    
+
+                                                                          <!-- Company Name -->
+                                                                          <div class="col-md-6">
+                                                                              <label for="company_name" class="form-label fw-bold">Company Name</label>
+                                                                              <input type="text" id="company_name" class="form-control" name="company_name" value="{{ i.company_name }}" readonly>
+                                                                          </div>
+
+
+                                                                        <div class="col-md-6">
+                                                                              <label for="company_email" class="form-label fw-bold">Company Email</label>
+                                                                              <input type="text" id="company_email" class="form-control" name="company_email" value="{{ i.company_email }}" readonly>
+                                                                          </div>
+                                                                          
+                                                                          <!-- Job Name -->
+                                                                          <div class="col-md-6">
+                                                                              <label for="job_name" class="form-label fw-bold">Job Name</label>
+                                                                              <input type="text" id="job_name" class="form-control" name="job_name" value="{{ i.job_name }}" readonly>
+                                                                          </div>
+                                                                      
+
+                                                                          <div class="col-md-6">
+                                                                              <label for="image" class="form-label fw-bold">Upload Images</label>
+                                                                              <input type="file" class="form-control" id="files" name="files"  multiple accept=".jpeg , .png, .jpg .ai" >
+                                                                          </div>
+                                                                          
+
+                                          
+                                                                          </div>
+                                                                         
+                                                                      
+
+                                                                          <br>
+                                                                       
+                                                                        
+
+                                                                          <!-- Form Actions -->
+                                                                          <div class="col-12">
+                                                                              <a href="{% url "dashboard_page" %}">
+                                                                                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                              </a>
+                                                                              <button type="submit" class="btn btn-primary">Save changes</button>
+                                                                          </div>
+
+                                                                          </div>
+                                                                    </form>
+                                                                  
+                                                                </div>
+                                                            </div>
+                                                        </div>
                         </tr>  
                         {% endfor %}
                         </tbody>
                       </table>
                     </div>
                   </div>
+</div>
+</div>
 
+{% if cdr_details %}
+<nav aria-label="Page navigation example">
+    <div class="pagination-info">
+        Page {{ cdr_details.number }} of {{ cdr_details.paginator.num_pages }}
+    </div>
 
+    <ul class="pagination justify-content-end">
+        {% if cdr_details.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ cdr_details.previous_page_number }}&search={{ request.GET.search }}&date={{ request.GET.date }}">Previous</a></li>
+        {% endif %}
 
+        {% for i in cdr_details.paginator.page_range %}
+        <li class="page-item {% if cdr_details.number == i %}active{% endif %}">
+            <a class="page-link" href="?page={{ i }}&search={{ request.GET.search }}&date={{ request.GET.date }}">{{ i }}</a>
+        </li>
+        {% endfor %}
+
+        {% if cdr_details.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ cdr_details.next_page_number }}&q={{ request.GET.q }}&date={{ request.GET.date }}">Next</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
 
 
 

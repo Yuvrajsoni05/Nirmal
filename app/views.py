@@ -334,7 +334,7 @@ def dashboard_page(request):
             
         get_q = request.GET.get('q')
         date_s = request.GET.get('date')
-        cylinder_company = request.GET.get('cylinder_company')
+        # cylinder_company = request.GET.get('cylinder_company')
 
     
         db_sqlite3 = Job_detail.objects.all().order_by('id')
@@ -362,19 +362,17 @@ def dashboard_page(request):
         
         
         filters = Q()
-
+        
         if get_q:
-            filters &= (Q(job_name__icontains=get_q) | Q(company_name__icontains=get_q) | Q(cylinder_made_in__icontains=get_q)
-            )
-
+            filters &= (Q(job_name__icontains=get_q) |
+                        Q(company_name__icontains=get_q) |
+                        Q(cylinder_made_in__icontains=get_q))
+        
         if date_s:
             filters &= Q(date__icontains=date_s)
 
-        if cylinder_company:
-            filters &= Q(cylinder_made_in__icontains=cylinder_company)
-
-        if get_q or date_s or cylinder_company:
-            db_sqlite3 = db_sqlite3.filter(filters)
+        
+        db_sqlite3 = db_sqlite3.filter(filters)
 
         
         db_sqlite3 = db_sqlite3.order_by('id')
@@ -422,6 +420,7 @@ def dashboard_page(request):
             'count_of_company':count_of_company,
             'count_of_cylinder_compnay':count_of_cylinder_compnay,
             'total_sales':b,
+            'datas':datas,
             'total_purchase':a
         }
 
@@ -1155,40 +1154,100 @@ def user_password(request):
     
 def comapny_add_page(request):
     
-    cdr_data = CDRDetail.objects.all()
+    search = request.GET.get('search')
+    date = request.GET.get('date')
     
+    
+    
+    if search and date:
+        cdr_data = CDRDetail.objects.filter(
+            Q(date__icontains=date) &
+            (
+                Q(job_name__icontains=search) |
+                Q(company_name__icontains=search) |
+                Q(company_email__icontains=search)
+            )
+        )
+    
+   
+    elif search:
+        cdr_data  = CDRDetail.objects.filter(Q(job_name__icontains = search)| Q(company_name__icontains = search)| Q(company_email__icontains = search))
+    elif date:
+        cdr_data = CDRDetail.objects.filter(Q(date__icontains =  date))
+    
+
+    
+    else:
+        cdr_data = CDRDetail.objects.all().order_by('id')
+        
+    print(cdr_data)
+    p = Paginator(cdr_data,5)
+    
+    page =  request.GET.get('page')
+    
+    datas = p.get_page(page)
+    nums = "a" * datas.paginator.num_pages
     context = {
-        'cdr_details':cdr_data
+        
+        'nums': nums,
+
+        'cdr_details':datas,
+        'page_obj':datas,
+        
     }
     return render(request,'CDR/add_company.html',context)
 
 
 def cdr_add(request):
     if request.method == 'POST':
-        company_name = request.POST.get('company_name')
-        company_email = request.POST.get('company_email')
+        company_name = request.POST.get('company_name').strip()
+        company_email = request.POST.get('company_email').strip()
         cdr_upload_date = request.POST.get('cdr_upload_date')
-        cdr_files  =       request.FILES.getlist('cdr_files')
-        job_name = request.POST.get('job_name')
-
+        cdr_files  =  request.FILES.getlist('cdr_files')
+        job_name = request.POST.get('job_name').strip()
+        cdr_corrections = request.POST.get('cdr_corrections')
+        
+        print(cdr_corrections)
         
 
-        
-        if CDRDetail.objects.filter(company_email = company_email).exists():
-            messages.error(request,"Company Email is Alredy exists",extra_tags='custom-success-style')
+        if not cdr_files:
+            messages.error(request,"CDR File is Required",extra_tags='custom-success-style')
             return redirect('company_add_page')
         
+        
+        
+        
+                
+        if CDRDetail.objects.filter(company_name__icontains = company_name, company_email=company_email).exists():
+            print("Valid")
+        else:
+            if CDRDetail.objects.filter(company_name__icontains = company_name).exists():
+                messages.error(request,"Choose Another Compnay NAme")
+                return redirect('company_add_page')
+            if CDRDetail.objects.filter(company_email__icontains = company_email).exists():
+                messages.error(request,"Choose Another Email")
+                return redirect('company_add_page')
+            
+        
+        if CDRDetail.objects.filter(job_name__icontains = job_name).exists():
+            messages.error(request,'Choose Diffrent Job name ')
+            return redirect('company_add_page')
+
         
         email_regex = r"(?!.*([.-])\1)(?!.*([.-])$)(?!.*[.-]$)(?!.*[.-]{2})[a-zA-Z0-9_%+-][a-zA-Z0-9._%+-]*@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         if not re.match(email_regex, company_email):
             messages.error(request, "Enter a valid email address.",extra_tags="custom-success-style") 
             return redirect('company_add_page')
         
+        
+        
+
         data = {
             'company_name':company_name,
             'company_email':company_email,
             'cdr_upload_date':cdr_upload_date,
-            'job_name':job_name
+            'job_name':job_name,
+            
         }
         file_dic = {}
         for i ,file in enumerate(cdr_files):
@@ -1203,6 +1262,21 @@ def cdr_add(request):
             
         response = requests.post('http://localhost:5678/webhook/b85c2653-dc7d-40cb-923d-5b12b18fbff8',data=data,files=file_dic)
         print(response.status_code)
+        print(response.text)
+        data_string  = response.text
+        data_dict = json.loads(data_string)
+        id_number = data_dict['id']
+        print(id_number)
+        
+        
+        if response.status_code == '200':
+            
+            cdrdetail_data = CDRDetail.objects.all().get(id=id_number)
+            cdrdetail_data.cdr_corrections = cdr_corrections
+            
+            cdrdetail_data.save()
+        
+        
         
         
         
@@ -1223,6 +1297,7 @@ def cdr_add(request):
         #         for chunk in cdr_file.chunks():   
         #             destination.write(chunk)
         messages.success(request, "New Company Add Successfully")
+        return redirect('company_add_page')
 
     return redirect('company_add_page')
     
@@ -1241,6 +1316,58 @@ def cdr_delete(request,delete_id):
         messages.success(request,'CDR File Deleted')
         return redirect('company_add_page')
     
+    return redirect('company_add_page')
+
+
+
+
+
+def cdr_update(request,update_id):
+    
+    
+    id = update_id
+    
+    
+    if request.method == 'POST':
+        date = request.POST.get('cdr_upload_date')
+        
+        company_email = request.POST.get('company_email')
+        cdr_files = request.FILES.getlist('files')
+        company_name = request.POST.get('company_name')
+        job_name = request.POST.get('job_name')
+        
+        
+        
+        if not cdr_files:
+            update_details = get_object_or_404(CDRDetail,id=id)
+            update_details.company_email = company_email
+            update_details.date = date
+            update_details.save()
+            messages.success(request,"CDR Data Updated")
+            return redirect('company_add_page')
+        else:
+            
+            data = {
+                'date':date,
+                'company_email':company_email,
+                'company_name':company_name,
+                'job_name':job_name
+            }
+            file_dic = {}
+            for i ,file in enumerate(cdr_files):
+                if file.name:
+                    file_name_without  = file.name.rsplit('.',1)[0]
+                    file_key = f"file_{i}_{file_name_without}"
+                else:
+                    file_key = f"file_{i}"
+                    
+                file_dic[file_key] = (file.name, file, file.content_type)
+            print(id)
+            response = requests.post(f"http://localhost:5678/webhook/49b66188-95f8-48a3-8665-3c8d4aafa404/49b66188-95f8-48a3-8665-3c8d4aafa404/{id}",data=data,files=file_dic)
+            print(response.status_code)     
+             
+
+
     return redirect('company_add_page')
     
 def offline_page(request):

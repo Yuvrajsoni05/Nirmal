@@ -53,10 +53,11 @@ class CDRDetail(models.Model):
     date = models.DateField()
     company_name = models.CharField(max_length=200)
     job_name =  models.CharField(max_length=200,blank=True, null=True)
-    company_email = models.EmailField(blank=True, null=True,unique=True)
+    company_email = models.EmailField(blank=True, null=True,)
     # cdr_upload = models.FileField(upload_to='cdr_file/',blank=True, null=True)
     file_url = models.URLField(max_length=200,blank=True, null=True)
     image_url = models.URLField(max_length=900,blank=True, null=True)
+    cdr_corrections = models.TextField(max_length=900,blank=True, null=True)
     
      
      
